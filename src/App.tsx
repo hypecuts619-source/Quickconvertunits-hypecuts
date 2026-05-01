@@ -543,6 +543,21 @@ export default function App() {
     setIsSearchFocused(false);
   };
 
+  // Keyboard shortcuts (Ctrl+K to search)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement;
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   const activeCategory = categories.find((c) => c.id === category)!;
   const activeFromUnit = activeCategory.units.find((u) => u.id === unitFrom);
   const activeToUnit = activeCategory.units.find((u) => u.id === unitTo);
@@ -706,8 +721,11 @@ export default function App() {
                   onBlur={() =>
                     setTimeout(() => setIsSearchFocused(false), 200)
                   }
-                  className="w-full pl-9 pr-4 py-2 rounded-full bg-neutral-100 dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary-500/50 dark:focus:ring-primary-400/50 text-sm transition-shadow"
+                  className="w-full pl-9 pr-14 py-2 rounded-full bg-neutral-100 dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary-500/50 dark:focus:ring-primary-400/50 text-sm transition-shadow"
                 />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none">
+                  <span className="text-[10px] font-medium text-neutral-400 px-1.5 py-0.5 rounded-md border border-neutral-200 dark:border-neutral-700 bg-white/50 dark:bg-neutral-900/50">⌘K</span>
+                </div>
               </div>
               <AnimatePresence>
                 {isSearchFocused && suggestions.length > 0 && (
@@ -1378,19 +1396,17 @@ export default function App() {
             </div>
 
             <h3 className="text-xl font-semibold mb-3 tracking-tight">
-              Understanding {activeCategory.name} Conversions
+              Understanding {activeFromUnit?.name} to {activeToUnit?.name} Conversions
             </h3>
+            <p className="mb-4 leading-relaxed font-light text-neutral-600 dark:text-neutral-400">
+              Converting <strong>{activeFromUnit?.name}</strong> to <strong>{activeToUnit?.name}</strong> is simple with our tool. 
+              {activeFromUnit?.description ? ` ${activeFromUnit.description}` : ""}
+              {activeToUnit?.description ? ` ${activeToUnit.description}` : ""}
+            </p>
             <p className="mb-8 leading-relaxed font-light text-neutral-600 dark:text-neutral-400">
-              Whether you are a student, engineer, or just need a quick
-              calculation on your phone, QuickConvert is designed to be fast and
-              mobile-friendly. It supports a wide range of units in the{" "}
-              {activeCategory.name.toLowerCase()} category, including{" "}
-              {activeCategory.units
-                .slice(0, 3)
-                .map((u) => u.name.toLowerCase())
-                .join(", ")}{" "}
-              and more. Want to learn more about the fascinating world of
-              measurements? Check out our{" "}
+              Our <em>{activeCategory.name.toLowerCase()} calculator</em> supports a wide range of units including {activeCategory.units.slice(0, 4).map((u) => u.name.toLowerCase()).join(", ")} and more. QuickConvert provides fast, responsive calculations designed for mobile and desktop users.
+              Want to learn more about the fascinating world of measurements? Check
+              out our{" "}
               <Link
                 to="/blog"
                 className="text-primary-600 dark:text-primary-400 hover:underline"
@@ -1399,6 +1415,28 @@ export default function App() {
               </Link>{" "}
               for detailed guides and tips.
             </p>
+
+            <h3 className="text-xl font-semibold mb-4 tracking-tight mt-10">
+              Conversion Table: {activeFromUnit?.name} to {activeToUnit?.name}
+            </h3>
+            <div className="overflow-x-auto mb-10">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-neutral-200 dark:border-neutral-800">
+                    <th className="py-3 px-4 font-medium text-neutral-900 dark:text-neutral-100">{activeFromUnit?.name}</th>
+                    <th className="py-3 px-4 font-medium text-neutral-900 dark:text-neutral-100">{activeToUnit?.name}</th>
+                  </tr>
+                </thead>
+                <tbody className="text-neutral-600 dark:text-neutral-400 font-light">
+                  {[1, 5, 10, 25, 50, 100, 500, 1000].map(val => (
+                    <tr key={val} className="border-b border-neutral-100 dark:border-neutral-800/50 hover:bg-neutral-50 dark:hover:bg-neutral-800/20">
+                      <td className="py-3 px-4">{val} {activeFromUnit?.symbol}</td>
+                      <td className="py-3 px-4">{convert(val, unitFrom, unitTo, category).toLocaleString(undefined, { maximumFractionDigits: 4 })} {activeToUnit?.symbol}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
             <h3 className="text-xl font-semibold mb-4 tracking-tight">
               Frequently Asked Questions
@@ -1437,7 +1475,13 @@ export default function App() {
               </p>
               <p className="opacity-80 font-medium">🛡️ Strictly Local: Your conversion data never leaves your device.</p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center justify-center md:justify-end gap-x-4 gap-y-2">
+              <Link
+                to="/about"
+                className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+              >
+                About Us
+              </Link>
               <Link
                 to="/blog"
                 className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
@@ -1445,10 +1489,22 @@ export default function App() {
                 Blog
               </Link>
               <Link
+                to="/contact"
+                className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+              >
+                Contact
+              </Link>
+              <Link
+                to="/terms"
+                className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+              >
+                Terms
+              </Link>
+              <Link
                 to="/privacy-policy"
                 className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
               >
-                Privacy Policy
+                Privacy
               </Link>
             </div>
           </div>

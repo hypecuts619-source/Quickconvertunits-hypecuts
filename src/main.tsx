@@ -3,6 +3,9 @@ import {createRoot} from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import App from './App.tsx';
 import PrivacyPolicy from './PrivacyPolicy.tsx';
+import TermsOfService from './TermsOfService.tsx';
+import AboutUs from './AboutUs.tsx';
+import Contact from './Contact.tsx';
 import Blog from './Blog.tsx';
 import BlogPost from './BlogPost.tsx';
 import './index.css';
@@ -13,6 +16,9 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
       </Routes>

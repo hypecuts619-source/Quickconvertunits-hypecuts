@@ -161,6 +161,22 @@ export const categories: UnitCategory[] = [
     ],
   },
   {
+    id: 'cooking',
+    name: 'Cooking',
+    baseUnit: 'milliliter',
+    units: [
+      { id: 'milliliter', name: 'Milliliter', symbol: 'mL', factor: 1, description: 'A metric unit of volume equal to one thousandth of a liter.' },
+      { id: 'liter', name: 'Liter', symbol: 'L', factor: 1000, description: 'A metric unit of volume equal to 1 cubic decimeter.' },
+      { id: 'teaspoon_us', name: 'US Teaspoon', symbol: 'tsp', factor: 4.92892, description: 'A US customary unit of volume, used in recipes and cooking.' },
+      { id: 'tablespoon_us', name: 'US Tablespoon', symbol: 'tbsp', factor: 14.7868, description: 'A US customary unit of volume equal to 3 teaspoons.' },
+      { id: 'cup_us', name: 'US Cup', symbol: 'cup', factor: 236.588, description: 'A US customary unit of volume, used extensively in cooking and baking.' },
+      { id: 'fluid_ounce_us', name: 'US Fluid Ounce', symbol: 'fl oz', factor: 29.5735, description: 'A unit of volume in the US customary system.' },
+      { id: 'pint_us', name: 'US Pint', symbol: 'pt', factor: 473.176, description: 'A metric unit of volume equal to 16 US fluid ounces.' },
+      { id: 'quart_us', name: 'US Quart', symbol: 'qt', factor: 946.353, description: 'A US customary unit equal to 2 pints.' },
+      { id: 'gallon_us', name: 'US Gallon', symbol: 'gal', factor: 3785.41, description: 'A US customary unit equal to 4 quarts.' },
+    ]
+  },
+  {
     id: 'currency',
     name: 'Currency',
     baseUnit: 'usd',
