@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, lazy, Suspense } from "react";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { getSuggestions, convert, categories } from "./lib/units";
 import { categorySeoContent } from "./lib/seoContent";
@@ -28,6 +28,8 @@ import {
 } from "lucide-react";
 import { UnitSelector } from "./components/UnitSelector";
 import { motion, AnimatePresence } from "motion/react";
+
+const ConversionChart = lazy(() => import("./components/ConversionChart"));
 
 const POPULAR = [
   { label: "Kilometers → Miles", cat: "length", fu: "kilometer", tu: "mile" },
@@ -122,15 +124,6 @@ interface HistoryItem {
   cat: string;
   timestamp: string;
 }
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-} from "recharts";
 
 const themes = ["blue", "rose", "emerald", "violet", "amber"];
 
@@ -294,106 +287,7 @@ function PwaPrompt() {
   );
 }
 
-function ConversionChart({
-  categoryId,
-  valFrom,
-  unitFrom,
-  theme,
-}: {
-  categoryId: string;
-  valFrom: string;
-  unitFrom: string;
-  theme: string;
-}) {
-  if (categoryId !== "energy" && categoryId !== "data_storage") return null;
-  const numVal = parseFloat(valFrom);
-  if (isNaN(numVal) || numVal <= 0) return null; // Log scale requires positive values
 
-  const activeCat = categories.find((c) => c.id === categoryId);
-  if (!activeCat) return null;
-
-  const data = activeCat.units.map((u) => {
-    let rawVal = convert(numVal, unitFrom, u.id, categoryId);
-    return {
-      name: u.symbol,
-      fullName: u.name,
-      value: rawVal,
-    };
-  });
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      const val = payload[0].value;
-      const formatted =
-        val >= 1000 || val < 0.01 ? val.toExponential(4) : val.toPrecision(4);
-      return (
-        <div className="bg-white dark:bg-neutral-800 p-3 shadow-lg rounded-xl border border-neutral-200 dark:border-neutral-700 text-sm">
-          <p className="font-semibold text-neutral-900 dark:text-neutral-100">
-            {payload[0].payload.fullName}
-          </p>
-          <p className="text-primary-600 dark:text-primary-400 mt-1">
-            {formatted} {label}
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
-
-  // Try to use CSS variable for fill color if supported by Recharts, or fallback
-  const getThemeColor = () => {
-    switch (theme) {
-      case "rose":
-        return "#e11d48";
-      case "emerald":
-        return "#10b981";
-      case "violet":
-        return "#8b5cf6";
-      case "amber":
-        return "#f59e0b";
-      default:
-        return "#3b82f6";
-    }
-  };
-
-  return (
-    <div className="mt-8 bg-white dark:bg-neutral-800 py-6 px-4 md:px-6 rounded-3xl shadow-xl shadow-neutral-200/50 dark:shadow-none border border-neutral-100 dark:border-neutral-700 w-full h-[350px]">
-      <h3 className="text-center font-semibold mb-6 text-neutral-800 dark:text-neutral-200">
-        Equivalent {activeCat.name} (Logarithmic Scale)
-      </h3>
-      <ResponsiveContainer width="100%" height="80%">
-        <BarChart
-          data={data}
-          margin={{ top: 10, right: 10, left: 10, bottom: 20 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" opacity={0.2} vertical={false} />
-          <XAxis
-            dataKey="name"
-            tick={{ fontSize: 11, fill: "#6b7280" }}
-            axisLine={false}
-            tickLine={false}
-            dy={10}
-            interval="preserveStartEnd"
-            tickFormatter={(val) =>
-              val.length > 6 ? val.substring(0, 5) + ".." : val
-            }
-          />
-          <YAxis scale="log" domain={["auto", "auto"]} hide />
-          <Tooltip
-            cursor={{ fill: "rgba(156, 163, 175, 0.1)" }}
-            content={<CustomTooltip />}
-          />
-          <Bar
-            dataKey="value"
-            fill={getThemeColor()}
-            radius={[4, 4, 0, 0]}
-            maxBarSize={40}
-          />
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
-  );
-}
 
 export default function App() {
   const { conversion } = useParams();
@@ -1086,19 +980,64 @@ export default function App() {
                       }
                     }}
                     autoFocus
-                    className="w-full bg-transparent text-4xl md:text-5xl lg:text-6xl font-light focus:outline-none text-neutral-900 dark:text-white pr-10 tracking-tight"
+                    className="w-full bg-transparent text-4xl md:text-5xl lg:text-6xl font-light focus:outline-none text-neutral-900 dark:text-white pr-20 tracking-tight"
                     placeholder="0"
                     inputMode="decimal"
                   />
-                  {valFrom && (
-                    <button
-                      onClick={handleClear}
-                      className="absolute right-0 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors opacity-0 group-focus-within:opacity-100 hover:opacity-100 focus:opacity-100 p-2"
-                      aria-label="Clear value"
-                    >
-                      <X className="w-6 h-6" />
-                    </button>
-                  )}
+                  <div className="absolute right-0 flex items-center gap-1 opacity-0 group-focus-within:opacity-100 hover:opacity-100 focus:opacity-100 transition-opacity">
+                    {(window as any).SpeechRecognition || (window as any).webkitSpeechRecognition ? (
+                      <button
+                        onClick={() => {
+                          const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+                          if (!SpeechRecognition) return;
+                          const recognition = new SpeechRecognition();
+                          recognition.continuous = false;
+                          recognition.interimResults = false;
+                          recognition.lang = 'en-US';
+                          
+                          recognition.onstart = () => {
+                            const toast = document.getElementById('error-toast');
+                            if (toast) {
+                              toast.textContent = "🎙️ Listening... Say a number";
+                              toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+                            }
+                          };
+                          
+                          recognition.onresult = (event: any) => {
+                            const transcript = event.results[0][0].transcript;
+                            // Extract first number found in speech
+                            const match = transcript.match(/-?\d*\.?\d+/);
+                            if (match) {
+                              setValFrom(match[0]);
+                            }
+                            const toast = document.getElementById('error-toast');
+                            if (toast) toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+                          };
+                          
+                          recognition.onerror = () => {
+                            const toast = document.getElementById('error-toast');
+                            if (toast) toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+                          };
+                          
+                          recognition.start();
+                        }}
+                        className="p-2 text-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors bg-primary-50/50 dark:bg-primary-900/20 rounded-lg"
+                        title="Dictate number"
+                        aria-label="Voice input"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/><line x1="8" x2="16" y1="22" y2="22"/></svg>
+                      </button>
+                    ) : null}
+                    {valFrom && (
+                      <button
+                        onClick={handleClear}
+                        className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors p-2"
+                        aria-label="Clear value"
+                      >
+                        <X className="w-6 h-6" />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -1426,12 +1365,14 @@ export default function App() {
           </motion.div>
 
           {/* Conversion Chart for Specific Categories */}
-          <ConversionChart
-            categoryId={category}
-            valFrom={valFrom}
-            unitFrom={unitFrom}
-            theme={theme}
-          />
+          <Suspense fallback={<div className="mt-8 h-[350px] flex items-center justify-center bg-white dark:bg-neutral-800 rounded-3xl border border-neutral-100 dark:border-neutral-700">Loading chart...</div>}>
+            <ConversionChart
+              categoryId={category}
+              valFrom={valFrom}
+              unitFrom={unitFrom}
+              theme={theme}
+            />
+          </Suspense>
 
           {/* AD: Below Result Ad */}
           <AdSlot
@@ -1744,27 +1685,61 @@ export default function App() {
             </p>
 
             <div className="grid md:grid-cols-2 gap-6 my-10">
-              {activeFromUnit?.description && (
-                <div className="bg-white dark:bg-[#111] p-8 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none">
-                  <h3 className="font-semibold text-lg mb-3 tracking-tight">
-                    About {activeFromUnit.name}
-                  </h3>
-                  <p className="text-neutral-500 dark:text-neutral-400 text-sm leading-relaxed font-light">
-                    {activeFromUnit.description}
-                  </p>
+              {/* Conversion Table generated correctly using the convert function */}
+              <div className="bg-white dark:bg-[#111] p-8 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none overflow-hidden">
+                <h3 className="font-semibold text-lg mb-4 tracking-tight flex items-center justify-between">
+                  <span>{activeFromUnit?.name} to {activeToUnit?.name} Table</span>
+                  <Table className="w-5 h-5 text-neutral-400" />
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-neutral-100 dark:border-neutral-800 text-left">
+                        <th className="pb-3 text-neutral-500 font-medium">{activeFromUnit?.name} ({activeFromUnit?.symbol})</th>
+                        <th className="pb-3 text-neutral-500 font-medium text-right">{activeToUnit?.name} ({activeToUnit?.symbol})</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[1, 5, 10, 50, 100, 500, 1000].map(val => {
+                        let res = 0;
+                        if (activeCategory && activeFromUnit && activeToUnit) {
+                          res = convert(val, activeFromUnit.id, activeToUnit.id, activeCategory.id);
+                        }
+                        const displayRes = Number.isInteger(res) ? res.toString() : parseFloat(res.toPrecision(7)).toString();
+                        return (
+                        <tr key={val} className="border-b border-neutral-50 dark:border-neutral-800/50 last:border-0 hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors">
+                          <td className="py-3 font-medium text-neutral-700 dark:text-neutral-300">{val} {activeFromUnit?.symbol}</td>
+                          <td className="py-3 text-right font-mono text-primary-600 dark:text-primary-400">{displayRes} {activeToUnit?.symbol}</td>
+                        </tr>
+                      )})}
+                    </tbody>
+                  </table>
                 </div>
-              )}
-              {activeToUnit?.description &&
-                activeToUnit.id !== activeFromUnit?.id && (
-                  <div className="bg-white dark:bg-[#111] p-8 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none">
+              </div>
+
+              <div className="flex flex-col gap-6">
+                {activeFromUnit?.description && (
+                  <div className="bg-white dark:bg-[#111] p-6 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none flex-1">
                     <h3 className="font-semibold text-lg mb-3 tracking-tight">
-                      About {activeToUnit.name}
+                      About {activeFromUnit.name}
                     </h3>
                     <p className="text-neutral-500 dark:text-neutral-400 text-sm leading-relaxed font-light">
-                      {activeToUnit.description}
+                      {activeFromUnit.description}
                     </p>
                   </div>
                 )}
+                {activeToUnit?.description &&
+                  activeToUnit.id !== activeFromUnit?.id && (
+                    <div className="bg-white dark:bg-[#111] p-6 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none flex-1">
+                      <h3 className="font-semibold text-lg mb-3 tracking-tight">
+                        About {activeToUnit.name}
+                      </h3>
+                      <p className="text-neutral-500 dark:text-neutral-400 text-sm leading-relaxed font-light">
+                        {activeToUnit.description}
+                      </p>
+                    </div>
+                  )}
+              </div>
             </div>
 
             <div className="bg-white dark:bg-[#111] p-8 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none mb-10">
