@@ -21,6 +21,12 @@ export default function BlogPost() {
 
   return (
     <div className="min-h-screen text-neutral-900 dark:text-neutral-100 font-sans p-6 md:p-12">
+      {post.faqSchema && (
+        <script 
+          type="application/ld+json" 
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(post.faqSchema) }} 
+        />
+      )}
       <div className="max-w-3xl mx-auto">
         <Link to="/blog" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-100 dark:bg-[#1a1a1a] hover:bg-neutral-200 dark:hover:bg-[#222] font-medium text-sm transition-colors mb-10 text-neutral-800 dark:text-neutral-200 border border-transparent dark:border-neutral-800">
           <ArrowLeft className="w-4 h-4" /> Back to Articles

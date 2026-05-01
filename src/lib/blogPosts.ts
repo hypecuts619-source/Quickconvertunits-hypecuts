@@ -5,6 +5,28 @@ export const blogPosts = [
     excerpt: 'Ever wondered how many ounces are in a gallon? Whether you are brewing beer, measuring water intake, or cooking, here is the definitive breakdown answering your question.',
     date: 'April 28, 2026',
     readTime: '6 min read',
+    faqSchema: {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How many ounces in a gallon?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "1 US gallon equals 128 fluid ounces, while 1 UK gallon equals 160 fluid ounces."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many 16 oz bottles are in a gallon?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "There are 8 bottles of 16 ounces in 1 US gallon."
+          }
+        }
+      ]
+    },
     content: `
       <p class="lead text-xl text-neutral-600 dark:text-neutral-300 mb-8">
         Are you trying to measure your daily water intake, scale up a soup recipe, or convert fluid ounces to gallons for a science project? The answer to "how many ounces in a gallon?" depends on where you are in the world.
@@ -41,6 +63,20 @@ export const blogPosts = [
       <p>
         If your goal is to drink a gallon of water a day, you will need to consume 128 ounces. If you have a standard 16-ounce water bottle, you need to drink exactly 8 of those bottles in a day to hit one gallon.
       </p>
+
+      <h2>Frequently Asked Questions</h2>
+      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">How many ounces in a gallon?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">1 US gallon equals 128 fluid ounces, while 1 UK gallon equals 160 fluid ounces.</p>
+        </div>
+      </div>
+      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">How many 16 oz bottles are in a gallon?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">There are 8 bottles of 16 ounces in 1 US gallon.</p>
+        </div>
+      </div>
     `
   },
   {
@@ -49,6 +85,28 @@ export const blogPosts = [
     excerpt: 'A deep dive into the history of the two most common temperature scales in the world, and how to accurately convert between them without a calculator.',
     date: 'April 22, 2026',
     readTime: '7 min read',
+    faqSchema: {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the formula to convert Celsius to Fahrenheit?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The formula is (°C × 9/5) + 32 = °F."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is 0 degrees Celsius in Fahrenheit?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "0 degrees Celsius is equal to 32 degrees Fahrenheit, which is the freezing point of water."
+          }
+        }
+      ]
+    },
     content: `
       <p class="lead text-xl text-neutral-600 dark:text-neutral-300 mb-8">
         When traveling from the United States to almost anywhere else in the world, the shift from Fahrenheit to Celsius is often the most confusing change. Let's look at the history of these two scales and how to convert them.
@@ -85,6 +143,20 @@ export const blogPosts = [
       <p>
         <em>Example:</em> 20°C (x 2 = 40 + 30 = 70°F). The exact temperature is 68°F, so this trick gets you very close!
       </p>
+
+      <h2>Frequently Asked Questions</h2>
+      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">What is the formula to convert Celsius to Fahrenheit?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">The formula is (°C × 9/5) + 32 = °F.</p>
+        </div>
+      </div>
+      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">What is 0 degrees Celsius in Fahrenheit?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">0 degrees Celsius is equal to 32 degrees Fahrenheit, which is the freezing point of water.</p>
+        </div>
+      </div>
     `
   },
   {
@@ -93,6 +165,28 @@ export const blogPosts = [
     excerpt: 'Comparing yards and meters can be confusing. Uncover the exact differences between a yard and a meter and how they impact sports like football and track.',
     date: 'April 15, 2026',
     readTime: '5 min read',
+    faqSchema: {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Which is longer a meter or a yard?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A meter is longer than a yard. One meter equals approximately 1.0936 yards."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many meters are in a 100 yard dash?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A 100-yard dash is equivalent to exactly 91.44 meters."
+          }
+        }
+      ]
+    },
     content: `
       <p class="lead text-xl text-neutral-600 dark:text-neutral-300 mb-8">
         Why are swimming pools measured in meters while American football fields are measured in yards? The intersection of meters and yards in sports creates endless confusion for global fans.
@@ -120,6 +214,20 @@ export const blogPosts = [
       <p>
         To get a quick estimate: add 10% to meters to get yards, or subtract 10% from yards to get meters.
       </p>
+
+      <h2>Frequently Asked Questions</h2>
+      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">Which is longer a meter or a yard?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">A meter is longer than a yard. One meter equals approximately 1.0936 yards.</p>
+        </div>
+      </div>
+      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">How many meters are in a 100 yard dash?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">A 100-yard dash is equivalent to exactly 91.44 meters.</p>
+        </div>
+      </div>
     `
   },
   {
@@ -128,6 +236,28 @@ export const blogPosts = [
     excerpt: 'Learn the simple formula and mental math tricks to quickly convert Celsius to Fahrenheit for your travels or cooking needs.',
     date: 'April 8, 2026',
     readTime: '3 min read',
+    faqSchema: {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the easiest way to convert Celsius to Fahrenheit?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A quick mental math trick is to double the Celsius temperature and add 30 for a rough approximation."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is 20 Celsius hot or cold?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "20 degrees Celsius is roughly 68 degrees Fahrenheit, which is generally considered room temperature or mild."
+          }
+        }
+      ]
+    },
     content: `
       <p class="lead text-xl text-neutral-600 dark:text-neutral-300 mb-8">
         Converting Celsius to Fahrenheit manually is easier than you think. Learn the classic formula and a mental math trick you can do without a calculator.
@@ -150,6 +280,20 @@ export const blogPosts = [
         <li>Add 30.</li>
       </ol>
       <p>If looking at 25°C, doubling it is 50. Add 30 = 80°F. (The exact temperature is actually 77°F, but 80 is close enough to know you should wear a T-shirt!).</p>
+
+      <h2>Frequently Asked Questions</h2>
+      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">What is the easiest way to convert Celsius to Fahrenheit?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">A quick mental math trick is to double the Celsius temperature and add 30 for a rough approximation.</p>
+        </div>
+      </div>
+      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">Is 20 Celsius hot or cold?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">20 degrees Celsius is roughly 68 degrees Fahrenheit, which is generally considered room temperature or mild.</p>
+        </div>
+      </div>
     `
   },
   {
@@ -158,6 +302,28 @@ export const blogPosts = [
     excerpt: 'Everything you need to know about converting km to miles. Learn the exact 1.609 km to mile conversion ratio, perfect for runners and road trips.',
     date: 'April 1, 2026',
     readTime: '4 min read',
+    faqSchema: {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How many kilometers are in a mile?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "There are exactly 1.60934 kilometers in one mile."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a 5K race in miles?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A 5K (5 kilometer) race is approximately 3.1 miles long."
+          }
+        }
+      ]
+    },
     content: `
       <p class="lead text-xl text-neutral-600 dark:text-neutral-300 mb-8">
         Whether you're training for a 5K or planning a European road trip, understanding how kilometers translate to miles is essential.
@@ -175,6 +341,20 @@ export const blogPosts = [
       <p>
         5 miles happens to equal roughly 8 kilometers. 8 miles is roughly 13 kilometers. 13 miles is roughly 21 kilometers! This is because the ratio between two consecutive Fibonacci numbers gets closer and closer to the golden ratio (1.618), which is incredibly close to 1.609.
       </p>
+
+      <h2>Frequently Asked Questions</h2>
+      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">How many kilometers are in a mile?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">There are exactly 1.60934 kilometers in one mile.</p>
+        </div>
+      </div>
+      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">What is a 5K race in miles?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">A 5K (5 kilometer) race is approximately 3.1 miles long.</p>
+        </div>
+      </div>
     `
   }
 ];
