@@ -43,6 +43,131 @@ function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1).replace(/_/g, " ");
 }
 
+function applySEO(urlPath: string, template: string): string {
+  // ensure leading slash is removed
+  urlPath = urlPath.replace(/^\//, "");
+  
+  if (urlPath && urlPath.includes("-to-")) {
+    const parts = urlPath.split("-to-");
+    if (parts.length === 2) {
+      const fromId = parts[0];
+      const toId = parts[1];
+      
+      const fromUnit = popularUnits[fromId] || { name: capitalize(fromId), symbol: capitalize(fromId) };
+      const toUnit = popularUnits[toId] || { name: capitalize(toId), symbol: capitalize(toId) };
+      
+      const title = `${fromUnit.symbol.toUpperCase()} to ${toUnit.symbol.toUpperCase()} Converter | ${fromUnit.name} to ${toUnit.name} Fast`;
+      const description = `Convert ${fromUnit.name.toLowerCase()} to ${toUnit.name.toLowerCase()} instantly and accurately. Enter value, select units—get results to 10 decimals. Perfect for cooking, fitness, shipping.`;
+
+      template = template.replace(
+        /<title>(.*?)<\/title>/,
+        `<title>${title} - QuickConvert</title>`
+      );
+      template = template.replace(
+        /<meta name="description" content="(.*?)" \/>/,
+        `<meta name="description" content="${description}" />`
+      );
+      template = template.replace(
+        /<meta property="og:title" content="(.*?)" \/>/,
+        `<meta property="og:title" content="${title} - QuickConvert" />`
+      );
+      template = template.replace(
+        /<meta property="og:description" content="(.*?)" \/>/,
+        `<meta property="og:description" content="${description}" />`
+      );
+      template = template.replace(
+        /<meta property="og:url" content="(.*?)" \/>/,
+        `<meta property="og:url" content="https://quickconvertunits.com/${urlPath}" />`
+      );
+      
+      const staticContent = `
+        <div style="display:none;" aria-hidden="true">
+          <h1>${fromUnit.name} to ${toUnit.name} Converter</h1>
+          <p>${description}</p>
+          <section>
+            <h2>How to convert ${fromUnit.name} to ${toUnit.name}</h2>
+            <p>To convert a value from ${fromUnit.name} to ${toUnit.name}, simply use our fast, responsive calculator above. Enter any number into the ${fromUnit.name} field and the conversion to ${toUnit.name} will evaluate instantly. We use the most precise conversion rates available.</p>
+          </section>
+          <section>
+            <h2>Quick Conversion Reference</h2>
+            <ul>
+              <li>1 ${fromUnit.name} to ${toUnit.name}</li>
+              <li>5 ${fromUnit.name} to ${toUnit.name}</li>
+              <li>10 ${fromUnit.name} to ${toUnit.name}</li>
+              <li>50 ${fromUnit.name} to ${toUnit.name}</li>
+              <li>100 ${fromUnit.name} to ${toUnit.name}</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Frequently Asked Questions</h2>
+            <h3>How do I convert ${fromUnit.name} to ${toUnit.name}?</h3>
+            <p>Enter the number of ${fromUnit.symbol} you wish to convert in the top input box. The corresponding ${toUnit.symbol} value will instantly populate in the bottom input box.</p>
+            <h3>Is this ${fromUnit.name} to ${toUnit.name} converter free?</h3>
+            <p>Yes, all conversions on QuickConvertUnits including ${fromUnit.name} to ${toUnit.name} are 100% free and work offline.</p>
+            <h3>Why should I use this converter?</h3>
+            <p>We built this tool to provide instant, precise unit conversions without intrusive ads. The ${fromUnit.name} to ${toUnit.name} tool works perfectly on both mobile and desktop.</p>
+          </section>
+        </div>
+      `;
+
+      // Replace the placeholder static content with our custom SEO block
+      template = template.replace(
+        /<div style="display:none;" aria-hidden="true">[\s\S]*?<\/div>/,
+        staticContent
+      );
+      
+      // Basic Schema.org injection
+      const schema = {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebApplication",
+            "name": `${title} - QuickConvert`,
+            "applicationCategory": "UtilityApplications",
+            "operatingSystem": "All",
+            "description": description,
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": `How do I convert ${fromUnit.name} to ${toUnit.name}?`,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": `Enter the number of ${fromUnit.name} you wish to convert in the top input box. The corresponding ${toUnit.name} value will instantly populate in the bottom input box.`
+                }
+              },
+              {
+                "@type": "Question",
+                "name": `Is this ${fromUnit.name} to ${toUnit.name} converter free?`,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": `Yes, all conversions on QuickConvertUnits including ${fromUnit.name} to ${toUnit.name} are 100% free and work offline.`
+                }
+              },
+              {
+                "@type": "Question",
+                "name": `Why should I use this converter?`,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": `We built this tool to provide instant, precise unit conversions without intrusive ads. The ${fromUnit.name} to ${toUnit.name} tool works perfectly on both mobile and desktop.`
+                }
+              }
+            ]
+          }
+        ]
+      };
+      
+      template = template.replace(
+        /<\/head>/,
+        `<script type="application/ld+json">${JSON.stringify(schema)}</script></head>`
+      );
+    }
+  }
+  return template;
+}
+
 async function startServer() {
   const app = express();
   const PORT = 3000;
@@ -59,9 +184,22 @@ async function startServer() {
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
-      appType: "spa",
+      appType: "custom",
     });
     app.use(vite.middlewares);
+
+    app.get("*", async (req, res) => {
+      let template = "";
+      try {
+        template = fs.readFileSync(path.resolve(__dirname, "index.html"), "utf-8");
+        template = await vite.transformIndexHtml(req.originalUrl, template);
+      } catch (e) {
+        return res.status(500).send("index.html not found.");
+      }
+
+      template = applySEO(req.path, template);
+      res.status(200).set({ "Content-Type": "text/html" }).send(template);
+    });
   } else {
     const distPath = path.resolve(__dirname, "dist");
     
@@ -79,126 +217,7 @@ async function startServer() {
         return res.status(500).send("index.html not found. Did you build the app?");
       }
 
-      const urlPath = req.path.replace(/^\//, "");
-      
-      if (urlPath && urlPath.includes("-to-")) {
-        const parts = urlPath.split("-to-");
-        if (parts.length === 2) {
-          const fromId = parts[0];
-          const toId = parts[1];
-          
-          const fromUnit = popularUnits[fromId] || { name: capitalize(fromId), symbol: capitalize(fromId) };
-          const toUnit = popularUnits[toId] || { name: capitalize(toId), symbol: capitalize(toId) };
-          
-          const title = `${fromUnit.symbol.toUpperCase()} to ${toUnit.symbol.toUpperCase()} Converter | ${fromUnit.name} to ${toUnit.name} Fast`;
-          const description = `Convert ${fromUnit.name.toLowerCase()} to ${toUnit.name.toLowerCase()} instantly and accurately. Enter value, select units—get results to 10 decimals. Perfect for cooking, fitness, shipping.`;
-
-          template = template.replace(
-            /<title>(.*?)<\/title>/,
-            `<title>${title} - QuickConvert</title>`
-          );
-          template = template.replace(
-            /<meta name="description" content="(.*?)" \/>/,
-            `<meta name="description" content="${description}" />`
-          );
-          template = template.replace(
-            /<meta property="og:title" content="(.*?)" \/>/,
-            `<meta property="og:title" content="${title} - QuickConvert" />`
-          );
-          template = template.replace(
-            /<meta property="og:description" content="(.*?)" \/>/,
-            `<meta property="og:description" content="${description}" />`
-          );
-          template = template.replace(
-            /<meta property="og:url" content="(.*?)" \/>/,
-            `<meta property="og:url" content="https://quickconvertunits.com/${urlPath}" />`
-          );
-          
-          const staticContent = `
-            <div style="display:none;" aria-hidden="true">
-              <h1>${fromUnit.name} to ${toUnit.name} Converter</h1>
-              <p>${description}</p>
-              <section>
-                <h2>How to convert ${fromUnit.name} to ${toUnit.name}</h2>
-                <p>To convert a value from ${fromUnit.name} to ${toUnit.name}, simply use our fast, responsive calculator above. Enter any number into the ${fromUnit.name} field and the conversion to ${toUnit.name} will evaluate instantly. We use the most precise conversion rates available.</p>
-              </section>
-              <section>
-                <h2>Quick Conversion Reference</h2>
-                <ul>
-                  <li>1 ${fromUnit.name} to ${toUnit.name}</li>
-                  <li>5 ${fromUnit.name} to ${toUnit.name}</li>
-                  <li>10 ${fromUnit.name} to ${toUnit.name}</li>
-                  <li>50 ${fromUnit.name} to ${toUnit.name}</li>
-                  <li>100 ${fromUnit.name} to ${toUnit.name}</li>
-                </ul>
-              </section>
-              <section>
-                <h2>Frequently Asked Questions</h2>
-                <h3>How do I convert ${fromUnit.name} to ${toUnit.name}?</h3>
-                <p>Enter the number of ${fromUnit.symbol} you wish to convert in the top input box. The corresponding ${toUnit.symbol} value will instantly populate in the bottom input box.</p>
-                <h3>Is this ${fromUnit.name} to ${toUnit.name} converter free?</h3>
-                <p>Yes, all conversions on QuickConvertUnits including ${fromUnit.name} to ${toUnit.name} are 100% free and work offline.</p>
-                <h3>Why should I use this converter?</h3>
-                <p>We built this tool to provide instant, precise unit conversions without intrusive ads. The ${fromUnit.name} to ${toUnit.name} tool works perfectly on both mobile and desktop.</p>
-              </section>
-            </div>
-          `;
-
-          // Replace the placeholder static content with our custom SEO block
-          template = template.replace(
-            /<div style="display:none;" aria-hidden="true">[\s\S]*?<\/div>/,
-            staticContent
-          );
-          
-          // Basic Schema.org injection
-          const schema = {
-            "@context": "https://schema.org",
-            "@graph": [
-              {
-                "@type": "WebApplication",
-                "name": `${title} - QuickConvert`,
-                "applicationCategory": "UtilityApplications",
-                "operatingSystem": "All",
-                "description": description,
-              },
-              {
-                "@type": "FAQPage",
-                "mainEntity": [
-                  {
-                    "@type": "Question",
-                    "name": `How do I convert ${fromUnit.name} to ${toUnit.name}?`,
-                    "acceptedAnswer": {
-                      "@type": "Answer",
-                      "text": `Enter the number of ${fromUnit.name} you wish to convert in the top input box. The corresponding ${toUnit.name} value will instantly populate in the bottom input box.`
-                    }
-                  },
-                  {
-                    "@type": "Question",
-                    "name": `Is this ${fromUnit.name} to ${toUnit.name} converter free?`,
-                    "acceptedAnswer": {
-                      "@type": "Answer",
-                      "text": `Yes, all conversions on QuickConvertUnits including ${fromUnit.name} to ${toUnit.name} are 100% free and work offline.`
-                    }
-                  },
-                  {
-                    "@type": "Question",
-                    "name": `Why should I use this converter?`,
-                    "acceptedAnswer": {
-                      "@type": "Answer",
-                      "text": `We built this tool to provide instant, precise unit conversions without intrusive ads. The ${fromUnit.name} to ${toUnit.name} tool works perfectly on both mobile and desktop.`
-                    }
-                  }
-                ]
-              }
-            ]
-          };
-          
-          template = template.replace(
-            /<\/head>/,
-            `<script type="application/ld+json">${JSON.stringify(schema)}</script></head>`
-          );
-        }
-      }
+      template = applySEO(req.path, template);
 
       res.status(200).set({ "Content-Type": "text/html" }).send(template);
     });
