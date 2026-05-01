@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, Calendar } from 'lucide-react';
 import { blogPosts } from './lib/blogPosts';
