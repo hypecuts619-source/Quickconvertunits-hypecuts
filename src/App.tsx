@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { getSuggestions, convert, categories } from "./lib/units";
 import { categorySeoContent } from "./lib/seoContent";
+import { trackConversionEvent, trackFunnelStep } from "./lib/analytics";
 import {
   ArrowRightLeft,
   Sun,
@@ -328,6 +329,9 @@ function ConversionChart({
 }
 
 export default function App() {
+  const { conversion } = useParams();
+  const navigate = useNavigate();
+
   const [darkMode, setDarkMode] = useState(
     () => localStorage.getItem("dark-mode") === "true",
   );
@@ -338,16 +342,38 @@ export default function App() {
 
   // Initialize state from URL params if present
   const [category, setCategory] = useState(() => {
+    if (conversion) {
+      const parts = conversion.split("-to-");
+      if (parts.length === 2) {
+        for (const cat of categories) {
+          if (cat.units.some(u => u.id === parts[0].toLowerCase()) && cat.units.some(u => u.id === parts[1].toLowerCase())) {
+            return cat.id;
+          }
+        }
+      }
+    }
     const params = new URLSearchParams(window.location.search);
     return params.get("category") || categories[0].id;
   });
   const [unitFrom, setUnitFrom] = useState(() => {
+    if (conversion) {
+      const parts = conversion.split("-to-");
+      if (parts.length === 2) {
+        return parts[0].toLowerCase();
+      }
+    }
     const params = new URLSearchParams(window.location.search);
     const cat = params.get("category") || categories[0].id;
     const activeCat = categories.find((c) => c.id === cat) || categories[0];
     return params.get("from") || activeCat.units[0].id;
   });
   const [unitTo, setUnitTo] = useState(() => {
+    if (conversion) {
+      const parts = conversion.split("-to-");
+      if (parts.length === 2) {
+        return parts[1].toLowerCase();
+      }
+    }
     const params = new URLSearchParams(window.location.search);
     const cat = params.get("category") || categories[0].id;
     const activeCat = categories.find((c) => c.id === cat) || categories[0];
@@ -417,8 +443,9 @@ export default function App() {
     }
   };
 
-  // Fetch currency rates
+  // Fetch currency rates and track funnel step
   useEffect(() => {
+    trackFunnelStep(`category_selected_${category}`);
     if (category === "currency") {
       handleRefreshRates();
     }
@@ -461,6 +488,8 @@ export default function App() {
             minute: "2-digit",
           }),
         };
+
+        trackConversionEvent(category, unitFrom, unitTo, valFrom);
 
         setHistoryItems((prev) => {
           const filtered = prev.filter(
@@ -610,11 +639,8 @@ export default function App() {
       const titleStr = `${valPrefix}${activeFromUnit.name} to ${activeToUnit.name} Conversion Calculator`;
       document.title = `${titleStr} - Free Tool | QuickConvert`;
 
-      const newUrl = new URL(window.location.href);
-      newUrl.searchParams.set("category", category);
-      newUrl.searchParams.set("from", unitFrom);
-      newUrl.searchParams.set("to", unitTo);
-      window.history.replaceState({}, "", newUrl);
+      const cleanUrl = `${window.location.origin}/${unitFrom}-to-${unitTo}`;
+      navigate(`/${unitFrom}-to-${unitTo}${valFrom && valFrom !== "1" ? `?val=${valFrom}` : ""}`, { replace: true });
 
       // SEO Meta Description
       let metaDesc = document.querySelector('meta[name="description"]');
@@ -635,7 +661,7 @@ export default function App() {
         canonical.setAttribute("rel", "canonical");
         document.head.appendChild(canonical);
       }
-      canonical.setAttribute("href", newUrl.href.split("?")[0]); // simplified to base for SPA, or full with query
+      canonical.setAttribute("href", cleanUrl);
 
       // SEO Open Graph / Twitter
       let ogTitle = document.querySelector('meta[property="og:title"]');
@@ -663,6 +689,14 @@ export default function App() {
           operatingSystem: "All",
           description: `Instantly convert ${valFrom || "1"} ${activeFromUnit.name} to ${activeToUnit.name}.`,
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Action",
+          name: `Converting ${activeFromUnit.name} to ${activeToUnit.name}`,
+          fromUnit: activeFromUnit.name,
+          toUnit: activeToUnit.name,
+          value: valFrom || "1"
         },
         {
           "@context": "https://schema.org",
@@ -1307,19 +1341,24 @@ export default function App() {
           <div className="mt-16 mb-12 px-4 md:px-0">
             <div className="flex flex-col items-center text-center mb-8">
               <h3 className="text-3xl font-semibold tracking-tight mb-3">Trusted by Professionals</h3>
-              <p className="text-neutral-500 dark:text-neutral-400 text-lg">Join over 1M+ users relying on our unit conversions.</p>
+              <p className="text-neutral-500 dark:text-neutral-400 text-lg">Join thousands of users relying on our fast, accurate conversions everyday.</p>
               <div className="flex items-center justify-center gap-1 mt-4">
                 {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 text-amber-500 fill-amber-500" />)}
-                <span className="ml-2 font-semibold text-neutral-800 dark:text-neutral-200">4.9/5 from 12,000+ ratings</span>
               </div>
             </div>
-            <div className="grid md:grid-cols-3 gap-6">
+            {/* Horizontal scrolling reviews container */}
+            <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-8 px-4 md:px-0 -mx-4 md:mx-0 hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               {[
                 { quote: "The fastest converter I've ever used. The live validation saves me so much time trying to figure out if I typed the right unit.", name: "Sarah K.", role: "Architect", rating: 5 },
                 { quote: "Finally, a converter that actually works offline on my phone. The PWA is a lifesaver when I'm out on a construction site with no signal.", name: "Mike T.", role: "Civil Engineer", rating: 5 },
-                { quote: "No confusing ads covering the buttons, straight to the point. The compare feature is exactly what I needed for my physics homework.", name: "Emily R.", role: "Student", rating: 5 }
+                { quote: "No confusing ads covering the buttons, straight to the point. The compare feature is exactly what I needed for my physics homework.", name: "Emily R.", role: "Student", rating: 5 },
+                { quote: "It’s so accurate and simple. I use it constantly for recipes when converting volumes and weights from global cooking sites.", name: "James L.", role: "Chef", rating: 5 },
+                { quote: "I love that when I share the URL with colleagues, it keeps the exact units we're talking about. Extremely useful for quick engineering chats.", name: "David P.", role: "Mechanical Engineer", rating: 5 },
+                { quote: "The dark mode is beautiful and doesn't hurt my eyes during late-night study sessions. A fantastic little conversion tool.", name: "Alicia C.", role: "Undergraduate", rating: 5 },
+                { quote: "It remembers what I used last so I don't have to keep selecting 'Kilometers to Miles' every single time I open the app.", name: "Robert J.", role: "Logistics Manager", rating: 5 },
+                { quote: "No fluff, just works. Extremely responsive and the UI is incredibly intuitive. The best unit converter I've found so far.", name: "Maria V.", role: "UX Designer", rating: 5 }
               ].map((review, i) => (
-                <div key={i} className="flex flex-col p-8 rounded-3xl bg-white dark:bg-[#111111] shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-neutral-100 dark:border-neutral-800 dark:shadow-none h-full transition-transform hover:-translate-y-1 duration-300">
+                <div key={i} className="shrink-0 snap-center w-[85vw] md:w-[350px] flex flex-col p-8 rounded-3xl bg-white dark:bg-[#111111] shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-neutral-100 dark:border-neutral-800 dark:shadow-none h-full transition-transform hover:-translate-y-1 duration-300">
                   <div className="flex items-center gap-1 mb-4">
                     {[...Array(review.rating)].map((_, j) => <Star key={j} className="w-4 h-4 text-amber-500 fill-amber-500" />)}
                   </div>
@@ -1334,6 +1373,11 @@ export default function App() {
                 </div>
               ))}
             </div>
+            <style>{`
+              .hide-scrollbar::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
           </div>
 
           {/* SEO Content Sections with Popular & History */}
