@@ -1,50 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen, ArrowRight } from 'lucide-react';
-
-const mockPosts = [
-  {
-    slug: 'how-to-convert-celsius-to-fahrenheit-easily',
-    title: 'How to Convert Celsius to Fahrenheit Easily',
-    excerpt: 'Learn the simple formula and mental math tricks to quickly convert Celsius to Fahrenheit for your travels or cooking needs.',
-    date: 'May 1, 2026',
-    readTime: '3 min read'
-  },
-  {
-    slug: 'km-to-miles-conversion-guide',
-    title: 'Kilometers to Miles (km to miles) Complete Guide',
-    excerpt: 'Everything you need to know about converting km to miles. Learn the exact 1.609 km to mile conversion ratio, perfect for runners and road trips.',
-    date: 'April 30, 2026',
-    readTime: '4 min read'
-  },
-  {
-    slug: 'cm-to-inches-conversion-tips',
-    title: 'Centimeters to Inches (cm to in) Made Easy',
-    excerpt: 'Find out the exact conversion factor from cm to inches (cm to in calculation) and grab quick reference charts for measuring clothing and furniture.',
-    date: 'April 29, 2026',
-    readTime: '3 min read'
-  },
-  {
-    slug: 'understanding-metric-vs-imperial-systems',
-    title: 'Understanding Metric vs. Imperial Systems',
-    excerpt: 'A deep dive into why different parts of the world use different measurement systems, and the history behind them.',
-    date: 'April 28, 2026',
-    readTime: '5 min read'
-  },
-  {
-    slug: 'liters-to-gallons-conversion',
-    title: 'Liters to Gallons Volume Conversion Explained',
-    excerpt: 'Converting liters to gallons can be tricky because of the US and UK gallon differences. Let us dive into the conversion rates and formulas.',
-    date: 'April 27, 2026',
-    readTime: '4 min read'
-  },
-  {
-    slug: 'kilograms-to-pounds-weight-conversion-guide',
-    title: 'Kilograms to Pounds: The Ultimate Weight Conversion Guide',
-    excerpt: 'Everything you need to know about converting kg to lbs, including common milestones and fitness tracking tips.',
-    date: 'April 25, 2026',
-    readTime: '4 min read'
-  }
-];
+import { blogPosts } from './lib/blogPosts';
 
 export default function Blog() {
   return (
@@ -66,7 +22,7 @@ export default function Blog() {
         </header>
 
         <div className="grid gap-6">
-          {mockPosts.map((post) => (
+          {blogPosts.map((post) => (
             <Link key={post.slug} to={`/blog/${post.slug}`} className="group block bg-white dark:bg-[#111111] p-6 md:p-8 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:shadow-none transition-all duration-300">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="flex-1">

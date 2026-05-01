@@ -318,7 +318,9 @@ function ConversionChart({
 }
 
 export default function App() {
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(
+    () => localStorage.getItem("dark-mode") === "true",
+  );
   const [theme, setTheme] = useState(
     () => localStorage.getItem("theme-color") || "blue",
   );
@@ -377,6 +379,7 @@ export default function App() {
     } else {
       document.documentElement.classList.remove("dark");
     }
+    localStorage.setItem("dark-mode", darkMode.toString());
   }, [darkMode]);
 
   // Set theme color
@@ -847,12 +850,11 @@ export default function App() {
         {/* Left Column (Main App + Content) */}
         <div className="flex-1 max-w-3xl mx-auto w-full">
           <div className="text-center mb-10">
-            <h1 className="text-4xl md:text-5xl font-semibold tracking-tight mb-4 text-neutral-900 dark:text-white capitalize">
-              {category.replace("_", " ")} Conversions
+            <h1 className="text-4xl md:text-5xl font-semibold tracking-tight mb-4 text-neutral-900 dark:text-white">
+              Convert {activeFromUnit?.name} to {activeToUnit?.name}
             </h1>
             <p className="text-neutral-500 dark:text-neutral-400 text-lg font-light">
-              Fast, accurate, and simple conversion from {activeFromUnit?.name}{" "}
-              to {activeToUnit?.name}.
+              Fast, accurate, and completely free {category.replace("_", " ")} conversion tool.
             </p>
           </div>
 
