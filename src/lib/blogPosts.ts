@@ -34,7 +34,7 @@ export const blogPosts = [
 
       <h2>The Short Answer</h2>
       <p>
-        In the United States, there are exactly <strong>128 fluid ounces in 1 US liquid gallon</strong>.
+        In the United States, there are exactly <strong><a href="/?category=volume&from=us_gallon&to=us_fluid_ounce" class="text-primary-600 dark:text-primary-400 hover:underline">128 fluid ounces in 1 US liquid gallon</a></strong>.
       </p>
       <p>
         In the United Kingdom (and places using the Imperial system), there are <strong>160 imperial fluid ounces in 1 Imperial gallon</strong>.
@@ -128,8 +128,8 @@ export const blogPosts = [
       </p>
       
       <div class="bg-neutral-50 dark:bg-[#1a1a1a] p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 my-6 font-mono text-sm shadow-inner">
-        Celsius to Fahrenheit: (°C × 9/5) + 32 = °F<br><br>
-        Fahrenheit to Celsius: (°F − 32) × 5/9 = °C
+        <a href="/?category=temperature&from=celsius&to=fahrenheit&val=" class="text-primary-600 dark:text-primary-400 hover:underline">Celsius to Fahrenheit: (°C × 9/5) + 32 = °F</a><br><br>
+        <a href="/?category=temperature&from=fahrenheit&to=celsius&val=" class="text-primary-600 dark:text-primary-400 hover:underline">Fahrenheit to Celsius: (°F − 32) × 5/9 = °C</a>
       </div>
 
       <h2>The "Rule of Thumb" For Travelers</h2>
@@ -194,7 +194,7 @@ export const blogPosts = [
 
       <h2>What is the exact ratio?</h2>
       <p>
-        One meter is exactly <strong>1.09361 yards</strong>. Or, conversely, one yard is exactly <strong>0.9144 meters</strong>.
+        One meter is exactly <strong><a href="/?category=length&from=meter&to=yard" class="text-primary-600 dark:text-primary-400 hover:underline">1.09361 yards</a></strong>. Or, conversely, one yard is exactly <strong><a href="/?category=length&from=yard&to=meter" class="text-primary-600 dark:text-primary-400 hover:underline">0.9144 meters</a></strong>.
       </p>
       <p>
         Because the two measurements are so close, people often mix them up or estimate them as a 1:1 ratio. Over a short distance, this approximation is fine. But over a 100-long stretch, it makes a substantial difference.
@@ -265,7 +265,7 @@ export const blogPosts = [
 
       <h2>The Exact Formula</h2>
       <div class="bg-neutral-50 dark:bg-[#1a1a1a] p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 my-6 font-mono text-sm shadow-inner">
-        (°C * 1.8) + 32 = °F
+        <a href="/?category=temperature&from=celsius&to=fahrenheit&val=" class="text-primary-600 dark:text-primary-400 hover:underline">(°C * 1.8) + 32 = °F</a>
       </div>
       <p>
          For example, to convert 30°C to Fahrenheit: 30 * 1.8 = 54. Adding 32 gives you 86°F.
@@ -331,7 +331,7 @@ export const blogPosts = [
 
       <h2>The Magic Ratio</h2>
       <p>
-        One mile is exactly equal to <strong>1.60934 kilometers</strong>. To convert kilometers to miles, divide the kilometers by 1.609. To do the reverse, multiply miles by 1.609.
+        One mile is exactly equal to <strong><a href="/?category=length&from=mile&to=kilometer" class="text-primary-600 dark:text-primary-400 hover:underline">1.60934 kilometers</a></strong>. To convert kilometers to miles, divide the kilometers by 1.609. To do the reverse, multiply miles by 1.609.
       </p>
 
       <h2>Fibonacci Trick</h2>

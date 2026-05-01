@@ -1,9 +1,10 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, Calendar } from 'lucide-react';
 import { blogPosts } from './lib/blogPosts';
 
 export default function BlogPost() {
   const { slug } = useParams();
+  const navigate = useNavigate();
 
   const post = blogPosts.find(p => p.slug === slug);
   const title = post?.title || slug?.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
@@ -18,6 +19,19 @@ export default function BlogPost() {
       </div>
     );
   }
+
+  const handleContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    const anchor = target.closest('a');
+    if (anchor) {
+      const href = anchor.getAttribute('href');
+      if (href && href.startsWith('/')) {
+        e.preventDefault();
+        navigate(href);
+        window.scrollTo(0, 0);
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen text-neutral-900 dark:text-neutral-100 font-sans p-6 md:p-12">
@@ -52,6 +66,7 @@ export default function BlogPost() {
           <div 
             className="prose prose-neutral dark:prose-invert prose-lg max-w-none font-light leading-relaxed prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-primary-600 dark:prose-a:text-primary-400"
             dangerouslySetInnerHTML={{ __html: post.content }}
+            onClick={handleContentClick}
           />
             
           <div className="mt-12 p-8 bg-primary-50 dark:bg-primary-900/10 rounded-3xl border border-primary-100 dark:border-primary-900/30 text-center">

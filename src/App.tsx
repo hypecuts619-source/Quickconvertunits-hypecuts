@@ -21,6 +21,7 @@ import {
   ArrowRight,
   Share2,
   Star,
+  Table,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -63,41 +64,49 @@ const FORMULAS = [
     title: "Celsius → Fahrenheit",
     code: "°F = (°C × 9/5) + 32",
     note: "Water boils at 100°C / 212°F",
+    link: { cat: "temperature", from: "celsius", to: "fahrenheit" },
   },
   {
     title: "Fahrenheit → Celsius",
     code: "°C = (°F − 32) × 5/9",
     note: "Water freezes at 0°C / 32°F",
+    link: { cat: "temperature", from: "fahrenheit", to: "celsius" },
   },
   {
     title: "Kilometers → Miles",
     code: "mi = km × 0.621371",
     note: "1 km ≈ 0.621 miles",
+    link: { cat: "length", from: "kilometer", to: "mile" },
   },
   {
     title: "Miles → Kilometers",
     code: "km = mi × 1.60934",
     note: "1 mile ≈ 1.609 km",
+    link: { cat: "length", from: "mile", to: "kilometer" },
   },
   {
     title: "Kilograms → Pounds",
     code: "lb = kg × 2.20462",
     note: "1 kg ≈ 2.205 pounds",
+    link: { cat: "mass", from: "kilogram", to: "pound" },
   },
   {
     title: "Meters → Feet",
     code: "ft = m × 3.28084",
     note: "1 meter ≈ 3.281 feet",
+    link: { cat: "length", from: "meter", to: "foot" },
   },
   {
     title: "Hectares → Acres",
     code: "ac = ha × 2.47105",
     note: "1 hectare ≈ 2.471 acres",
+    link: { cat: "area", from: "hectare", to: "acre" },
   },
   {
     title: "Liters → US Gallons",
     code: "gal = L × 0.264172",
     note: "1 liter ≈ 0.264 gallons",
+    link: { cat: "volume", from: "liter", to: "us_gallon" },
   },
 ];
 
@@ -344,7 +353,11 @@ export default function App() {
     return params.get("to") || activeCat.units[1].id;
   });
 
-  const [valFrom, setValFrom] = useState("1");
+  const [valFrom, setValFrom] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const val = params.get("val");
+    return val !== null ? val : "1";
+  });
   const [valTo, setValTo] = useState("");
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -354,6 +367,8 @@ export default function App() {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const [showBulk, setShowBulk] = useState(false);
+  const [showCompare, setShowCompare] = useState(false);
+  const [compareUnits, setCompareUnits] = useState<string[]>([]);
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>(() => {
     try {
       return JSON.parse(localStorage.getItem("qcu_hist") || "[]");
@@ -685,6 +700,18 @@ export default function App() {
     valFrom,
   ]);
 
+  useEffect(() => {
+    setCompareUnits((prev) => {
+      const activeCat = categories.find((c) => c.id === category);
+      if (!activeCat) return prev;
+      const valid = prev.filter(p => activeCat.units.some(u => u.id === p));
+      if (valid.length < 2) {
+         return Array.from(new Set([unitFrom, unitTo, ...valid]));
+      }
+      return valid;
+    });
+  }, [category, unitFrom, unitTo]);
+
   return (
     <div
       className={`min-h-screen text-neutral-900 dark:text-neutral-100 font-sans transition-colors duration-200 relative overflow-hidden`}
@@ -909,9 +936,21 @@ export default function App() {
                 </div>
                 <div className="relative flex items-center mt-3">
                   <input
-                    type="number"
+                    type="text"
                     value={valFrom}
-                    onChange={(e) => setValFrom(e.target.value)}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/,/g, ".");
+                      if (v !== "" && !/^-?\d*\.?\d*$/.test(v)) {
+                         const toast = document.getElementById('error-toast');
+                         if(toast) {
+                           toast.textContent = "Invalid: use only numbers (e.g., 10.5)";
+                           toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+                           setTimeout(() => toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none'), 3000);
+                         }
+                         return;
+                      }
+                      setValFrom(v);
+                    }}
                     autoFocus
                     className="w-full bg-transparent text-4xl md:text-5xl lg:text-6xl font-light focus:outline-none text-neutral-900 dark:text-white pr-10 tracking-tight"
                     placeholder="0"
@@ -1043,6 +1082,13 @@ export default function App() {
                 {showBulk ? "Hide Bulk Convert" : "Bulk Convert"}
               </button>
               <button
+                onClick={() => setShowCompare(!showCompare)}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${showCompare ? "bg-primary-500/10 text-primary-600 dark:text-primary-400" : "bg-neutral-100 dark:bg-[#1a1a1a] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300"}`}
+              >
+                <Table className="w-4 h-4" />{" "}
+                {showCompare ? "Hide Compare" : "Compare"}
+              </button>
+              <button
                 onClick={handleClear}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-neutral-100 dark:bg-[#1a1a1a] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-sm font-medium text-neutral-700 dark:text-neutral-300 transition-colors"
               >
@@ -1100,6 +1146,127 @@ export default function App() {
                         );
                       })}
                     </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+              {showCompare && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                  animate={{ opacity: 1, height: "auto", marginTop: 24 }}
+                  exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="bg-neutral-50 dark:bg-[#161616] border border-neutral-100 dark:border-neutral-800 rounded-3xl p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <Table className="w-5 h-5 text-primary-500" />
+                        <h3 className="font-semibold text-neutral-800 dark:text-neutral-200 tracking-tight">
+                          Compare Units Side-by-Side
+                        </h3>
+                      </div>
+                    </div>
+                    <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-6">
+                      Select multiple units below to see how they compare to each other.
+                    </p>
+
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {activeCategory.units.map((u) => {
+                        const isSelected = compareUnits.includes(u.id);
+                        return (
+                          <button
+                            key={u.id}
+                            onClick={() => {
+                              setCompareUnits((prev) =>
+                                isSelected
+                                  ? prev.filter((id) => id !== u.id)
+                                  : [...prev, u.id],
+                              );
+                            }}
+                            className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${isSelected ? "bg-primary-500 text-white border-primary-500 shadow-md shadow-primary-500/20" : "bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border-neutral-200 dark:border-neutral-700 hover:border-primary-500"}`}
+                          >
+                            {u.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {compareUnits.length > 0 && (
+                      <div className="overflow-x-auto border-x border-t border-neutral-200 dark:border-neutral-700 rounded-xl scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-600 pb-2">
+                        <table className="w-full text-sm text-left">
+                          <thead className="bg-neutral-100/50 dark:bg-neutral-800/50 text-neutral-600 dark:text-neutral-300 font-medium border-b border-neutral-200 dark:border-neutral-700">
+                            <tr>
+                              <th className="p-3 border-r border-neutral-200 dark:border-neutral-700 font-medium w-32 sticky left-0 z-10 bg-neutral-100/90 dark:bg-neutral-800/90 backdrop-blur-sm">
+                                1 Unit
+                              </th>
+                              {compareUnits.map((cu) => {
+                                const unitInfo = activeCategory.units.find(
+                                  (u) => u.id === cu,
+                                );
+                                return (
+                                  <th
+                                    key={cu}
+                                    className="p-3 font-medium whitespace-nowrap min-w-[120px]"
+                                  >
+                                    {unitInfo?.name}
+                                  </th>
+                                );
+                              })}
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-neutral-200 dark:divide-neutral-700 bg-white dark:bg-[#111]">
+                            {compareUnits.map((rowUnit) => {
+                              const rUnitInfo = activeCategory.units.find(
+                                (u) => u.id === rowUnit,
+                              );
+                              return (
+                                <tr
+                                  key={rowUnit}
+                                  className="hover:bg-neutral-50 dark:hover:bg-neutral-800/20 transition-colors"
+                                >
+                                  <td className="p-3 border-r border-neutral-200 dark:border-neutral-700 font-medium whitespace-nowrap text-neutral-800 dark:text-neutral-200 sticky left-0 z-10 bg-white dark:bg-[#111]">
+                                    {rUnitInfo?.name}
+                                  </td>
+                                  {compareUnits.map((colUnit) => {
+                                    if (rowUnit === colUnit) {
+                                      return (
+                                        <td
+                                          key={colUnit}
+                                          className="p-3 text-neutral-400 dark:text-neutral-500 italic"
+                                        >
+                                          1
+                                        </td>
+                                      );
+                                    }
+                                    const rawVal = convert(
+                                      1,
+                                      rowUnit,
+                                      colUnit,
+                                      category,
+                                    );
+                                    const displayVal = Number.isInteger(rawVal)
+                                      ? rawVal.toString()
+                                      : parseFloat(
+                                          rawVal.toPrecision(6),
+                                        ).toString();
+                                    return (
+                                      <td
+                                        key={colUnit}
+                                        className="p-3 font-mono text-neutral-600 dark:text-neutral-400"
+                                      >
+                                        {displayVal}
+                                      </td>
+                                    );
+                                  })}
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -1314,9 +1481,21 @@ export default function App() {
                     key={i}
                     className="p-5 rounded-2xl bg-white dark:bg-[#111111] border border-neutral-100 dark:border-neutral-800"
                   >
-                    <h4 className="font-semibold text-sm mb-3 tracking-tight text-neutral-800 dark:text-neutral-200">
+                    <div
+                      className="font-semibold text-sm mb-3 tracking-tight text-neutral-800 dark:text-neutral-200 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors underline decoration-neutral-300 dark:decoration-neutral-700 underline-offset-4 hover:decoration-primary-500 inline-block"
+                      onClick={() => {
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                        handleCategoryChange(f.link.cat);
+                        setTimeout(() => {
+                          setUnitFrom(f.link.from);
+                          setUnitTo(f.link.to);
+                          setValFrom("1");
+                        }, 0);
+                      }}
+                      title={`Go to ${f.title} converter`}
+                    >
                       {f.title}
-                    </h4>
+                    </div>
                     <div
                       className="bg-neutral-50 dark:bg-neutral-800/50 p-2.5 rounded-lg text-primary-600 dark:text-primary-400 font-mono text-sm font-medium mb-2 w-full truncate cursor-pointer hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
                       onClick={() =>
@@ -1542,6 +1721,11 @@ export default function App() {
       </div>
 
       <CookieConsent />
+      
+      {/* Error Toast */}
+      <div id="error-toast" className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 bg-red-500 text-white rounded-full font-medium text-sm shadow-xl opacity-0 translate-y-4 pointer-events-none transition-all duration-300">
+        Error message
+      </div>
     </div>
   );
 }
