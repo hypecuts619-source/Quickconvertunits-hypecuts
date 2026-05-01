@@ -26,6 +26,7 @@ import {
   Table,
   Download,
 } from "lucide-react";
+import { UnitSelector } from "./components/UnitSelector";
 import { motion, AnimatePresence } from "motion/react";
 
 const POPULAR = [
@@ -772,25 +773,31 @@ export default function App() {
         script.setAttribute("type", "application/ld+json");
         document.head.appendChild(script);
       }
-      const schema = [
+      
+      const schema: any[] = [
         {
           "@context": "https://schema.org",
           "@type": "WebApplication",
           name: `${titleStr} - QuickConvert`,
           applicationCategory: "UtilityApplications",
           operatingSystem: "All",
-          description: `Instantly convert ${valFrom || "1"} ${activeFromUnit.name} to ${activeToUnit.name}.`,
+          description: metaDescStr,
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-        },
-        {
+        }
+      ];
+
+      // Only add specific conversion rich results on particular converter pages
+      if (isSpecificConverter) {
+        schema.push({
           "@context": "https://schema.org",
           "@type": "Action",
           name: `Converting ${activeFromUnit.name} to ${activeToUnit.name}`,
           fromUnit: activeFromUnit.name,
           toUnit: activeToUnit.name,
           value: valFrom || "1"
-        },
-        {
+        });
+        
+        schema.push({
           "@context": "https://schema.org",
           "@type": "FAQPage",
           mainEntity: [
@@ -813,8 +820,9 @@ export default function App() {
               },
             },
           ],
-        },
-      ];
+        });
+      }
+
       script.textContent = JSON.stringify(schema);
     }
   }, [
@@ -1044,22 +1052,12 @@ export default function App() {
                   From
                 </label>
                 <div className="relative">
-                  <select
+                  <UnitSelector
                     value={unitFrom}
-                    onChange={(e) => setUnitFrom(e.target.value)}
-                    className="w-full appearance-none bg-transparent font-medium text-neutral-600 dark:text-neutral-300 focus:outline-none pb-2 text-base cursor-pointer transition-colors uppercase tracking-wide truncate pr-8"
-                  >
-                    {activeCategory.units.map((u) => (
-                      <option
-                        key={u.id}
-                        value={u.id}
-                        className="text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-800"
-                      >
-                        {u.name} ({u.symbol})
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-0 top-1 w-4 h-4 text-neutral-400 pointer-events-none" />
+                    onChange={setUnitFrom}
+                    units={activeCategory.units}
+                    activeCategoryId={category}
+                  />
                 </div>
                 <div className="relative flex items-center mt-3">
                   <input
@@ -1110,24 +1108,21 @@ export default function App() {
                   To
                 </label>
                 <div className="relative">
-                  <select
+                  <UnitSelector
                     value={unitTo}
-                    onChange={(e) => setUnitTo(e.target.value)}
-                    className="w-full appearance-none bg-transparent font-medium text-neutral-600 dark:text-neutral-300 focus:outline-none pb-2 text-base cursor-pointer transition-colors uppercase tracking-wide truncate pr-8"
-                  >
-                    {activeCategory.units.map((u) => (
-                      <option
-                        key={u.id}
-                        value={u.id}
-                        className="text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-800"
-                      >
-                        {u.name} ({u.symbol})
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-0 top-1 w-4 h-4 text-neutral-400 pointer-events-none" />
+                    onChange={setUnitTo}
+                    units={activeCategory.units}
+                    activeCategoryId={category}
+                  />
                 </div>
                 <div className="relative flex items-center mt-3">
+                  <motion.div
+                    key={valTo}
+                    initial={{ scale: 0.98, opacity: 0.8 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.15 }}
+                    className="w-full"
+                  >
                   <input
                     type="text"
                     value={valTo}
@@ -1148,6 +1143,7 @@ export default function App() {
                     placeholder="0"
                     inputMode="decimal"
                   />
+                  </motion.div>
                   {valTo && (
                     <button
                       onClick={handleCopy}
