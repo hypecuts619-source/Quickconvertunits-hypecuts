@@ -560,12 +560,13 @@ export default function App() {
         trackConversionEvent(category, unitFrom, unitTo, valFrom);
 
         setHistoryItems((prev) => {
+          // Remove exact duplicates (same from-unit, to-unit, and from-value)
           const filtered = prev.filter(
             (h) =>
               !(
                 h.fu === newEntry.fu &&
                 h.tu === newEntry.tu &&
-                h.cat === newEntry.cat
+                h.fv === newEntry.fv
               ),
           );
           const updated = [newEntry, ...filtered].slice(0, 15);
@@ -1064,17 +1065,25 @@ export default function App() {
                     type="text"
                     value={valFrom}
                     onChange={(e) => {
-                      const v = e.target.value.replace(/,/g, ".");
-                      if (v !== "" && !/^-?\d*\.?\d*$/.test(v)) {
-                         const toast = document.getElementById('error-toast');
-                         if(toast) {
-                           toast.textContent = "Invalid: use only numbers (e.g., 10.5)";
-                           toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
-                           setTimeout(() => toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none'), 3000);
-                         }
-                         return;
+                      const raw = e.target.value;
+                      const v = raw.replace(/,/g, ".");
+                      
+                      if (v === "" || /^-?\d*\.?\d*$/.test(v)) {
+                        setValFrom(v);
+                        return;
                       }
-                      setValFrom(v);
+
+                      // Failed regex - figure out why
+                      const toast = document.getElementById('error-toast');
+                      if (toast) {
+                        if (/[a-zA-Z]/.test(v)) {
+                          toast.textContent = "❌ Try selecting units from the dropdown (kg, lbs, meters...)";
+                        } else {
+                          toast.textContent = "❌ Enter a valid number (e.g., 10.5)";
+                        }
+                        toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+                        setTimeout(() => toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none'), 3000);
+                      }
                     }}
                     autoFocus
                     className="w-full bg-transparent text-4xl md:text-5xl lg:text-6xl font-light focus:outline-none text-neutral-900 dark:text-white pr-10 tracking-tight"
@@ -1127,17 +1136,25 @@ export default function App() {
                     type="text"
                     value={valTo}
                     onChange={(e) => {
-                      const v = e.target.value.replace(/,/g, ".");
-                      if (v !== "" && !/^-?\d*\.?\d*$/.test(v)) {
-                         const toast = document.getElementById('error-toast');
-                         if(toast) {
-                           toast.textContent = "Invalid: use only numbers (e.g., 10.5)";
-                           toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
-                           setTimeout(() => toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none'), 3000);
-                         }
+                      const raw = e.target.value;
+                      const v = raw.replace(/,/g, ".");
+                      
+                      if (v === "" || /^-?\d*\.?\d*$/.test(v)) {
+                         handleValToChange(v);
                          return;
                       }
-                      handleValToChange(v);
+
+                      // Failed regex
+                      const toast = document.getElementById('error-toast');
+                      if (toast) {
+                        if (/[a-zA-Z]/.test(v)) {
+                          toast.textContent = "❌ Try selecting units from the dropdown (kg, lbs, meters...)";
+                        } else {
+                          toast.textContent = "❌ Enter a valid number (e.g., 10.5)";
+                        }
+                        toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+                        setTimeout(() => toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none'), 3000);
+                      }
                     }}
                     className="w-full bg-transparent text-4xl md:text-5xl lg:text-6xl font-light focus:outline-none text-neutral-900 dark:text-white pr-10 tracking-tight"
                     placeholder="0"

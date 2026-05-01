@@ -50,12 +50,41 @@ export function UnitSelector({ value, onChange, units, activeCategoryId }: UnitS
   
   const filteredUnits = useMemo(() => {
     if (!search.trim()) return units;
-    const query = search.toLowerCase();
-    return units.filter((u) => 
-      u.name.toLowerCase().includes(query) || 
-      u.symbol.toLowerCase().includes(query) ||
-      u.id.toLowerCase().includes(query)
-    );
+    const query = search.toLowerCase().trim();
+    
+    // Normalize query for common plurals and variations
+    const normalized = query
+      .replace(/feet/g, 'foot')
+      .replace(/inches/g, 'inch')
+      .replace(/\blbs?\b/g, 'pound');
+      
+    // Strip trailing 's' if it makes sense to avoid missing singulars
+    const qSingular = (normalized.length > 3 && normalized.endsWith('s') && !['us', 'ss', 'is'].some(suffix => normalized.endsWith(suffix))) 
+      ? normalized.slice(0, -1) 
+      : normalized;
+
+    const results = units.filter((u) => {
+      const searchStr = `${u.name} ${u.symbol} ${u.id}`.toLowerCase();
+      return searchStr.includes(normalized) || searchStr.includes(qSingular);
+    });
+
+    // Sort exact matches and startsWith matches to the top
+    return results.sort((a, b) => {
+      const aName = a.name.toLowerCase();
+      const bName = b.name.toLowerCase();
+      const aSym = a.symbol.toLowerCase();
+      const bSym = b.symbol.toLowerCase();
+      
+      const aExact = aName === qSingular || aSym === query ? 1 : 0;
+      const bExact = bName === qSingular || bSym === query ? 1 : 0;
+      
+      if (aExact !== bExact) return bExact - aExact;
+      
+      const aStart = aName.startsWith(qSingular) || aSym.startsWith(query) ? 1 : 0;
+      const bStart = bName.startsWith(qSingular) || bSym.startsWith(query) ? 1 : 0;
+      
+      return bStart - aStart;
+    });
   }, [units, search]);
 
   return (
@@ -79,11 +108,16 @@ export function UnitSelector({ value, onChange, units, activeCategoryId }: UnitS
               onClick={() => setIsOpen(false)}
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white dark:bg-neutral-900 shadow-2xl rounded-2xl z-[101] overflow-hidden flex flex-col max-h-[80vh]"
+              initial={{ opacity: 0, y: "100%" }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="fixed bottom-0 left-0 right-0 md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:bottom-auto md:right-auto w-full md:max-w-md bg-white dark:bg-neutral-900 shadow-2xl rounded-t-3xl md:rounded-2xl z-[101] overflow-hidden flex flex-col max-h-[85vh] md:max-h-[80vh]"
             >
+              {/* Mobile drag handle indicator */}
+              <div className="w-full flex justify-center pt-3 pb-1 md:hidden">
+                <div className="w-12 h-1.5 bg-neutral-200 dark:bg-neutral-700 rounded-full" />
+              </div>
               <div className="p-4 border-b border-neutral-100 dark:border-neutral-800 flex items-center gap-3">
                 <Search className="w-5 h-5 text-neutral-400" />
                 <input
