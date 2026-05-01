@@ -190,6 +190,16 @@ export const categories: UnitCategory[] = [
       { id: 'cad', name: 'Canadian Dollar', symbol: 'C$', factor: 1.35, description: 'The Canadian Dollar, the official currency of Canada.' },
       { id: 'chf', name: 'Swiss Franc', symbol: 'CHF', factor: 0.88, description: 'The Swiss Franc, the official currency of Switzerland.' },
       { id: 'cny', name: 'Chinese Yuan', symbol: '¥', factor: 7.23, description: 'The Chinese Yuan, the primary currency of the People\'s Republic of China.' },
+      { id: 'mxn', name: 'Mexican Peso', symbol: '$', factor: 17.0, description: 'The Mexican Peso, the official currency of Mexico.' },
+      { id: 'brl', name: 'Brazilian Real', symbol: 'R$', factor: 5.0, description: 'The Brazilian Real, the official currency of Brazil.' },
+      { id: 'zar', name: 'South African Rand', symbol: 'R', factor: 18.5, description: 'The South African Rand, the official currency of South Africa.' },
+      { id: 'rub', name: 'Russian Ruble', symbol: '₽', factor: 90.0, description: 'The Russian Ruble, the official currency of Russia.' },
+      { id: 'sgd', name: 'Singapore Dollar', symbol: 'S$', factor: 1.35, description: 'The Singapore Dollar, the official currency of Singapore.' },
+      { id: 'hkd', name: 'Hong Kong Dollar', symbol: 'HK$', factor: 7.8, description: 'The Hong Kong Dollar, the official currency of Hong Kong.' },
+      { id: 'nzd', name: 'New Zealand Dollar', symbol: 'NZ$', factor: 1.6, description: 'The New Zealand Dollar, the official currency of New Zealand.' },
+      { id: 'sek', name: 'Swedish Krona', symbol: 'kr', factor: 10.5, description: 'The Swedish Krona, the official currency of Sweden.' },
+      { id: 'krw', name: 'South Korean Won', symbol: '₩', factor: 1300.0, description: 'The South Korean Won, the official currency of South Korea.' },
+      { id: 'aed', name: 'UAE Dirham', symbol: 'د.إ', factor: 3.67, description: 'The United Arab Emirates Dirham, the official currency of the UAE.' },
     ],
   }
 ];

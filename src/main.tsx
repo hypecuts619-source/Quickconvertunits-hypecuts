@@ -8,7 +8,13 @@ import AboutUs from './AboutUs.tsx';
 import Contact from './Contact.tsx';
 import Blog from './Blog.tsx';
 import BlogPost from './BlogPost.tsx';
+import { registerSW } from 'virtual:pwa-register';
 import './index.css';
+
+// Automatically register the service worker
+if ('serviceWorker' in navigator) {
+  registerSW({ immediate: true });
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

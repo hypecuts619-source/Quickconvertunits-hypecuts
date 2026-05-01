@@ -12,21 +12,45 @@ export default defineConfig(({mode}) => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
+        includeAssets: ['favicon.svg'],
         manifest: {
           name: 'QuickConvert Units',
           short_name: 'QuickConvert',
           description: 'Fast, free, and accurate unit conversions for professionals and students.',
           theme_color: '#3b82f6',
+          background_color: '#ffffff',
+          display: 'standalone',
           icons: [
             {
               src: '/favicon.svg',
               sizes: '192x192',
-              type: 'image/svg+xml'
+              type: 'image/svg+xml',
+              purpose: 'any maskable'
             },
             {
               src: '/favicon.svg',
               sizes: '512x512',
-              type: 'image/svg+xml'
+              type: 'image/svg+xml',
+              purpose: 'any maskable'
+            }
+          ]
+        },
+        workbox: {
+          globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+          runtimeCaching: [
+            {
+              urlPattern: /^https:\/\/api\.frankfurter\.app\/.*/i,
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'currency-api-cache',
+                expiration: {
+                  maxEntries: 50,
+                  maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
+                },
+                cacheableResponse: {
+                  statuses: [0, 200]
+                }
+              }
             }
           ]
         }

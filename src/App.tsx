@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { getSuggestions, convert, categories } from "./lib/units";
 import { categorySeoContent } from "./lib/seoContent";
 import { trackConversionEvent, trackFunnelStep } from "./lib/analytics";
@@ -24,6 +24,7 @@ import {
   Share2,
   Star,
   Table,
+  Download,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -227,6 +228,71 @@ function CookieConsent() {
   );
 }
 
+function PwaPrompt() {
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isPromptReady, setIsPromptReady] = useState(false);
+
+  useEffect(() => {
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      setDeferredPrompt(e);
+      setIsPromptReady(true);
+    });
+
+    window.addEventListener('appinstalled', () => {
+      // Clear prompt
+      setIsPromptReady(false);
+      setDeferredPrompt(null);
+    });
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    
+    // Show the install prompt
+    deferredPrompt.prompt();
+    
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    // We've used the prompt, and can't use it again, throw it away
+    setDeferredPrompt(null);
+    setIsPromptReady(false);
+  };
+
+  if (!isPromptReady) return null;
+
+  return (
+    <div className="fixed bottom-20 left-4 right-4 md:left-auto md:right-4 md:bottom-4 md:w-80 p-4 bg-white dark:bg-[#111111] border border-neutral-200 dark:border-neutral-800 z-[60] rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] text-center md:text-left flex flex-col items-center md:items-start transition-all">
+      <div className="flex items-center gap-3 mb-3 shrink-0">
+         <div className="w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center shrink-0">
+           <Download className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+         </div>
+         <div>
+           <h4 className="font-semibold text-neutral-900 dark:text-white text-sm">Install QuickConvert</h4>
+           <p className="text-xs text-neutral-500 dark:text-neutral-400">Use offline anywhere</p>
+         </div>
+      </div>
+      <div className="flex w-full gap-2">
+        <button
+          onClick={() => setIsPromptReady(false)}
+          className="flex-1 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 rounded-lg text-sm font-medium hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+        >
+          Later
+        </button>
+        <button
+          onClick={handleInstallClick}
+          className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
+        >
+          Install App
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function ConversionChart({
   categoryId,
   valFrom,
@@ -331,6 +397,7 @@ function ConversionChart({
 export default function App() {
   const { conversion } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [darkMode, setDarkMode] = useState(
     () => localStorage.getItem("dark-mode") === "true",
@@ -634,13 +701,41 @@ export default function App() {
 
   useEffect(() => {
     if (activeFromUnit && activeToUnit) {
-      const valPrefix =
-        valFrom && valFrom !== "1" && valFrom !== "0" ? `${valFrom} ` : "";
-      const titleStr = `${valPrefix}${activeFromUnit.name} to ${activeToUnit.name} Conversion Calculator`;
-      document.title = `${titleStr} - Free Tool | QuickConvert`;
+      const isHomepage = location.pathname === "/" && !location.search.includes("category=");
+      const isCategoryPage = location.pathname === "/" && location.search.includes("category=");
+      const isSpecificConverter = location.pathname !== "/";
 
-      const cleanUrl = `${window.location.origin}/${unitFrom}-to-${unitTo}`;
-      navigate(`/${unitFrom}-to-${unitTo}${valFrom && valFrom !== "1" ? `?val=${valFrom}` : ""}`, { replace: true });
+      let titleStr = "";
+      let metaDescStr = "";
+      let canonicalUrlStr = "";
+      let ogTitleStr = "";
+
+      if (isHomepage) {
+         titleStr = "Quick Unit Converter | Free Online Tool";
+         metaDescStr = "Instantly convert units like meters to feet, kg to lbs, or cups to grams. Fast, accurate, no ads interrupting. Try now—no sign-up needed.";
+         canonicalUrlStr = "https://quickconvertunits.com/";
+         ogTitleStr = titleStr;
+      } else if (isCategoryPage) {
+         const catName = activeCategory.name;
+         const topUnits = `${activeCategory.units[0].name}s to ${activeCategory.units[1].name}s, ${activeCategory.units[2]?.name || ''}s`.replace(/ss/g, 's').replace(/, s/g, '');
+         const allTopUnits = activeCategory.units.slice(0, 5).map(u => u.name.toLowerCase() + (u.name.endsWith('s') ? '' : 's')).join(", ");
+         titleStr = `${catName} Converter: ${topUnits} & More`;
+         metaDescStr = `Free ${catName.toLowerCase()} unit converter for ${allTopUnits}. Precise calculations with real-time results. Convert now in seconds.`;
+         canonicalUrlStr = `https://quickconvertunits.com/?category=${category}`;
+         ogTitleStr = titleStr;
+      } else {
+         const valPrefix = valFrom && valFrom !== "1" && valFrom !== "0" ? `${valFrom} ` : "";
+         titleStr = `${activeFromUnit.symbol.toUpperCase()} to ${activeToUnit.symbol.toUpperCase()} Converter | ${valPrefix}${activeFromUnit.name} to ${activeToUnit.name} Fast`;
+         metaDescStr = `Convert ${activeFromUnit.name.toLowerCase()} to ${activeToUnit.name.toLowerCase()} instantly and accurately. Enter value, select units—get results to 10 decimals. Perfect for cooking, fitness, shipping.`;
+         canonicalUrlStr = `https://quickconvertunits.com/${unitFrom}-to-${unitTo}`;
+         ogTitleStr = `${valPrefix}${activeFromUnit.name} to ${activeToUnit.name} Conversion Calculator - QuickConvert`;
+         
+         // Only navigate cleanly if we are already on a converter page OR if it's the first time landing on a specific URL
+         // This syncs the URL with the values e.g. adding ?val= without redirecting homepage visitors.
+         navigate(`/${unitFrom}-to-${unitTo}${valFrom && valFrom !== "1" ? `?val=${valFrom}` : ""}`, { replace: true });
+      }
+
+      document.title = titleStr;
 
       // SEO Meta Description
       let metaDesc = document.querySelector('meta[name="description"]');
@@ -649,10 +744,7 @@ export default function App() {
         metaDesc.setAttribute("name", "description");
         document.head.appendChild(metaDesc);
       }
-      metaDesc.setAttribute(
-        "content",
-        `Free online ${activeFromUnit.name} to ${activeToUnit.name} converter. Instantly calculate how many ${activeToUnit.name} are in a ${activeFromUnit.name} with our fast, accurate ${activeCategory.name.toLowerCase()} tool.`,
-      );
+      metaDesc.setAttribute("content", metaDescStr);
 
       // SEO Canonical URL
       let canonical = document.querySelector('link[rel="canonical"]');
@@ -661,7 +753,7 @@ export default function App() {
         canonical.setAttribute("rel", "canonical");
         document.head.appendChild(canonical);
       }
-      canonical.setAttribute("href", cleanUrl);
+      canonical.setAttribute("href", canonicalUrlStr);
 
       // SEO Open Graph / Twitter
       let ogTitle = document.querySelector('meta[property="og:title"]');
@@ -670,7 +762,7 @@ export default function App() {
         ogTitle.setAttribute("property", "og:title");
         document.head.appendChild(ogTitle);
       }
-      ogTitle.setAttribute("content", `${titleStr} - QuickConvert`);
+      ogTitle.setAttribute("content", ogTitleStr);
 
       // SEO Structured Data (JSON-LD)
       let script = document.querySelector("#seo-schema");
@@ -1347,35 +1439,57 @@ export default function App() {
               </div>
             </div>
             {/* Horizontal scrolling reviews container */}
-            <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-8 px-4 md:px-0 -mx-4 md:mx-0 hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              {[
-                { quote: "The fastest converter I've ever used. The live validation saves me so much time trying to figure out if I typed the right unit.", name: "Sarah K.", role: "Architect", rating: 5 },
-                { quote: "Finally, a converter that actually works offline on my phone. The PWA is a lifesaver when I'm out on a construction site with no signal.", name: "Mike T.", role: "Civil Engineer", rating: 5 },
-                { quote: "No confusing ads covering the buttons, straight to the point. The compare feature is exactly what I needed for my physics homework.", name: "Emily R.", role: "Student", rating: 5 },
-                { quote: "It’s so accurate and simple. I use it constantly for recipes when converting volumes and weights from global cooking sites.", name: "James L.", role: "Chef", rating: 5 },
-                { quote: "I love that when I share the URL with colleagues, it keeps the exact units we're talking about. Extremely useful for quick engineering chats.", name: "David P.", role: "Mechanical Engineer", rating: 5 },
-                { quote: "The dark mode is beautiful and doesn't hurt my eyes during late-night study sessions. A fantastic little conversion tool.", name: "Alicia C.", role: "Undergraduate", rating: 5 },
-                { quote: "It remembers what I used last so I don't have to keep selecting 'Kilometers to Miles' every single time I open the app.", name: "Robert J.", role: "Logistics Manager", rating: 5 },
-                { quote: "No fluff, just works. Extremely responsive and the UI is incredibly intuitive. The best unit converter I've found so far.", name: "Maria V.", role: "UX Designer", rating: 5 }
-              ].map((review, i) => (
-                <div key={i} className="shrink-0 snap-center w-[85vw] md:w-[350px] flex flex-col p-8 rounded-3xl bg-white dark:bg-[#111111] shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-neutral-100 dark:border-neutral-800 dark:shadow-none h-full transition-transform hover:-translate-y-1 duration-300">
-                  <div className="flex items-center gap-1 mb-4">
-                    {[...Array(review.rating)].map((_, j) => <Star key={j} className="w-4 h-4 text-amber-500 fill-amber-500" />)}
-                  </div>
-                  <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed font-light mb-6 flex-grow">"{review.quote}"</p>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 font-semibold uppercase text-sm border-2 border-white dark:border-neutral-800 shadow-sm">{review.name.charAt(0)}</div>
-                    <div>
-                      <div className="font-semibold text-sm text-neutral-900 dark:text-white leading-tight mb-0.5">{review.name}</div>
-                      <div className="text-xs text-neutral-500 font-medium">{review.role}</div>
+            <div className="w-[100vw] relative left-[50%] -translate-x-1/2 overflow-hidden pb-8 pt-4" style={{ maskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)' }}>
+              <div className="flex gap-6 w-max animate-scroll-x hover:[animation-play-state:paused]">
+                {[...[
+                  { quote: "The fastest converter I've ever used. The live validation saves me so much time trying to figure out if I typed the right unit.", name: "Sarah K.", role: "Architect", rating: 5 },
+                  { quote: "Finally, a converter that actually works offline on my phone. The PWA is a lifesaver when I'm out on a construction site with no signal.", name: "Mike T.", role: "Civil Engineer", rating: 5 },
+                  { quote: "No confusing ads covering the buttons, straight to the point. The compare feature is exactly what I needed for my physics homework.", name: "Emily R.", role: "Student", rating: 5 },
+                  { quote: "It’s so accurate and simple. I use it constantly for recipes when converting volumes and weights from global cooking sites.", name: "James L.", role: "Chef", rating: 5 },
+                  { quote: "I love that when I share the URL with colleagues, it keeps the exact units we're talking about. Extremely useful for quick engineering chats.", name: "David P.", role: "Mechanical Engineer", rating: 5 },
+                  { quote: "The dark mode is beautiful and doesn't hurt my eyes during late-night study sessions. A fantastic little conversion tool.", name: "Alicia C.", role: "Undergraduate", rating: 5 },
+                  { quote: "It remembers what I used last so I don't have to keep selecting 'Kilometers to Miles' every single time I open the app.", name: "Robert J.", role: "Logistics Manager", rating: 5 },
+                  { quote: "No fluff, just works. Extremely responsive and the UI is incredibly intuitive. The best unit converter I've found so far.", name: "Maria V.", role: "UX Designer", rating: 5 }
+                ], ...[
+                  { quote: "The fastest converter I've ever used. The live validation saves me so much time trying to figure out if I typed the right unit.", name: "Sarah K.", role: "Architect", rating: 5 },
+                  { quote: "Finally, a converter that actually works offline on my phone. The PWA is a lifesaver when I'm out on a construction site with no signal.", name: "Mike T.", role: "Civil Engineer", rating: 5 },
+                  { quote: "No confusing ads covering the buttons, straight to the point. The compare feature is exactly what I needed for my physics homework.", name: "Emily R.", role: "Student", rating: 5 },
+                  { quote: "It’s so accurate and simple. I use it constantly for recipes when converting volumes and weights from global cooking sites.", name: "James L.", role: "Chef", rating: 5 },
+                  { quote: "I love that when I share the URL with colleagues, it keeps the exact units we're talking about. Extremely useful for quick engineering chats.", name: "David P.", role: "Mechanical Engineer", rating: 5 },
+                  { quote: "The dark mode is beautiful and doesn't hurt my eyes during late-night study sessions. A fantastic little conversion tool.", name: "Alicia C.", role: "Undergraduate", rating: 5 },
+                  { quote: "It remembers what I used last so I don't have to keep selecting 'Kilometers to Miles' every single time I open the app.", name: "Robert J.", role: "Logistics Manager", rating: 5 },
+                  { quote: "No fluff, just works. Extremely responsive and the UI is incredibly intuitive. The best unit converter I've found so far.", name: "Maria V.", role: "UX Designer", rating: 5 }
+                ]].map((review, i) => (
+                  <div key={i} className="shrink-0 w-[85vw] md:w-[350px] flex flex-col p-8 rounded-3xl bg-white dark:bg-[#111111] shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-neutral-100 dark:border-neutral-800 dark:shadow-none h-auto transition-transform hover:-translate-y-1 duration-300">
+                    <div className="flex items-center gap-1 mb-4">
+                      {[...Array(review.rating)].map((_, j) => <Star key={j} className="w-4 h-4 text-amber-500 fill-amber-500" />)}
+                    </div>
+                    <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed font-light mb-6 flex-grow">"{review.quote}"</p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 font-semibold uppercase text-sm border-2 border-white dark:border-neutral-800 shadow-sm">{review.name.charAt(0)}</div>
+                      <div>
+                        <div className="font-semibold text-sm text-neutral-900 dark:text-white leading-tight mb-0.5">{review.name}</div>
+                        <div className="text-xs text-neutral-500 font-medium">{review.role}</div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
             <style>{`
-              .hide-scrollbar::-webkit-scrollbar {
-                display: none;
+              @keyframes bounce-short {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+              }
+              .animate-bounce-short {
+                animation: bounce-short 2s ease-in-out infinite;
+              }
+              @keyframes scroll-x {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(calc(-50% - 12px)); }
+              }
+              .animate-scroll-x {
+                animation: scroll-x 40s linear infinite;
               }
             `}</style>
           </div>
@@ -1822,6 +1936,7 @@ export default function App() {
       </div>
 
       <CookieConsent />
+      <PwaPrompt />
       
       {/* Error Toast */}
       <div id="error-toast" className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 bg-red-500 text-white rounded-full font-medium text-sm shadow-xl opacity-0 translate-y-4 pointer-events-none transition-all duration-300">
