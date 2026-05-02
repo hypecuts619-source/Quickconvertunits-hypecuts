@@ -7,6 +7,7 @@ import { SeoContent } from "./components/SeoContent";
 import { LanguageSelector } from "./components/LanguageSelector";
 import { useTranslation } from "react-i18next";
 import { PopularConversions, POPULAR_CONVERSIONS } from "./components/PopularConversions";
+import { TimeZoneConverter } from "./components/TimeZoneConverter";
 import {
   ArrowRightLeft,
   Sun,
@@ -38,6 +39,7 @@ const ConversionChart = lazy(() => import("./components/ConversionChart"));
 const POPULAR = [
   { label: "kg to lbs", cat: "weight", fu: "kilogram", tu: "pound" },
   { label: "inches to cm", cat: "length", fu: "inch", tu: "centimeter" },
+  { label: "Time Zone Converter", cat: "time_zone", fu: "time_zone", tu: "time_zone" },
   { label: "cm to inches", cat: "length", fu: "centimeter", tu: "inch" },
   { label: "lbs to kg", cat: "weight", fu: "pound", tu: "kilogram" },
   { label: "feet to meters", cat: "length", fu: "foot", tu: "meter" },
@@ -217,6 +219,7 @@ function CookieConsent() {
 function PwaPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isPromptReady, setIsPromptReady] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -282,6 +285,7 @@ function PwaPrompt() {
 
 
 const getSEOUrlPath = (fromId: string, toId: string) => {
+  if (fromId === 'time_zone') return 'time-zone-converter';
   if (fromId === 'kilogram' && toId === 'pound') return 'kg-to-lbs';
   if (fromId === 'inch' && toId === 'centimeter') return 'inches-to-cm';
   if (fromId === 'centimeter' && toId === 'inch') return 'cm-to-inches';
@@ -289,10 +293,19 @@ const getSEOUrlPath = (fromId: string, toId: string) => {
   if (fromId === 'foot' && toId === 'meter') return 'feet-to-meters';
   if (fromId === 'mile' && toId === 'kilometer') return 'miles-to-km';
   if (fromId === 'millimeter' && toId === 'inch') return 'mm-to-inches';
+  
+  if (fromId === 'usd' && toId === 'inr') return 'usd-to-inr';
+  if (fromId === 'mile_per_hour' && toId === 'kilometer_per_hour') return 'mph-to-kph';
+  if (fromId === 'liter' && toId === 'us_gallon') return 'liters-to-gallons';
+  if (fromId === 'acre' && toId === 'square_meter') return 'acres-to-square-meters';
+  if (fromId === 'square_foot' && toId === 'square_meter') return 'square-feet-to-square-meters';
+  if (fromId === 'celsius' && toId === 'fahrenheit') return 'celsius-to-fahrenheit';
+  if (fromId === 'fahrenheit' && toId === 'celsius') return 'fahrenheit-to-celsius';
   return `${fromId}-to-${toId}`;
 };
 
 const getUnitIdsFromPath = (path: string) => {
+  if (path === 'time-zone-converter') return ['time_zone', 'time_zone'];
   if (path === 'kg-to-lbs') return ['kilogram', 'pound'];
   if (path === 'inches-to-cm') return ['inch', 'centimeter'];
   if (path === 'cm-to-inches') return ['centimeter', 'inch'];
@@ -300,6 +313,14 @@ const getUnitIdsFromPath = (path: string) => {
   if (path === 'feet-to-meters') return ['foot', 'meter'];
   if (path === 'miles-to-km') return ['mile', 'kilometer'];
   if (path === 'mm-to-inches') return ['millimeter', 'inch'];
+  
+  if (path === 'usd-to-inr') return ['usd', 'inr'];
+  if (path === 'mph-to-kph') return ['mile_per_hour', 'kilometer_per_hour'];
+  if (path === 'liters-to-gallons') return ['liter', 'us_gallon'];
+  if (path === 'acres-to-square-meters') return ['acre', 'square_meter'];
+  if (path === 'square-feet-to-square-meters') return ['square_foot', 'square_meter'];
+  if (path === 'celsius-to-fahrenheit') return ['celsius', 'fahrenheit'];
+  if (path === 'fahrenheit-to-celsius') return ['fahrenheit', 'celsius'];
   return path.split('-to-');
 };
 
@@ -326,6 +347,7 @@ export default function App() {
   // Initialize state from URL params if present
   const [category, setCategory] = useState(() => {
     if (conversion) {
+      if (conversion === "time-zone-converter") return "time_zone";
       const parts = getUnitIdsFromPath(conversion);
       if (parts.length === 2) {
         for (const cat of categories) {
@@ -348,7 +370,7 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     const cat = params.get("category") || categories[0].id;
     const activeCat = categories.find((c) => c.id === cat) || categories[0];
-    return params.get("from") || activeCat.units[0].id;
+    return params.get("from") || activeCat.units[0]?.id || "";
   });
   const [unitTo, setUnitTo] = useState(() => {
     if (conversion) {
@@ -360,7 +382,7 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     const cat = params.get("category") || categories[0].id;
     const activeCat = categories.find((c) => c.id === cat) || categories[0];
-    return params.get("to") || activeCat.units[1].id;
+    return params.get("to") || activeCat.units[1]?.id || activeCat.units[0]?.id || "";
   });
 
   const [valFrom, setValFrom] = useState(() => {
@@ -586,8 +608,13 @@ export default function App() {
     const cat = categories.find((c) => c.id === catId);
     if (cat) {
       setCategory(cat.id);
-      setUnitFrom(cat.units[0].id);
-      setUnitTo(cat.units[1].id);
+      if (cat.id === 'time_zone') {
+        setUnitFrom('time_zone');
+        setUnitTo('time_zone');
+      } else {
+        setUnitFrom(cat.units[0]?.id || "");
+        setUnitTo(cat.units[1]?.id || cat.units[0]?.id || "");
+      }
     }
   };
 
@@ -662,6 +689,53 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (category === 'time_zone') {
+       const titleStr = 'Time Zone Converter: Convert UTC, EST, PST, CET | QuickConvert';
+       const metaDescStr = 'Instantly convert between time zones to schedule global meetings easily. Supports UTC, EST, PST, standard and daylight time conversions.';
+       document.title = titleStr;
+       let metaDesc = document.querySelector('meta[name="description"]');
+       if (!metaDesc) {
+         metaDesc = document.createElement("meta");
+         metaDesc.setAttribute("name", "description");
+         document.head.appendChild(metaDesc);
+       }
+       metaDesc.setAttribute("content", metaDescStr);
+       let lkCan = document.querySelector('link[rel="canonical"]');
+       if (!lkCan) {
+         lkCan = document.createElement("link");
+         lkCan.setAttribute("rel", "canonical");
+         document.head.appendChild(lkCan);
+       }
+       lkCan.setAttribute("href", "https://quickconvertunits.com/time-zone-converter");
+       
+       let ogTitle = document.querySelector('meta[property="og:title"]');
+       if (!ogTitle) {
+         ogTitle = document.createElement("meta");
+         ogTitle.setAttribute("property", "og:title");
+         document.head.appendChild(ogTitle);
+       }
+       ogTitle.setAttribute("content", titleStr);
+       
+       let seoSchema = document.getElementById("seo-schema");
+       if (!seoSchema) {
+         seoSchema = document.createElement("script");
+         seoSchema.id = "seo-schema";
+         seoSchema.setAttribute("type", "application/ld+json");
+         document.head.appendChild(seoSchema);
+       }
+       seoSchema.innerText = JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          name: titleStr,
+          url: "https://quickconvertunits.com/time-zone-converter",
+          applicationCategory: "UtilityApplications",
+          operatingSystem: "All",
+          description: metaDescStr,
+         }, null, 2);
+       navigate('/time-zone-converter', { replace: true });
+       return;
+    }
+
     if (activeFromUnit && activeToUnit) {
       const isHomepage = location.pathname === "/" && !location.search.includes("category=");
       const isCategoryPage = location.pathname === "/" && location.search.includes("category=");
@@ -760,7 +834,7 @@ export default function App() {
       ];
 
       // Only add specific conversion rich results on particular converter pages
-      if (isSpecificConverter) {
+      if (isSpecificConverter && activeFromUnit && activeToUnit && category !== 'time_zone') {
         const conversionFactor = convert(1, unitFrom, unitTo, category);
         const formattedFactor = parseFloat(conversionFactor.toFixed(6));
         
@@ -1088,20 +1162,26 @@ export default function App() {
         {/* Left Column (Main App + Content) */}
         <div className="flex-1 max-w-3xl mx-auto w-full">
           <div className="text-center mb-10">
-            <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-4xl md:text-5xl font-semibold tracking-tight mb-4 text-neutral-900 dark:text-white">
-              Convert {activeFromUnit?.name} to {activeToUnit?.name}
-              <button
-                onClick={toggleFavorite}
-                className={`flex-shrink-0 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full transition-colors ${
-                  isFavorited
-                    ? "bg-amber-100 text-amber-500 dark:bg-amber-500/20 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-500/30"
-                    : "bg-neutral-100 text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600 dark:bg-[#1a1a1a] dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-neutral-300"
-                }`}
-                title={isFavorited ? "Saved to Favorites" : "Save this conversion"}
-              >
-                <Star className={`w-5 h-5 md:w-6 md:h-6 ${isFavorited ? "fill-current" : ""}`} />
-              </button>
-            </h1>
+            {category === 'time_zone' ? (
+              <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-4xl md:text-5xl font-semibold tracking-tight mb-4 text-neutral-900 dark:text-white">
+                Time Zone Converter
+              </h1>
+            ) : (
+              <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-4xl md:text-5xl font-semibold tracking-tight mb-4 text-neutral-900 dark:text-white">
+                Convert {activeFromUnit?.name} to {activeToUnit?.name}
+                <button
+                  onClick={toggleFavorite}
+                  className={`flex-shrink-0 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full transition-colors ${
+                    isFavorited
+                      ? "bg-amber-100 text-amber-500 dark:bg-amber-500/20 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-500/30"
+                      : "bg-neutral-100 text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600 dark:bg-[#1a1a1a] dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-neutral-300"
+                  }`}
+                  title={isFavorited ? "Saved to Favorites" : "Save this conversion"}
+                >
+                  <Star className={`w-5 h-5 md:w-6 md:h-6 ${isFavorited ? "fill-current" : ""}`} />
+                </button>
+              </h1>
+            )}
             <p className="text-neutral-500 dark:text-neutral-400 text-lg font-light">
               Fast, accurate, and completely free {category.replace("_", " ")} conversion tool.
             </p>
@@ -1125,6 +1205,9 @@ export default function App() {
           </div>
 
           {/* Converter Card */}
+          {category === 'time_zone' ? (
+            <TimeZoneConverter />
+          ) : (
           <motion.div
             layout
             className="bg-white dark:bg-[#111111] p-6 md:p-10 rounded-[2.5rem] shadow-[0_8px_40px_rgba(0,0,0,0.04)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 relative z-10 overflow-hidden"
@@ -1372,27 +1455,27 @@ export default function App() {
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-neutral-100 dark:bg-[#1a1a1a] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-sm font-medium text-neutral-700 dark:text-neutral-300 transition-colors"
               >
                 <Copy className="w-4 h-4" />{" "}
-                {copied ? "Copied!" : "Copy Result"}
+                {copied ? t("copied", "Copied!") : t("copyResult", "Copy Result")}
               </button>
               <button
                 onClick={handleShare}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-neutral-100 dark:bg-[#1a1a1a] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-sm font-medium text-neutral-700 dark:text-neutral-300 transition-colors"
               >
-                <Share2 className="w-4 h-4" /> Share
+                <Share2 className="w-4 h-4" /> {t("share", "Share")}
               </button>
               <button
                 onClick={() => setShowBulk(!showBulk)}
                 className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${showBulk ? "bg-primary-500/10 text-primary-600 dark:text-primary-400" : "bg-neutral-100 dark:bg-[#1a1a1a] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300"}`}
               >
                 <Grid className="w-4 h-4" />{" "}
-                {showBulk ? "Hide Bulk Convert" : "Bulk Convert"}
+                {showBulk ? t("hideBulkConvert", "Hide Bulk Convert") : t("bulkConvert", "Bulk Convert")}
               </button>
               <button
                 onClick={() => setShowCompare(!showCompare)}
                 className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${showCompare ? "bg-primary-500/10 text-primary-600 dark:text-primary-400" : "bg-neutral-100 dark:bg-[#1a1a1a] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300"}`}
               >
                 <Table className="w-4 h-4" />{" "}
-                {showCompare ? "Hide Compare" : "Compare"}
+                {showCompare ? t("hideCompare", "Hide Compare") : t("compare", "Compare")}
               </button>
               <button
                 onClick={handleClear}
@@ -1578,8 +1661,10 @@ export default function App() {
               )}
             </AnimatePresence>
           </motion.div>
+          )}
 
           {/* Frequently Asked Questions */}
+          {category !== 'time_zone' && activeFromUnit && activeToUnit && (
           <div className="mt-8 bg-white dark:bg-[#111111] rounded-3xl p-8 md:p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-neutral-100 dark:border-neutral-800">
             <h3 className="text-2xl font-semibold tracking-tight mb-6">Frequently Asked Questions</h3>
             <div className="space-y-6">
@@ -1615,6 +1700,7 @@ export default function App() {
               </div>
             </div>
           </div>
+          )}
 
           {/* Conversion Chart for Specific Categories */}
           <Suspense fallback={<div className="mt-8 h-[350px] flex items-center justify-center bg-white dark:bg-neutral-800 rounded-3xl border border-neutral-100 dark:border-neutral-700">Loading chart...</div>}>
@@ -1999,7 +2085,7 @@ export default function App() {
                 {POPULAR_CONVERSIONS.slice(0, 12).map((conv, i) => (
                   <a
                     key={i}
-                    href={`/?category=${conv.cat}&from=${conv.from}&to=${conv.to}`}
+                    href={conv.cat === 'time_zone' ? '/time-zone-converter' : `/?category=${conv.cat}&from=${conv.from}&to=${conv.to}`}
                     onClick={(e) => {
                       e.preventDefault();
                       handleCategoryChange(conv.cat);
@@ -2010,9 +2096,15 @@ export default function App() {
                       }, 10);
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
-                    className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800/50 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 group transition-colors"
+                    className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-neutral-50 dark:bg-neutral-800/20 dark:hover:bg-neutral-800/50 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 group transition-colors"
                   >
-                    <span>{t(`units.${conv.from}`, conv.label.split(' to ')[0])} {t("to", "to")} {t(`units.${conv.to}`, conv.label.split(' to ')[1])}</span>
+                    <span>
+                      {conv.cat === 'time_zone' ? (
+                        t(`units.time_zone_converter`, 'Time Zone Converter')
+                      ) : (
+                        <>{t(`units.${conv.from}`, conv.label.split(' to ')[0])} {t("to", "to")} {t(`units.${conv.to}`, conv.label.split(' to ')[1])}</>
+                      )}
+                    </span>
                     <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                   </a>
                 ))}

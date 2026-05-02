@@ -236,6 +236,12 @@ export const categories: UnitCategory[] = [
       { id: 'miles_per_gallon_uk', name: 'Miles per Gallon (UK)', symbol: 'mpg (UK)', factor: 0.35400619, description: 'A measure of how far a vehicle can travel on one imperial gallon of fuel.' }
       // liters per 100km is inversely proportional, not linear, so we'll omit it here or implement a special case later.
     ]
+  },
+  {
+    id: 'time_zone',
+    name: 'Time Zone',
+    baseUnit: 'utc',
+    units: [] // Special case for UI
   }
 ];
 
@@ -317,6 +323,7 @@ export function convert(
   return baseValue / toUnit.factor;
 }
 
+
 export function getSuggestions(query: string) {
   if (!query || query.trim().length === 0) return [];
   const q = query.toLowerCase().trim();
@@ -325,6 +332,23 @@ export function getSuggestions(query: string) {
   
   // Parse something like "kg to lbs", "meter", etc.
   categories.forEach(cat => {
+    if (cat.id === 'time_zone') {
+      if (
+        'time zone'.includes(q) || 
+        'timezone'.includes(q) || 
+        'converter'.includes(q) ||
+        (q.includes('time') && q.includes('zone'))
+      ) {
+         results.push({
+           categoryId: 'time_zone',
+           fromId: 'time_zone',
+           toId: 'time_zone',
+           text: `Time Zone Converter`
+         });
+      }
+      return;
+    }
+
     cat.units.forEach(u1 => {
       cat.units.forEach(u2 => {
         if (u1.id === u2.id) return;

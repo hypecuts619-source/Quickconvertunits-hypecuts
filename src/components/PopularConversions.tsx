@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export const POPULAR_CONVERSIONS = [
+  { from: 'time_zone', to: 'time_zone', label: 'Time Zone Converter', cat: 'time_zone' },
   { from: 'kilogram', to: 'pound', label: 'KG to LBS', cat: 'weight' },
   { from: 'pound', to: 'kilogram', label: 'LBS to KG', cat: 'weight' },
   { from: 'meter', to: 'foot', label: 'Meters to Feet', cat: 'length' },
@@ -42,7 +43,7 @@ export function PopularConversions({ onSelect }: { onSelect: (cat: string, from:
         {POPULAR_CONVERSIONS.map((conv, i) => (
           <a
             key={i}
-            href={`/?category=${conv.cat}&from=${conv.from}&to=${conv.to}`}
+            href={conv.cat === 'time_zone' ? '/time-zone-converter' : `/?category=${conv.cat}&from=${conv.from}&to=${conv.to}`}
             onClick={(e) => {
               e.preventDefault();
               onSelect(conv.cat, conv.from, conv.to);
@@ -51,7 +52,11 @@ export function PopularConversions({ onSelect }: { onSelect: (cat: string, from:
             className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-[#111111] border border-neutral-100 dark:border-neutral-800 hover:border-primary-500 hover:shadow-md transition-all group"
           >
             <span className="font-medium text-sm text-neutral-800 dark:text-neutral-200 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-              {t(`units.${conv.from}`, conv.label.split(' to ')[0])} {t("to", "to")} {t(`units.${conv.to}`, conv.label.split(' to ')[1])}
+              {conv.cat === 'time_zone' ? (
+                t(`units.time_zone_converter`, 'Time Zone Converter')
+              ) : (
+                <>{t(`units.${conv.from}`, conv.label.split(' to ')[0])} {t("to", "to")} {t(`units.${conv.to}`, conv.label.split(' to ')[1])}</>
+              )}
             </span>
             <ArrowRight className="w-4 h-4 text-neutral-300 dark:text-neutral-600 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all" />
           </a>

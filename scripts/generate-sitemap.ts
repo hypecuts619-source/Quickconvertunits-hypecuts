@@ -41,10 +41,22 @@ const getSEOUrlPath = (fromId, toId) => {
   if (fromId === 'foot' && toId === 'meter') return '/feet-to-meters';
   if (fromId === 'mile' && toId === 'kilometer') return '/miles-to-km';
   if (fromId === 'millimeter' && toId === 'inch') return '/mm-to-inches';
+  
+  // Specific requested pair shortcuts
+  if (fromId === 'usd' && toId === 'inr') return '/usd-to-inr';
+  if (fromId === 'mile_per_hour' && toId === 'kilometer_per_hour') return '/mph-to-kph';
+  if (fromId === 'liter' && toId === 'us_gallon') return '/liters-to-gallons';
+  if (fromId === 'acre' && toId === 'square_meter') return '/acres-to-square-meters';
+  if (fromId === 'square_foot' && toId === 'square_meter') return '/square-feet-to-square-meters';
+  if (fromId === 'celsius' && toId === 'fahrenheit') return '/celsius-to-fahrenheit';
+  if (fromId === 'fahrenheit' && toId === 'celsius') return '/fahrenheit-to-celsius';
+
   return `/${fromId}-to-${toId}`;
 };
 
 // All valid conversion combinations
+addUrl("/time-zone-converter", "0.9", "weekly");
+
 for (const category of categories) {
   for (const fromUnit of category.units) {
     for (const toUnit of category.units) {

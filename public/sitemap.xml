@@ -81,6 +81,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://ais-dev-esayqq4dju4rtwygglnkm7-224543665282.asia-east1.run.app/time-zone-converter</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>https://ais-dev-esayqq4dju4rtwygglnkm7-224543665282.asia-east1.run.app/meter-to-kilometer</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -631,7 +636,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://ais-dev-esayqq4dju4rtwygglnkm7-224543665282.asia-east1.run.app/acre-to-square_meter</loc>
+    <loc>https://ais-dev-esayqq4dju4rtwygglnkm7-224543665282.asia-east1.run.app/acres-to-square-meters</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -691,7 +696,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://ais-dev-esayqq4dju4rtwygglnkm7-224543665282.asia-east1.run.app/square_foot-to-square_meter</loc>
+    <loc>https://ais-dev-esayqq4dju4rtwygglnkm7-224543665282.asia-east1.run.app/square-feet-to-square-meters</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -761,7 +766,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://ais-dev-esayqq4dju4rtwygglnkm7-224543665282.asia-east1.run.app/liter-to-us_gallon</loc>
+    <loc>https://ais-dev-esayqq4dju4rtwygglnkm7-224543665282.asia-east1.run.app/liters-to-gallons</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -1736,7 +1741,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://ais-dev-esayqq4dju4rtwygglnkm7-224543665282.asia-east1.run.app/mile_per_hour-to-kilometer_per_hour</loc>
+    <loc>https://ais-dev-esayqq4dju4rtwygglnkm7-224543665282.asia-east1.run.app/mph-to-kph</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

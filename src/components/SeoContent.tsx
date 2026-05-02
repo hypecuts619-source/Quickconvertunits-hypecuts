@@ -28,7 +28,7 @@ export function SeoContent({
   
   const fUnitName = t(`units.${fUnit.id}`, fUnit.name);
   const tUnitName = t(`units.${tUnit.id}`, tUnit.name);
-  const catName = cat ? t(`categories.${cat.id}`, cat.name).toLowerCase() : 'measurement';
+  const catName = cat ? String(t(`categories.${cat.id}`, cat.name)).toLowerCase() : 'measurement';
 
   const catSeoHtml = categorySeoContent[category];
 
