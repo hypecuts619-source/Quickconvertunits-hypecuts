@@ -342,3 +342,11 @@ export function getSuggestions(query: string) {
 }
 
 // Ensure categorzeQuery doesn't cause errors if not imported, replacing it with getSuggestions in App.tsx
+
+export function formatNumber(num: number): string {
+  if (Number.isNaN(num)) return "0";
+  const str = Number.isInteger(num) ? num.toString() : parseFloat(num.toFixed(6)).toString();
+  const parts = str.split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return parts.join(".");
+}

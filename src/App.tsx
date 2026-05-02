@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo, useRef, lazy, Suspense } from "react";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
-import { getSuggestions, convert, categories } from "./lib/units";
+import { getSuggestions, convert, categories, formatNumber } from "./lib/units";
 import { categorySeoContent } from "./lib/seoContent";
 import { trackConversionEvent, trackFunnelStep } from "./lib/analytics";
+import { SeoContent } from "./components/SeoContent";
+import { PopularConversions, POPULAR_CONVERSIONS } from "./components/PopularConversions";
 import {
   ArrowRightLeft,
   Sun,
@@ -137,16 +139,24 @@ const AdSlot = ({
     }
   }, [useRealAds]);
 
+  const extractPx = (cls: string) => {
+    const match = cls.match(/\[(\d+px)\]/);
+    return match ? match[1] : undefined;
+  };
+  
+  const minHeight = extractPx(heightClass);
+  const minWidth = extractPx(widthClass);
+
   return (
-    <div className={`flex flex-col items-center overflow-hidden max-w-full ${className || ""}`}>
+    <div className={`flex flex-col items-center overflow-hidden max-w-full ${className || ""}`} style={{ minHeight }}>
       <span className="text-[10px] text-neutral-400 dark:text-neutral-500 uppercase tracking-widest mb-1.5 font-medium">
         Advertisement
       </span>
       {useRealAds ? (
-        <div className={`overflow-hidden flex justify-center ${widthClass} ${heightClass}`}>
+        <div className={`overflow-hidden flex justify-center ${widthClass} ${heightClass}`} style={{ minHeight, minWidth }}>
           <ins
             className="adsbygoogle"
-            style={{ display: "block", width: "100%", height: "100%" }}
+            style={{ display: "block", width: "100%", height: "100%", minHeight, minWidth }}
             data-ad-client="ca-pub-0000000000000000" // Replace with your AdSense Publisher ID
             data-ad-slot={adSlotId}
             data-ad-format="auto"
@@ -394,6 +404,19 @@ export default function App() {
     localStorage.setItem("theme-color", theme);
   }, [theme]);
 
+  // Offline status indicator
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  useEffect(() => {
+    const handleOffline = () => setIsOffline(true);
+    const handleOnline = () => setIsOffline(false);
+    window.addEventListener("offline", handleOffline);
+    window.addEventListener("online", handleOnline);
+    return () => {
+      window.removeEventListener("offline", handleOffline);
+      window.removeEventListener("online", handleOnline);
+    };
+  }, []);
+
   const handleRefreshRates = async () => {
     setIsRefreshing(true);
     try {
@@ -417,7 +440,7 @@ export default function App() {
 
   // Handle conversion forward
   useEffect(() => {
-    if (valFrom === "") {
+    if (valFrom === "" || valFrom === "-" || valFrom === ".") {
       setValTo("");
       return;
     }
@@ -430,6 +453,8 @@ export default function App() {
           ? res.toString()
           : parseFloat(res.toFixed(6)).toString(),
       );
+    } else {
+      setValTo("");
     }
   }, [valFrom, unitFrom, unitTo, category, ratesUpdated]);
 
@@ -477,7 +502,7 @@ export default function App() {
   // Handle reverse conversion
   const handleValToChange = (v: string) => {
     setValTo(v);
-    if (v === "") {
+    if (v === "" || v === "-" || v === ".") {
       setValFrom("");
       return;
     }
@@ -489,6 +514,8 @@ export default function App() {
           ? res.toString()
           : parseFloat(res.toFixed(6)).toString(),
       );
+    } else {
+      setValFrom("");
     }
   };
 
@@ -504,6 +531,15 @@ export default function App() {
     if (valTo) {
       navigator.clipboard.writeText(valTo);
       setCopied(true);
+      
+      const toast = document.getElementById('error-toast');
+      if (toast) {
+        // Simple visual improvement
+        toast.textContent = "✅ Result copied to clipboard!";
+        toast.className = "fixed bottom-5 left-1/2 -translate-x-1/2 z-50 py-3 px-5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-full shadow-lg text-sm font-medium transition-all duration-300";
+        setTimeout(() => toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none'), 2500);
+      }
+      
       setTimeout(() => setCopied(false), 2000);
     }
   };
@@ -563,9 +599,14 @@ export default function App() {
       // Ignore if typing inside input fields (unless it's cmd/ctrl + combination)
       const isInputFocused = document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA';
 
-      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+      if (e.key === "Escape") {
+        setValFrom("");
+        setValTo("");
+      }
+
+      if ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "/")) {
         e.preventDefault();
-        const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement;
+        const searchInput = document.getElementById("main-converter-input") as HTMLInputElement;
         if (searchInput) {
           searchInput.focus();
         }
@@ -782,6 +823,21 @@ export default function App() {
     <div
       className={`min-h-screen text-neutral-900 dark:text-neutral-100 font-sans transition-colors duration-200 relative overflow-hidden`}
     >
+      {/* Offline Banner */}
+      <AnimatePresence>
+        {isOffline && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="bg-amber-500 text-amber-950 px-4 py-2 text-sm font-medium text-center flex items-center justify-center gap-2 overflow-hidden"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m2 2 20 20"/><path d="M8.53 8.53C5.52 9.57 2 12 2 12l2 2.67c2.5-1.57 5-2.5 7.5-2.62M16.74 16.74c1.9-.37 3.9-.99 5.26-1.4L20 12c-1.4 1-3.1 1.77-5 2.15M13 13h.01M22 6s-4-3-10-3c-2.4 0-4.6.6-6.6 1.7"/></svg>
+            You're currently offline. Core conversions still work locally!
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Background gradients */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-500/5 dark:bg-primary-500/10 blur-[120px]" />
@@ -1069,6 +1125,7 @@ export default function App() {
                 </div>
                 <div className="relative flex items-center mt-3">
                   <input
+                    id="main-converter-input"
                     aria-label={`From value in ${activeFromUnit?.name || 'unit'}`}
                     type="text"
                     value={valFrom}
@@ -1167,6 +1224,12 @@ export default function App() {
                     )}
                   </div>
                 </div>
+                {valFrom.startsWith("-") && category !== "temperature" && (
+                  <p className="text-amber-500 dark:text-amber-400 text-xs mt-3 flex items-center gap-1 font-medium bg-amber-50 dark:bg-amber-500/10 p-2 rounded-lg py-1.5 border border-amber-200 dark:border-amber-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    {activeCategory?.name} conversions typically use positive values.
+                  </p>
+                )}
               </div>
 
               {/* SWAP BUTTON */}
@@ -1233,14 +1296,20 @@ export default function App() {
                   {valTo && (
                     <button
                       onClick={handleCopy}
-                      className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors"
+                      className="flex-shrink-0 flex items-center justify-center gap-2 px-4 h-12 rounded-xl bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/40 text-primary-600 dark:text-primary-400 font-medium transition-colors shadow-sm"
                       aria-label="Copy result"
                       title="Copy result"
                     >
                       {copied ? (
-                        <Check className="w-5 h-5 text-green-500" />
+                        <>
+                          <Check className="w-5 h-5 md:w-4 md:h-4 text-green-500" />
+                          <span className="hidden md:inline">Copied!</span>
+                        </>
                       ) : (
-                        <Copy className="w-5 h-5" />
+                        <>
+                          <Copy className="w-5 h-5 md:w-4 md:h-4" />
+                          <span className="hidden md:inline">Copy</span>
+                        </>
                       )}
                     </button>
                   )}
@@ -1346,13 +1415,13 @@ export default function App() {
                               {u.name}
                             </div>
                             <div className="text-sm font-semibold font-mono text-neutral-800 dark:text-neutral-200 break-all">
-                              {parseFloat(
+                              {formatNumber(
                                 convert(
                                   parseFloat(valFrom),
                                   unitFrom,
                                   u.id,
                                   category,
-                                ).toFixed(6),
+                                )
                               )}{" "}
                               {u.symbol}
                             </div>
@@ -1834,309 +1903,23 @@ export default function App() {
               </div>
             </div>
 
-            {/* Dedicated Specific SEO Content Block */}
-            {unitFrom === "kilogram" && unitTo === "pound" && (
-              <div className="prose prose-neutral dark:prose-invert max-w-none mb-10 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-2xl prose-h3:text-lg prose-p:font-light prose-p:leading-relaxed prose-p:text-neutral-600 dark:prose-p:text-neutral-400">
-                <h2>KG to LBS Converter</h2>
-                <p>Welcome to the ultimate tool to convert kg to lbs instantly. Whether you're tracking your health journey, measuring international shipping details, or looking up heavy materials, you need an accurate kilograms to pounds calculator. We provide reliable accuracy down to the decimal.</p>
-                
-                <h3>How to Convert KG to LBS</h3>
-                <p>To manually convert kilograms (kg) to pounds (lbs), you multiply the weight in kilograms by <strong>2.20462</strong>. For example, if you have 5 kg, the calculation is 5 × 2.20462 = 11.02 lbs. However, memorizing this formula and performing manual math is slow and prone to errors. Our real-time calculator handles this for you instantly.</p>
-                
-                <h3>Common Uses for KG to LBS Conversions</h3>
-                <ul>
-                  <li><strong>Fitness and Health:</strong> Most international gyms and health equipment (like Olympic barbells and bumper plates) are measured in kilograms. If you're following an American fitness plan, you'll constantly need to know your lifts and body weight in pounds.</li>
-                  <li><strong>Shipping and Logistics:</strong> International freight, airlines, and courier services use kilograms to calculate mass. Converting this to pounds ensures you understand the exact limits before packing your luggage or shipping a heavy pallet.</li>
-                  <li><strong>Baking and Cooking:</strong> Many European recipes list heavy ingredient quantities in kilograms rather than pounds for precise food scaling.</li>
-                </ul>
-                
-                <h3>Frequently Asked Questions</h3>
-                <h4>How many pounds are in 1 kilogram?</h4>
-                <p>There are approximately 2.20462 pounds in exactly 1 kilogram.</p>
-                <h4>Is 50kg heavier than 100 lbs?</h4>
-                <p>Yes, 50 kg is equal to 110.23 lbs, making it heavier than 100 lbs.</p>
-              </div>
-            )}
+            <SeoContent 
+              unitFrom={unitFrom} 
+              unitTo={unitTo} 
+              category={category} 
+              categories={categories} 
+            />
             
-            {unitFrom === "inch" && unitTo === "centimeter" && (
-               <div className="prose prose-neutral dark:prose-invert max-w-none mb-10 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-2xl prose-h3:text-lg prose-p:font-light prose-p:leading-relaxed prose-p:text-neutral-600 dark:prose-p:text-neutral-400">
-                 <h2>Inches to CM Converter</h2>
-                 <p>Quickly and precisely convert inches to centimeters (in to cm) with our free tool. Whether you're reviewing electronics screen sizes, tackling a DIY home project, or reading international blueprints, understanding the metric equivalent to inches is crucial for accuracy.</p>
-                 
-                 <h3>How to Convert Inches to CM</h3>
-                 <p>The standard conversion factor dictates that 1 inch is exactly equal to <strong>2.54 centimeters</strong>. To translate your measurement, simply multiply the number of inches by 2.54. For example, a standard 12-inch ruler is 12 × 2.54 = 30.48 cm long. Using our calculator saves you the hassle of manual math.</p>
-                 
-                 <h3>Common Uses for Inches to CM Conversions</h3>
-                 <ul>
-                   <li><strong>Screen Sizes:</strong> Televisions, computer monitors, and smartphone screens are globally marketed in inches (e.g., a "55-inch TV" or "6-inch phone"). Converting this to centimeters provides a clearer idea of physical dimensions for room planning.</li>
-                   <li><strong>Clothing and Textiles:</strong> Waist sizes and inseams often use inches. Converting to centimeters ensures you purchase the correct fit when shopping with international retailers.</li>
-                   <li><strong>Engineering and Machining:</strong> Transitioning between imperial blueprints and metric materials requires precise conversions to prevent catastrophic measurement errors.</li>
-                 </ul>
-                 
-                 <h3>Frequently Asked Questions</h3>
-                 <h4>What is 1 inch in cm?</h4>
-                 <p>One inch is exactly 2.54 centimeters.</p>
-                 <h4>How many cm are in 12 inches?</h4>
-                 <p>There are 30.48 centimeters in 12 inches (or 1 foot).</p>
-               </div>
-            )}
-
-            {unitFrom === "centimeter" && unitTo === "inch" && (
-               <div className="prose prose-neutral dark:prose-invert max-w-none mb-10 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-2xl prose-h3:text-lg prose-p:font-light prose-p:leading-relaxed prose-p:text-neutral-600 dark:prose-p:text-neutral-400">
-                 <h2>CM to Inches Converter</h2>
-                 <p>Easily convert centimeters to inches (cm to in) with our fast online calculator. Perfect for converting international measurements back to the imperial system for sewing, drafting, or human height.</p>
-                 
-                 <h3>How to Convert Centimeters to Inches</h3>
-                 <p>To convert from metric centimeters back to imperial inches, divide the value by 2.54 (or multiply by 0.3937). For instance, 50 centimeters ÷ 2.54 = approximately 19.685 inches. Our reliable calculator instantly performs this math for free.</p>
-                 
-                 <h3>Common Uses for CM to Inches</h3>
-                 <ul>
-                   <li><strong>Measuring Height:</strong> Most of the world records human height in centimeters. Translating a height of 175 cm to inches helps individuals familiar with feet and inches understand the measurement clearly.</li>
-                   <li><strong>Medical Data:</strong> Doctors frequently use centimeters to record physiological dimensions. Translating this to inches can make personal health records easier to read.</li>
-                   <li><strong>Arts and Crafts:</strong> Buying imported fabrics, art canvases, or frames often involves centimeter measurements that you'll need to fit into your US-based projects.</li>
-                 </ul>
-               </div>
-            )}
-
-            {unitFrom === "pound" && unitTo === "kilogram" && (
-               <div className="prose prose-neutral dark:prose-invert max-w-none mb-10 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-2xl prose-h3:text-lg prose-p:font-light prose-p:leading-relaxed prose-p:text-neutral-600 dark:prose-p:text-neutral-400">
-                 <h2>LBS to KG Converter</h2>
-                 <p>Accurately convert pounds to kilograms (lbs to kg) in a single step. Our calculator provides high-precision answers for logistics, healthcare, and bodybuilding applications.</p>
-                 
-                 <h3>How to Convert LBS to KG</h3>
-                 <p>To get kilograms, multiply your pounds by <strong>0.453592</strong> (or divide by 2.20462). This means 150 lbs is equal to 150 × 0.453592 = 68.04 kg. For exact results without the heavy lifting, our straightforward calculator handles the complex decimals behind the scenes.</p>
-                 
-                 <h3>Common Uses for LBS to KG</h3>
-                 <ul>
-                   <li><strong>Aviation Allowances:</strong> International airlines strictly enforce luggage weight limits in kilograms, typically around 23 kg. Knowing how many pounds this corresponds to stops unexpected oversized baggage fees.</li>
-                   <li><strong>Medical Dosing:</strong> Many medical prescriptions are based on "mg per kg of body weight." Knowing your exact mass in kilograms rather than pounds ensures critical dosage accuracy.</li>
-                 </ul>
-               </div>
-            )}
-            
-            {unitFrom === "foot" && unitTo === "meter" && (
-               <div className="prose prose-neutral dark:prose-invert max-w-none mb-10 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-2xl prose-h3:text-lg prose-p:font-light prose-p:leading-relaxed prose-p:text-neutral-600 dark:prose-p:text-neutral-400">
-                 <h2>Feet to Meters Converter</h2>
-                 <p>Instantly convert feet to meters (ft to m). Essential for civil engineering, track and field, and real estate, allowing you to bridge imperial scales to metric precision.</p>
-                 <h3>How to Convert Feet to Meters</h3>
-                 <p>Since 1 meter is roughly 3.28084 feet, you divide your total feet by 3.28084 (or multiply by 0.3048). Thus, 10 feet equals exactly 3.048 meters.</p>
-               </div>
-            )}
-
-            {unitFrom === "mile" && unitTo === "kilometer" && (
-               <div className="prose prose-neutral dark:prose-invert max-w-none mb-10 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-2xl prose-h3:text-lg prose-p:font-light prose-p:leading-relaxed prose-p:text-neutral-600 dark:prose-p:text-neutral-400">
-                 <h2>Miles to KM Converter</h2>
-                 <p>Quickly convert miles to kilometers (mi to km) for international travel, running races, or automotive specifications. Our calculator simplifies road distances effortlessly.</p>
-                 
-                 <h3>How to Convert Miles to KM</h3>
-                 <p>1 mile equals 1.60934 kilometers. To get kilometers, just multiply your miles by 1.60934. For instance, a 5-mile run is 5 × 1.60934 = 8.0467 kilometers.</p>
-                 
-                 <h3>Common Uses for Miles to KM</h3>
-                 <ul>
-                   <li><strong>Travel and Driving:</strong> U.S. speeds and distances are in miles, while most of the globe reads kilometers. Knowing the conversion prevents speeding tickets abroad.</li>
-                   <li><strong>Running and Cycling:</strong> Popular event distances like "10K" drops the mystery when you convert them (10 kilometers is roughly 6.2 miles).</li>
-                 </ul>
-               </div>
-            )}
-
-            {unitFrom === "millimeter" && unitTo === "inch" && (
-               <div className="prose prose-neutral dark:prose-invert max-w-none mb-10 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-2xl prose-h3:text-lg prose-p:font-light prose-p:leading-relaxed prose-p:text-neutral-600 dark:prose-p:text-neutral-400">
-                 <h2>MM to Inches Converter</h2>
-                 <p>Convert millimeters to inches (mm to in) instantly. Highly useful for precision engineering, 3D printing, jewelry, and mechanical parts.</p>
-                 
-                 <h3>How to Convert MM to Inches</h3>
-                 <p>Divide the millimeter value by 25.4 to get inches (since 1 inch = 25.4 mm). For instance, 50 mm is 50 ÷ 25.4 = 1.9685 inches. Our reliable calculator does the fraction math for you!</p>
-               </div>
-            )}
-
-            {!(
-               // If it's not one of our dedicated SEO pages, render the generic text instead
-               (unitFrom === "kilogram" && unitTo === "pound") ||
-               (unitFrom === "inch" && unitTo === "centimeter") ||
-               (unitFrom === "centimeter" && unitTo === "inch") ||
-               (unitFrom === "pound" && unitTo === "kilogram") ||
-               (unitFrom === "foot" && unitTo === "meter") ||
-               (unitFrom === "mile" && unitTo === "kilometer") ||
-               (unitFrom === "millimeter" && unitTo === "inch")
-            ) && (
-              <>
-                <h2 className="text-2xl font-semibold mb-4 tracking-tight">
-                  How to convert {activeFromUnit?.name} to {activeToUnit?.name}
-                </h2>
-                <p className="mb-6 leading-relaxed font-light text-neutral-600 dark:text-neutral-400">
-                  Our {activeCategory.name.toLowerCase()} converter makes it easy to
-                  convert between {activeFromUnit?.name.toLowerCase()} and{" "}
-                  {activeToUnit?.name.toLowerCase()}. Simply enter the value you
-                  want to convert in the input fields above, and the calculator will
-                  automatically update with the correct result.
-                </p>
-              </>
-            )}
-
-            <div className="grid md:grid-cols-2 gap-6 my-10">
-              {/* Conversion Table generated correctly using the convert function */}
-              <div className="bg-white dark:bg-[#111] p-8 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none overflow-hidden">
-                <h3 className="font-semibold text-lg mb-4 tracking-tight flex items-center justify-between">
-                  <span>{activeFromUnit?.name} to {activeToUnit?.name} Table</span>
-                  <Table className="w-5 h-5 text-neutral-400" />
-                </h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-neutral-100 dark:border-neutral-800 text-left">
-                        <th className="pb-3 text-neutral-500 font-medium">{activeFromUnit?.name} ({activeFromUnit?.symbol})</th>
-                        <th className="pb-3 text-neutral-500 font-medium text-right">{activeToUnit?.name} ({activeToUnit?.symbol})</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {[1, 5, 10, 50, 100, 500, 1000].map(val => {
-                        let res = 0;
-                        if (activeCategory && activeFromUnit && activeToUnit) {
-                          res = convert(val, activeFromUnit.id, activeToUnit.id, activeCategory.id);
-                        }
-                        const displayRes = Number.isInteger(res) ? res.toString() : parseFloat(res.toPrecision(7)).toString();
-                        return (
-                        <tr key={val} className="border-b border-neutral-50 dark:border-neutral-800/50 last:border-0 hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors">
-                          <td className="py-3 font-medium text-neutral-700 dark:text-neutral-300">{val} {activeFromUnit?.symbol}</td>
-                          <td className="py-3 text-right font-mono text-primary-600 dark:text-primary-400">{displayRes} {activeToUnit?.symbol}</td>
-                        </tr>
-                      )})}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-6">
-                {activeFromUnit?.description && (
-                  <div className="bg-white dark:bg-[#111] p-6 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none flex-1">
-                    <h3 className="font-semibold text-lg mb-3 tracking-tight">
-                      About {activeFromUnit.name}
-                    </h3>
-                    <p className="text-neutral-500 dark:text-neutral-400 text-sm leading-relaxed font-light">
-                      {activeFromUnit.description}
-                    </p>
-                  </div>
-                )}
-                {activeToUnit?.description &&
-                  activeToUnit.id !== activeFromUnit?.id && (
-                    <div className="bg-white dark:bg-[#111] p-6 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none flex-1">
-                      <h3 className="font-semibold text-lg mb-3 tracking-tight">
-                        About {activeToUnit.name}
-                      </h3>
-                      <p className="text-neutral-500 dark:text-neutral-400 text-sm leading-relaxed font-light">
-                        {activeToUnit.description}
-                      </p>
-                    </div>
-                  )}
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-[#111] p-8 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none mb-10">
-              <h3 className="text-xl font-semibold mb-4 tracking-tight">
-                Related {activeFromUnit?.name} Conversions
-              </h3>
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                {activeCategory.units.map((u) => {
-                  if (u.id === unitFrom || u.id === unitTo) return null;
-                  return (
-                    <Link
-                      key={`rel-${u.id}`}
-                      to={`/?category=${category}&from=${unitFrom}&to=${u.id}`}
-                      onClick={() => {
-                        setUnitTo(u.id);
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      className="block text-left p-3 text-sm text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 rounded-xl transition-colors border border-transparent hover:border-neutral-100 dark:hover:border-neutral-800 group"
-                    >
-                      <span className="font-medium group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                        {activeFromUnit?.name} to {u.name}
-                      </span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-
-            {categorySeoContent[activeCategory.id] && (
-              <div 
-                className="prose prose-neutral dark:prose-invert max-w-none mb-10
-                           prose-headings:font-semibold prose-headings:tracking-tight 
-                           prose-h2:text-2xl prose-h3:text-lg prose-p:font-light 
-                           prose-p:leading-relaxed prose-p:text-neutral-600 
-                           dark:prose-p:text-neutral-400"
-                dangerouslySetInnerHTML={{ __html: categorySeoContent[activeCategory.id] }} 
-              />
-            )}
-
-            <h3 className="text-xl font-semibold mb-3 tracking-tight">
-              Understanding {activeFromUnit?.name} to {activeToUnit?.name} Conversions
-            </h3>
-            <p className="mb-4 leading-relaxed font-light text-neutral-600 dark:text-neutral-400">
-              Converting <strong>{activeFromUnit?.name}</strong> to <strong>{activeToUnit?.name}</strong> is simple with our tool. 
-              {activeFromUnit?.description ? ` ${activeFromUnit.description}` : ""}
-              {activeToUnit?.description ? ` ${activeToUnit.description}` : ""}
-            </p>
-            <p className="mb-8 leading-relaxed font-light text-neutral-600 dark:text-neutral-400">
-              Our <em>{activeCategory.name.toLowerCase()} calculator</em> supports a wide range of units including {activeCategory.units.slice(0, 4).map((u) => u.name.toLowerCase()).join(", ")} and more. QuickConvert provides fast, responsive calculations designed for mobile and desktop users.
-              Want to learn more about the fascinating world of measurements? Check
-              out our{" "}
-              <Link
-                to="/blog"
-                className="text-primary-600 dark:text-primary-400 hover:underline"
-              >
-                measurement blog series
-              </Link>{" "}
-              for detailed guides and tips.
-            </p>
-
-            <h3 className="text-xl font-semibold mb-4 tracking-tight mt-10">
-              Conversion Table: {activeFromUnit?.name} to {activeToUnit?.name}
-            </h3>
-            <div className="overflow-x-auto mb-10">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-neutral-200 dark:border-neutral-800">
-                    <th className="py-3 px-4 font-medium text-neutral-900 dark:text-neutral-100">{activeFromUnit?.name}</th>
-                    <th className="py-3 px-4 font-medium text-neutral-900 dark:text-neutral-100">{activeToUnit?.name}</th>
-                  </tr>
-                </thead>
-                <tbody className="text-neutral-600 dark:text-neutral-400 font-light">
-                  {[1, 5, 10, 25, 50, 100, 500, 1000].map(val => (
-                    <tr key={val} className="border-b border-neutral-100 dark:border-neutral-800/50 hover:bg-neutral-50 dark:hover:bg-neutral-800/20">
-                      <td className="py-3 px-4">{val} {activeFromUnit?.symbol}</td>
-                      <td className="py-3 px-4">{convert(val, unitFrom, unitTo, category).toLocaleString(undefined, { maximumFractionDigits: 4 })} {activeToUnit?.symbol}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <h3 className="text-xl font-semibold mb-4 tracking-tight">
-              Frequently Asked Questions
-            </h3>
-            <div className="space-y-6">
-              <div>
-                <h4 className="font-medium text-lg mb-2 text-neutral-900 dark:text-white">
-                  How do I convert {activeFromUnit?.name} to{" "}
-                  {activeToUnit?.name}?
-                </h4>
-                <p className="font-light text-neutral-600 dark:text-neutral-400 text-sm">
-                  To convert {activeFromUnit?.name} to {activeToUnit?.name}, you
-                  simply multiply or divide the given value based on the
-                  respective standard multiplier. Our tool handles this complex
-                  math behind the scenes for an instant and accurate result.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-medium text-lg mb-2 text-neutral-900 dark:text-white">
-                  What is a {activeFromUnit?.name}?
-                </h4>
-                <p className="font-light text-neutral-600 dark:text-neutral-400 text-sm">
-                  {activeFromUnit?.description ||
-                    `A ${activeFromUnit?.name} is a standardized unit of ${activeCategory.name.toLowerCase()} used commonly across various applications.`}
-                </p>
-              </div>
-            </div>
+            <PopularConversions 
+              onSelect={(cat, from, to) => {
+                handleCategoryChange(cat);
+                setTimeout(() => {
+                  setUnitFrom(from);
+                  setUnitTo(to);
+                  setValFrom("1");
+                }, 10);
+              }} 
+            />
           </section>
 
           {/* SEO Optional Content area placeholder */}
@@ -2186,6 +1969,36 @@ export default function App() {
         {/* Right Column (Sidebar Ads Desktop) */}
         <aside className="hidden lg:block w-[300px] shrink-0">
           <div className="sticky top-24 space-y-6">
+            {/* Quick Reference Table */}
+            <div className="bg-white dark:bg-[#111111] border border-neutral-100 dark:border-neutral-800 rounded-2xl p-5 shadow-sm overflow-hidden">
+              <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 mb-4 tracking-tight flex items-center gap-2">
+                <Star className="w-4 h-4 text-amber-500" />
+                Popular Conversions
+              </h3>
+              <div className="flex flex-col gap-1">
+                {POPULAR_CONVERSIONS.slice(0, 8).map((conv, i) => (
+                  <a
+                    key={i}
+                    href={`/?category=${conv.cat}&from=${conv.from}&to=${conv.to}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleCategoryChange(conv.cat);
+                      setTimeout(() => {
+                        setUnitFrom(conv.from);
+                        setUnitTo(conv.to);
+                        setValFrom("1");
+                      }, 10);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800/50 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 group transition-colors"
+                  >
+                    <span>{conv.label}</span>
+                    <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                  </a>
+                ))}
+              </div>
+            </div>
+
             {/* AD: Right Sidebar Sticky 1 */}
             <AdSlot
               widthClass="w-[300px]"
