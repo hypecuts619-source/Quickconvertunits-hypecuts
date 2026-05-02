@@ -58,6 +58,8 @@ const getSEOUrlPath = (fromId, toId) => {
 addUrl("/time-zone-converter", "0.9", "weekly");
 
 for (const category of categories) {
+  addUrl(`/${category.id.replace(/_/g, '-')}-converter`, "0.9", "weekly");
+  
   for (const fromUnit of category.units) {
     for (const toUnit of category.units) {
       if (fromUnit.id !== toUnit.id) {

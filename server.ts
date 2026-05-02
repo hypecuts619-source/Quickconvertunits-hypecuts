@@ -79,7 +79,7 @@ function calculateConversion(val: number, fromId: string, toId: string): string 
 }
 
 function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1).replace(/_/g, " ");
+  return str.charAt(0).toUpperCase() + str.slice(1).replace(/_/g, " ").replace(/-/g, " ");
 }
 
 function applySEO(urlPath: string, template: string): string {
@@ -231,6 +231,52 @@ function applySEO(urlPath: string, template: string): string {
         `<script type="application/ld+json">${JSON.stringify(schema)}</script></head>`
       );
     }
+  } else if (urlPath && urlPath.endsWith("-converter")) {
+    const catNameRaw = urlPath.replace("-converter", "");
+    const title = `${capitalize(catNameRaw)} Conversion Calculator | QuickConvert`;
+    const description = `Free ${catNameRaw.toLowerCase()} unit converter. Precise calculations with real-time results. Convert measurements instantly.`;
+
+    template = template.replace(
+      /<title>(.*?)<\/title>/,
+      `<title>${title}</title>`
+    );
+    template = template.replace(
+      /<meta name="description" content="(.*?)" \/>/,
+      `<meta name="description" content="${description}" />`
+    );
+    template = template.replace(
+      /<meta property="og:title" content="(.*?)" \/>/,
+      `<meta property="og:title" content="${title}" />`
+    );
+    template = template.replace(
+      /<meta property="og:description" content="(.*?)" \/>/,
+      `<meta property="og:description" content="${description}" />`
+    );
+    template = template.replace(
+      /<meta property="og:url" content="(.*?)" \/>/,
+      `<meta property="og:url" content="https://quickconvertunits.com/${urlPath}" />`
+    );
+    
+    const staticContent = `
+      <div style="display:none;" aria-hidden="true">
+        <h1>${capitalize(catNameRaw)} Converter</h1>
+        <p>${description}</p>
+        <section>
+          <h2>About ${capitalize(catNameRaw)} Conversion</h2>
+          <p>Instantly convert between various ${catNameRaw.toLowerCase()} units. Our calculator is built for speed and precision, offering real-time conversions without page reloads.</p>
+        </section>
+        <section>
+          <h2>Frequently Asked Questions</h2>
+          <h3>Is this ${capitalize(catNameRaw)} converter free?</h3>
+          <p>Yes, all conversions on our platform are completely free and work offline.</p>
+        </section>
+      </div>
+    `;
+
+    template = template.replace(
+      /<div style="display:none;" aria-hidden="true">[\s\S]*?<\/div>/,
+      staticContent
+    );
   }
   return template;
 }

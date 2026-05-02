@@ -321,7 +321,12 @@ const getUnitIdsFromPath = (path: string) => {
   if (path === 'square-feet-to-square-meters') return ['square_foot', 'square_meter'];
   if (path === 'celsius-to-fahrenheit') return ['celsius', 'fahrenheit'];
   if (path === 'fahrenheit-to-celsius') return ['fahrenheit', 'celsius'];
-  return path.split('-to-');
+  
+  const parts = path.split('-to-');
+  if (parts.length === 2) {
+    return [parts[0].replace(/-/g, '_'), parts[1].replace(/-/g, '_')];
+  }
+  return [];
 };
 
 export default function App() {
@@ -348,6 +353,12 @@ export default function App() {
   const [category, setCategory] = useState(() => {
     if (conversion) {
       if (conversion === "time-zone-converter") return "time_zone";
+      if (conversion.endsWith("-converter")) {
+        const potentialCat = conversion.replace("-converter", "").replace(/-/g, "_");
+        if (categories.some(c => c.id === potentialCat)) {
+          return potentialCat;
+        }
+      }
       const parts = getUnitIdsFromPath(conversion);
       if (parts.length === 2) {
         for (const cat of categories) {
@@ -362,6 +373,11 @@ export default function App() {
   });
   const [unitFrom, setUnitFrom] = useState(() => {
     if (conversion) {
+      if (conversion.endsWith("-converter") && conversion !== "time-zone-converter") {
+         const potentialCat = conversion.replace("-converter", "").replace(/-/g, "_");
+         const acat = categories.find(c => c.id === potentialCat);
+         if (acat) return acat.units[0]?.id || "";
+      }
       const parts = getUnitIdsFromPath(conversion);
       if (parts.length === 2) {
         return parts[0].toLowerCase();
@@ -374,6 +390,11 @@ export default function App() {
   });
   const [unitTo, setUnitTo] = useState(() => {
     if (conversion) {
+      if (conversion.endsWith("-converter") && conversion !== "time-zone-converter") {
+         const potentialCat = conversion.replace("-converter", "").replace(/-/g, "_");
+         const acat = categories.find(c => c.id === potentialCat);
+         if (acat) return acat.units[1]?.id || acat.units[0]?.id || "";
+      }
       const parts = getUnitIdsFromPath(conversion);
       if (parts.length === 2) {
         return parts[1].toLowerCase();
@@ -607,6 +628,11 @@ export default function App() {
   const handleCategoryChange = (catId: string) => {
     const cat = categories.find((c) => c.id === catId);
     if (cat) {
+      if (cat.id === 'time_zone') {
+        navigate('/time-zone-converter');
+      } else {
+        navigate(`/${cat.id.replace(/_/g, '-')}-converter`);
+      }
       setCategory(cat.id);
       if (cat.id === 'time_zone') {
         setUnitFrom('time_zone');
@@ -747,9 +773,9 @@ export default function App() {
     }
 
     if (activeFromUnit && activeToUnit) {
-      const isHomepage = location.pathname === "/" && !location.search.includes("category=");
-      const isCategoryPage = location.pathname === "/" && location.search.includes("category=");
-      const isSpecificConverter = location.pathname !== "/";
+      const isHomepage = location.pathname === "/" && !location.search.includes("val=");
+      const isCategoryPage = location.pathname.endsWith("-converter") && !location.pathname.includes("-to-") && location.pathname !== "/time-zone-converter";
+      const isSpecificConverter = location.pathname !== "/" && !isCategoryPage;
 
       let titleStr = "";
       let metaDescStr = "";
@@ -761,6 +787,12 @@ export default function App() {
          metaDescStr = "Instantly convert units like meters to feet, kg to lbs, or cups to grams. Fast, accurate, no ads interrupting. Try now—no sign-up needed.";
          canonicalUrlStr = "https://quickconvertunits.com/";
          ogTitleStr = titleStr;
+
+         const defaultFrom = activeCategory.units[0]?.id;
+         const defaultTo = activeCategory.units[1]?.id || defaultFrom;
+         if (unitFrom !== defaultFrom || unitTo !== defaultTo) {
+           navigate(`/${getSEOUrlPath(unitFrom, unitTo)}${valFrom && valFrom !== "1" ? `?val=${valFrom}` : ""}`);
+         }
       } else if (isCategoryPage) {
          const catName = activeCategory.name;
          const topUnits = `${activeCategory.units[0].name}s to ${activeCategory.units[1].name}s, ${activeCategory.units[2]?.name || ''}s`.replace(/ss/g, 's').replace(/, s/g, '');
@@ -778,8 +810,15 @@ export default function App() {
 
          titleStr = `${catName} Conversion Calculator: ${topUnits} | QuickConvert`;
          metaDescStr = `Free ${catName.toLowerCase()} unit converter for ${allTopUnits}. ${seoSnippet || "Precise calculations with real-time results. Convert measurements instantly."}`;
-         canonicalUrlStr = `https://quickconvertunits.com/?category=${category}`;
+         canonicalUrlStr = `https://quickconvertunits.com/${category.replace(/_/g, '-')}-converter`;
          ogTitleStr = titleStr;
+         
+         // If the user changed units explicitly, we should navigate them to the pair page
+         const defaultFrom = activeCategory.units[0]?.id;
+         const defaultTo = activeCategory.units[1]?.id || defaultFrom;
+         if (unitFrom !== defaultFrom || unitTo !== defaultTo) {
+           navigate(`/${getSEOUrlPath(unitFrom, unitTo)}${valFrom && valFrom !== "1" ? `?val=${valFrom}` : ""}`, { replace: true });
+         }
       } else {
          const valPrefix = valFrom && valFrom !== "1" && valFrom !== "0" ? `${valFrom} ` : "";
          titleStr = `${valPrefix}${activeFromUnit.name} to ${activeToUnit.name} (${activeFromUnit.symbol} to ${activeToUnit.symbol}) - ${activeCategory.name} Converter`;
