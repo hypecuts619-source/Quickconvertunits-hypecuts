@@ -1,6 +1,10 @@
 import express from "express";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Vercel path fallback
 let currentDir = process.cwd();
@@ -290,7 +294,7 @@ function applySEO(urlPath: string, template: string): string {
 
 const app = express();
 const PORT = 3000;
-const isProd = process.env.NODE_ENV === "production";
+const isProd = process.env.NODE_ENV === "production" || !!process.env.VERCEL || !!process.env.VERCEL_ENV;
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
@@ -330,23 +334,42 @@ if (isProd) {
        } catch (e) {}
     }
 
-    let templatePath = path.resolve(process.cwd(), "dist", "index.html");
+    let templatePath = path.resolve(__dirname, "dist", "index.html");
     if (!fs.existsSync(templatePath)) {
-      templatePath = path.resolve(currentDir, "..", "dist", "index.html");
+      templatePath = path.resolve(process.cwd(), "dist", "index.html");
+    }
+    if (!fs.existsSync(templatePath)) {
+      templatePath = path.resolve(__dirname, "..", "dist", "index.html");
     }
     if (!fs.existsSync(templatePath)) {
       templatePath = path.resolve(currentDir, "dist", "index.html");
     }
+
     let template = "";
     try {
+      if (!fs.existsSync(templatePath)) {
+        throw new Error("File not found at " + templatePath);
+      }
       template = fs.readFileSync(templatePath, "utf-8");
-    } catch (e) {
+    } catch (e: any) {
+      // If it's a static file request that reached here, 404 instead of 500
+      if (requestedUrlInfo.includes(".") && !requestedUrlInfo.endsWith(".html")) {
+        return res.status(404).send("File not found: " + requestedUrlInfo);
+      }
+
       let debugInfo = "";
-      try { debugInfo += "CWD files: " + fs.readdirSync(process.cwd()).join(", "); } catch(e){}
-      try { debugInfo += " | CWD/dist files: " + fs.readdirSync(path.resolve(process.cwd(), "dist")).join(", "); } catch(e){}
-      try { debugInfo += " | __dirname files: " + fs.readdirSync(__dirname).join(", "); } catch(e){}
-      try { debugInfo += " | root files: " + fs.readdirSync("/var/task").join(", "); } catch(e){}
-      return res.status(500).send("index.html not found. Paths checked: " + templatePath + " | " + debugInfo);
+      try { debugInfo += "CWD: " + process.cwd(); } catch(e){}
+      try { debugInfo += " | __dirname: " + __dirname; } catch(e){}
+      try { debugInfo += " | CWD files: " + fs.readdirSync(process.cwd()).join(", "); } catch(e){}
+      try { 
+        const distP = path.resolve(process.cwd(), "dist");
+        if (fs.existsSync(distP)) {
+          debugInfo += " | dist files: " + fs.readdirSync(distP).join(", ");
+        } else {
+          debugInfo += " | dist folder missing at " + distP;
+        }
+      } catch(e){}
+      return res.status(500).send("index.html not found. Path: " + templatePath + " | " + debugInfo + " | Error: " + e.message);
     }
 
     try {
