@@ -6,13 +6,15 @@
     </linearGradient>
   </defs>
   <g stroke="url(#qGrad)">
-    <!-- Top arc -->
-    <path d="M 3.5 10.5 A 7.5 7.5 0 0 1 18 7.5" />
-    <path d="M 18 3 L 18 7.5 L 13.5 7.5" />
-    <!-- Bottom arc -->
-    <path d="M 18.5 10.5 A 7.5 7.5 0 0 1 4 13.5" />
-    <path d="M 4 18 L 4 13.5 L 8.5 13.5" />
+    <!-- Top arc forming left and top, going towards right -->
+    <path d="M 4.5 12 A 7.5 7.5 0 0 1 18.5 8" />
+    <path d="M 18.5 8 L 18.5 3.5 M 18.5 8 L 14 8" />
+
+    <!-- Bottom arc forming right and bottom, going towards left -->
+    <path d="M 19.5 12 A 7.5 7.5 0 0 1 5.5 16" />
+    <path d="M 5.5 16 L 5.5 20.5 M 5.5 16 L 10 16" />
+
     <!-- Q tail -->
-    <path d="M 14.5 14.5 L 20.5 20.5" />
+    <path d="M 14.5 14.5 L 21 21" />
   </g>
 </svg>
