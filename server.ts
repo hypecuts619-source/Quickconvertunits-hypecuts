@@ -1,19 +1,9 @@
 import express from "express";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 
+// Vercel path fallback
 let currentDir = process.cwd();
-try {
-  // ESM dirname
-  const __filename = fileURLToPath(import.meta.url);
-  currentDir = path.dirname(__filename);
-} catch (e) {
-  // fallback for CJS / Vercel
-  if (typeof __dirname !== 'undefined') {
-    currentDir = __dirname;
-  }
-}
 
 // We define a small map of the most common units to serve rich SEO tags quickly.
 // If a unit is not in this map, we fallback to formatting the URL string.
@@ -351,11 +341,20 @@ if (isProd) {
     try {
       template = fs.readFileSync(templatePath, "utf-8");
     } catch (e) {
-      return res.status(500).send("index.html not found. Paths checked: " + templatePath + " | " + process.cwd() + " | " + currentDir);
+      let debugInfo = "";
+      try { debugInfo += "CWD files: " + fs.readdirSync(process.cwd()).join(", "); } catch(e){}
+      try { debugInfo += " | CWD/dist files: " + fs.readdirSync(path.resolve(process.cwd(), "dist")).join(", "); } catch(e){}
+      try { debugInfo += " | __dirname files: " + fs.readdirSync(__dirname).join(", "); } catch(e){}
+      try { debugInfo += " | root files: " + fs.readdirSync("/var/task").join(", "); } catch(e){}
+      return res.status(500).send("index.html not found. Paths checked: " + templatePath + " | " + debugInfo);
     }
 
-    template = applySEO(requestedUrlInfo.split("?")[0], template);
-    res.status(200).set({ "Content-Type": "text/html" }).send(template);
+    try {
+      template = applySEO(requestedUrlInfo.split("?")[0], template);
+      res.status(200).set({ "Content-Type": "text/html" }).send(template);
+    } catch (e: any) {
+      return res.status(500).send("SEO Error: " + e.message + " stack: " + e.stack);
+    }
   });
 }
 
