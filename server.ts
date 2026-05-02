@@ -332,6 +332,25 @@ function applySEO(urlPath: string, template: string): string {
             "applicationCategory": "UtilityApplications",
             "operatingSystem": "All",
             "description": description,
+            "url": `https://quickconvertunits.com/${urlPath}`
+          },
+          {
+            "@type": "HowTo",
+            "name": `How to convert ${fromUnit.name} to ${toUnit.name}`,
+            "description": `Instructions to convert ${fromUnit.name} (${fromUnit.symbol}) to ${toUnit.name} (${toUnit.symbol}).`,
+            "step": [
+              {
+                "@type": "HowToStep",
+                "name": "Enter value",
+                "text": `Enter the quantity of ${fromUnit.name} you want to convert in the input field.`
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Read result",
+                "text": `The equivalent value in ${toUnit.name} will be automatically displayed in the result field.`
+              }
+            ],
+            "totalTime": "PT1S"
           },
           {
             "@type": "FAQPage",
@@ -341,7 +360,7 @@ function applySEO(urlPath: string, template: string): string {
                 "name": `How do I convert ${fromUnit.name} to ${toUnit.name}?`,
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": `Enter the number of ${fromUnit.name} you wish to convert in the top input box. The corresponding ${toUnit.name} value will instantly populate in the bottom input box.`
+                  "text": `Simply enter the value of ${fromUnit.name} into our online converter. The tool will instantly calculate and display the corresponding value in ${toUnit.name} based on the most accurate conversion factor.`
                 }
               },
               {
@@ -349,15 +368,7 @@ function applySEO(urlPath: string, template: string): string {
                 "name": `Is this ${fromUnit.name} to ${toUnit.name} converter free?`,
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": `Yes, all conversions on QuickConvertUnits including ${fromUnit.name} to ${toUnit.name} are 100% free and work offline.`
-                }
-              },
-              {
-                "@type": "Question",
-                "name": `Why should I use this converter?`,
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": `We built this tool to provide instant, precise unit conversions without intrusive ads. The ${fromUnit.name} to ${toUnit.name} tool works perfectly on both mobile and desktop.`
+                  "text": `Yes, our conversion tool is 100% free for all users and works instantly on both mobile and desktop devices.`
                 }
               }
             ]

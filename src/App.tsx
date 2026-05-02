@@ -1139,7 +1139,7 @@ export default function App() {
       </header>
 
       {/* Mobile Search */}
-      <div className="md:hidden px-4 py-3 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 relative z-10">
+      <div className="md:hidden px-4 py-3 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 relative z-30">
         <div className="relative">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
           <input
@@ -1159,7 +1159,7 @@ export default function App() {
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 5 }}
-              className="absolute top-14 left-4 right-4 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-100 dark:border-neutral-700 overflow-hidden z-20"
+              className="absolute top-14 left-0 right-0 bg-white dark:bg-neutral-800 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-neutral-100 dark:border-neutral-800 overflow-hidden z-40 mx-4"
             >
               {!searchQuery && favorites.length > 0 && (
                 <div className="px-4 py-2 text-xs font-semibold text-neutral-500 bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700">
@@ -1212,22 +1212,22 @@ export default function App() {
         <div className="flex-1 max-w-3xl mx-auto w-full">
           <div className="text-center mb-10">
             {category === 'time_zone' ? (
-              <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-4xl md:text-5xl font-semibold tracking-tight mb-4 text-neutral-900 dark:text-white">
+              <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-3xl md:text-5xl font-semibold tracking-tight mb-4 text-neutral-900 dark:text-white">
                 Time Zone Converter
               </h1>
             ) : (
-              <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-4xl md:text-5xl font-semibold tracking-tight mb-4 text-neutral-900 dark:text-white">
+              <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-3xl md:text-5xl font-semibold tracking-tight mb-4 text-neutral-900 dark:text-white">
                 Convert {activeFromUnit?.name} to {activeToUnit?.name}
                 <button
                   onClick={toggleFavorite}
-                  className={`flex-shrink-0 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full transition-colors ${
+                  className={`flex-shrink-0 flex items-center justify-center w-9 h-9 md:w-12 md:h-12 rounded-full transition-colors ${
                     isFavorited
                       ? "bg-amber-100 text-amber-500 dark:bg-amber-500/20 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-500/30"
                       : "bg-neutral-100 text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600 dark:bg-[#1a1a1a] dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-neutral-300"
                   }`}
                   title={isFavorited ? "Saved to Favorites" : "Save this conversion"}
                 >
-                  <Star className={`w-5 h-5 md:w-6 md:h-6 ${isFavorited ? "fill-current" : ""}`} />
+                  <Star className={`w-4 h-4 md:w-6 md:h-6 ${isFavorited ? "fill-current" : ""}`} />
                 </button>
               </h1>
             )}
