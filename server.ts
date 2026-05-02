@@ -3,9 +3,17 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// ESM dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+let currentDir = process.cwd();
+try {
+  // ESM dirname
+  const __filename = fileURLToPath(import.meta.url);
+  currentDir = path.dirname(__filename);
+} catch (e) {
+  // fallback for CJS / Vercel
+  if (typeof __dirname !== 'undefined') {
+    currentDir = __dirname;
+  }
+}
 
 // We define a small map of the most common units to serve rich SEO tags quickly.
 // If a unit is not in this map, we fallback to formatting the URL string.
@@ -300,23 +308,53 @@ app.get("/api/health", (req, res) => {
 
 if (isProd) {
   // Production routes (Synchronous)
-  const distPath = path.resolve(process.cwd(), "dist");
   
-  // Serve static files EXCEPT index.html. In Vercel, Vercel itself handles static routing usually via vercel.json,
-  // but if it falls through to this function we will serve it.
-  app.use(express.static(distPath, { index: false }));
-
+  let distStaticPath = path.resolve(process.cwd(), "dist");
+  if (!fs.existsSync(distStaticPath)) {
+    distStaticPath = path.resolve(currentDir, "..", "dist");
+  }
+  
+  app.use(express.static(distStaticPath, { index: false }));
+  
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   app.get("*", (req: any, res: any) => {
-    const templatePath = path.join(distPath, "index.html");
+    // Determine the original URL. If Vercel rewrote it to /api/server, use the original host and path headers if available
+    let requestedUrlInfo = req.originalUrl || req.url;
+    if (req.headers["x-now-route-matches"]) {
+      try {
+        const matches = new URLSearchParams(req.headers["x-now-route-matches"] as string);
+        if (matches.has("1")) requestedUrlInfo = "/" + matches.get("1");
+      } catch (e) {}
+    } else if (req.headers["x-vercel-forwarded-for"]) {
+      // Vercel sometimes passes the original path inside the host
+    }
+    // simple hack: if req.path is /api/server and we have a query parameter or just use req.originalUrl 
+    if (requestedUrlInfo === "/api/server" && req.headers["x-invoke-path"]) {
+       requestedUrlInfo = req.headers["x-invoke-path"] as string;
+    } else if (requestedUrlInfo.startsWith("/api/server")) {
+       const proto = req.headers["x-forwarded-proto"] || "https";
+       const host = req.headers["host"] || "localhost";
+       try {
+          const urlObj = new URL(req.url, `${proto}://${host}`);
+          requestedUrlInfo = urlObj.pathname + urlObj.search;
+       } catch (e) {}
+    }
+
+    let templatePath = path.resolve(process.cwd(), "dist", "index.html");
+    if (!fs.existsSync(templatePath)) {
+      templatePath = path.resolve(currentDir, "..", "dist", "index.html");
+    }
+    if (!fs.existsSync(templatePath)) {
+      templatePath = path.resolve(currentDir, "dist", "index.html");
+    }
     let template = "";
     try {
       template = fs.readFileSync(templatePath, "utf-8");
     } catch (e) {
-      return res.status(500).send("index.html not found. Did you build the app?");
+      return res.status(500).send("index.html not found. Paths checked: " + templatePath + " | " + process.cwd() + " | " + currentDir);
     }
 
-    template = applySEO(req.path, template);
+    template = applySEO(requestedUrlInfo.split("?")[0], template);
     res.status(200).set({ "Content-Type": "text/html" }).send(template);
   });
 }
@@ -334,7 +372,7 @@ async function startServer() {
     app.get("*", async (req, res) => {
       let template = "";
       try {
-        template = fs.readFileSync(path.resolve(__dirname, "index.html"), "utf-8");
+        template = fs.readFileSync(path.resolve(currentDir, "index.html"), "utf-8");
         template = await vite.transformIndexHtml(req.originalUrl, template);
       } catch (e) {
         return res.status(500).send("index.html not found.");
