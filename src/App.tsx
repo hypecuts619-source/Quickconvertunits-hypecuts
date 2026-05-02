@@ -812,6 +812,7 @@ export default function App() {
 
             <div className="relative">
               <button
+                aria-label="Toggle theme menu"
                 onClick={() => setShowThemeMenu(!showThemeMenu)}
                 onBlur={() => setTimeout(() => setShowThemeMenu(false), 200)}
                 className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-neutral-500 dark:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500/50"
@@ -828,6 +829,7 @@ export default function App() {
                   >
                     {themes.map((t) => (
                       <button
+                        aria-label={`Select ${t} theme`}
                         key={t}
                         onClick={() => setTheme(t)}
                         className={`w-8 h-8 rounded-full border-2 transition-all ${theme === t ? "border-primary-500 scale-110" : "border-transparent hover:scale-105"}`}
@@ -845,7 +847,6 @@ export default function App() {
                                       ? "#f59e0b"
                                       : "#3b82f6",
                         }}
-                        aria-label={`Select ${t} theme`}
                       />
                     ))}
                   </motion.div>
@@ -854,6 +855,7 @@ export default function App() {
             </div>
 
             <button
+              aria-label="Toggle dark mode"
               onClick={() => setDarkMode(!darkMode)}
               className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-neutral-500 dark:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500/50"
             >
@@ -1134,6 +1136,7 @@ export default function App() {
               )}
               {category === "currency" && (
                 <button
+                  aria-label="Refresh exchange rates"
                   onClick={handleRefreshRates}
                   disabled={isRefreshing}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-xs font-medium text-neutral-600 dark:text-neutral-300 transition-colors disabled:opacity-50"
@@ -1595,6 +1598,7 @@ export default function App() {
                             {h.timestamp}
                           </span>
                           <button
+                            aria-label={`Remove history item ${h.label}`}
                             onClick={(e) => {
                               e.stopPropagation();
                               setHistoryItems((prev) => {
