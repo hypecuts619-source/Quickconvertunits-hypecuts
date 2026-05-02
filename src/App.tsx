@@ -618,6 +618,16 @@ export default function App() {
     }
   };
 
+  useEffect(() => {
+    if (category !== 'time_zone') {
+      const input = document.getElementById("main-converter-input");
+      if (input) {
+        // We use a tiny timeout to ensure the DOM is ready after category transition
+        setTimeout(() => input.focus(), 50);
+      }
+    }
+  }, [category, unitFrom, unitTo]);
+
   const suggestions = useMemo(() => getSuggestions(searchQuery), [searchQuery]);
 
   const selectSuggestion = (sug: any) => {
@@ -1244,6 +1254,20 @@ export default function App() {
                         return;
                       }
 
+                      const match = v.match(/^-?\d*\.?\d+/);
+                      if (match && v.startsWith(match[0])) {
+                        // Allow typing suffix by stripping it
+                        setValFrom(match[0]);
+                        return;
+                      }
+                      
+                      // Try to find any number in the string (e.g. pasted '100 miles')
+                      const anyMatch = v.match(/-?\d*\.?\d+/);
+                      if (anyMatch) {
+                        setValFrom(anyMatch[0]);
+                        return;
+                      }
+
                       // Failed regex - figure out why
                       const toast = document.getElementById('error-toast');
                       if (toast) {
@@ -1381,6 +1405,18 @@ export default function App() {
                          return;
                       }
 
+                      const match = v.match(/^-?\d*\.?\d+/);
+                      if (match && v.startsWith(match[0])) {
+                         handleValToChange(match[0]);
+                         return;
+                      }
+                      
+                      const anyMatch = v.match(/-?\d*\.?\d+/);
+                      if (anyMatch) {
+                         handleValToChange(anyMatch[0]);
+                         return;
+                      }
+
                       // Failed regex
                       const toast = document.getElementById('error-toast');
                       if (toast) {
@@ -1399,26 +1435,6 @@ export default function App() {
                     inputMode="decimal"
                   />
                   </motion.div>
-                  {valTo && (
-                    <button
-                      onClick={handleCopy}
-                      className="flex-shrink-0 flex items-center justify-center gap-2 px-4 h-12 rounded-xl bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/40 text-primary-600 dark:text-primary-400 font-medium transition-colors shadow-sm"
-                      aria-label={t("copy", "Copy result")}
-                      title={t("copy", "Copy result")}
-                    >
-                      {copied ? (
-                        <>
-                          <Check className="w-5 h-5 md:w-4 md:h-4 text-green-500" />
-                          <span className="hidden md:inline">Copied!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-5 h-5 md:w-4 md:h-4" />
-                          <span className="hidden md:inline">Copy</span>
-                        </>
-                      )}
-                    </button>
-                  )}
                 </div>
               </div>
             </div>
