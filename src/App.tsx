@@ -57,12 +57,18 @@ const POPULAR = [
     tu: "centimeter",
   },
   { label: "Liters → Gallons", cat: "volume", fu: "liter", tu: "us_gallon" },
+  { label: "Gallons → Liters", cat: "volume", fu: "us_gallon", tu: "liter" },
   {
     label: "Gigabytes → Megabytes",
     cat: "data",
     fu: "gigabyte",
     tu: "megabyte",
   },
+  { label: "Hectares → Acres", cat: "area", fu: "hectare", tu: "acre" },
+  { label: "Acres → Hectares", cat: "area", fu: "acre", tu: "hectare" },
+  { label: "Square Meters → Square Feet", cat: "area", fu: "square_meter", tu: "square_foot" },
+  { label: "km/h → mph", cat: "speed", fu: "kilometer_per_hour", tu: "mile_per_hour" },
+  { label: "mph → km/h", cat: "speed", fu: "mile_per_hour", tu: "kilometer_per_hour" },
 ];
 
 const FORMULAS = [
