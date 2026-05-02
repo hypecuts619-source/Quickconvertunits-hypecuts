@@ -91,6 +91,8 @@ export function UnitSelector({ value, onChange, units, activeCategoryId }: UnitS
     <div className="relative">
       <button
         onClick={() => setIsOpen(true)}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
         className="w-full relative flex items-center justify-between bg-transparent font-medium text-neutral-600 dark:text-neutral-300 focus:outline-none pb-2 text-base cursor-pointer transition-colors uppercase tracking-wide truncate pr-8"
       >
         <span className="truncate">{activeUnit.name} ({activeUnit.symbol})</span>
@@ -121,6 +123,7 @@ export function UnitSelector({ value, onChange, units, activeCategoryId }: UnitS
               <div className="p-4 border-b border-neutral-100 dark:border-neutral-800 flex items-center gap-3">
                 <Search className="w-5 h-5 text-neutral-400" />
                 <input
+                  aria-label="Search units"
                   ref={inputRef}
                   type="text"
                   placeholder="Search units..."
@@ -128,7 +131,7 @@ export function UnitSelector({ value, onChange, units, activeCategoryId }: UnitS
                   onChange={(e) => setSearch(e.target.value)}
                   className="w-full bg-transparent border-none focus:outline-none text-neutral-900 dark:text-white"
                 />
-                <button onClick={() => setIsOpen(false)} className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full">
+                <button aria-label="Close" onClick={() => setIsOpen(false)} className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full">
                   <X className="w-5 h-5 text-neutral-500" />
                 </button>
               </div>

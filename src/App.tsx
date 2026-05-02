@@ -773,6 +773,7 @@ export default function App() {
               <div className="relative">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
                 <input
+                  aria-label="Search top conversions"
                   type="text"
                   placeholder="e.g. meters to feet"
                   value={searchQuery}
@@ -871,6 +872,7 @@ export default function App() {
         <div className="relative">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
           <input
+            aria-label="Search categories"
             type="text"
             placeholder="Search conversions..."
             value={searchQuery}
@@ -956,6 +958,7 @@ export default function App() {
                 </div>
                 <div className="relative flex items-center mt-3">
                   <input
+                    aria-label={`From value in ${activeFromUnit?.name || 'unit'}`}
                     type="text"
                     value={valFrom}
                     onChange={(e) => {
@@ -1072,6 +1075,7 @@ export default function App() {
                     className="w-full"
                   >
                   <input
+                    aria-label={`To value in ${activeToUnit?.name || 'unit'}`}
                     type="text"
                     value={valTo}
                     onChange={(e) => {
