@@ -554,11 +554,15 @@ export default function App() {
     setUnitTo(sug.toId);
     setSearchQuery("");
     setIsSearchFocused(false);
+    navigate(`/${getSEOUrlPath(sug.fromId, sug.toId)}`);
   };
 
-  // Keyboard shortcuts (Ctrl+K to search)
+  // Keyboard shortcuts (Ctrl+K to search, Shift+S to swap, Shift+C to copy)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if typing inside input fields (unless it's cmd/ctrl + combination)
+      const isInputFocused = document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA';
+
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
         const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement;
@@ -566,10 +570,20 @@ export default function App() {
           searchInput.focus();
         }
       }
+      
+      if (!isInputFocused && e.shiftKey && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        handleSwap();
+      }
+      
+      if (!isInputFocused && e.shiftKey && e.key.toLowerCase() === 'c') {
+        e.preventDefault();
+        handleCopy();
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [handleSwap, handleCopy]);
 
   const activeCategory = categories.find((c) => c.id === category)!;
   const activeFromUnit = activeCategory.units.find((u) => u.id === unitFrom);
@@ -609,7 +623,7 @@ export default function App() {
       let ogTitleStr = "";
 
       if (isHomepage) {
-         titleStr = "Quick Unit Converter | Free Online Tool";
+         titleStr = "Quick Unit Converter | Free Online Translation Tool for Measurements";
          metaDescStr = "Instantly convert units like meters to feet, kg to lbs, or cups to grams. Fast, accurate, no ads interrupting. Try now—no sign-up needed.";
          canonicalUrlStr = "https://quickconvertunits.com/";
          ogTitleStr = titleStr;
@@ -617,14 +631,14 @@ export default function App() {
          const catName = activeCategory.name;
          const topUnits = `${activeCategory.units[0].name}s to ${activeCategory.units[1].name}s, ${activeCategory.units[2]?.name || ''}s`.replace(/ss/g, 's').replace(/, s/g, '');
          const allTopUnits = activeCategory.units.slice(0, 5).map(u => u.name.toLowerCase() + (u.name.endsWith('s') ? '' : 's')).join(", ");
-         titleStr = `${catName} Converter: ${topUnits} & More`;
-         metaDescStr = `Free ${catName.toLowerCase()} unit converter for ${allTopUnits}. Precise calculations with real-time results. Convert now in seconds.`;
+         titleStr = `${catName} Conversion Calculator: ${topUnits} | QuickConvert`;
+         metaDescStr = `Free ${catName.toLowerCase()} unit converter for ${allTopUnits}. Precise calculations with real-time results. Convert ${catName.toLowerCase()} measurements instantly.`;
          canonicalUrlStr = `https://quickconvertunits.com/?category=${category}`;
          ogTitleStr = titleStr;
       } else {
          const valPrefix = valFrom && valFrom !== "1" && valFrom !== "0" ? `${valFrom} ` : "";
-         titleStr = `${activeFromUnit.symbol.toUpperCase()} to ${activeToUnit.symbol.toUpperCase()} Converter | ${valPrefix}${activeFromUnit.name} to ${activeToUnit.name} Fast`;
-         metaDescStr = `Convert ${activeFromUnit.name.toLowerCase()} to ${activeToUnit.name.toLowerCase()} instantly and accurately. Enter value, select units—get results to 10 decimals. Perfect for cooking, fitness, shipping.`;
+         titleStr = `${valPrefix}${activeFromUnit.name} to ${activeToUnit.name} (${activeFromUnit.symbol} to ${activeToUnit.symbol}) - ${activeCategory.name} Converter`;
+         metaDescStr = `Convert ${valPrefix}${activeFromUnit.name.toLowerCase()} to ${activeToUnit.name.toLowerCase()} instantly. Free online ${activeCategory.name.toLowerCase()} conversion calculator. Enter value, select units—get precise results fast.`;
          canonicalUrlStr = `https://quickconvertunits.com/${getSEOUrlPath(unitFrom, unitTo)}`;
          ogTitleStr = `${valPrefix}${activeFromUnit.name} to ${activeToUnit.name} Conversion Calculator - QuickConvert`;
          
@@ -685,6 +699,9 @@ export default function App() {
 
       // Only add specific conversion rich results on particular converter pages
       if (isSpecificConverter) {
+        const conversionFactor = convert(1, unitFrom, unitTo, category);
+        const formattedFactor = parseFloat(conversionFactor.toFixed(6));
+        
         schema.push({
           "@context": "https://schema.org",
           "@type": "Action",
@@ -694,16 +711,33 @@ export default function App() {
           value: valFrom || "1"
         });
         
+        const isTemp = category === 'temperature';
+        const amountText = isTemp
+          ? `1 degree ${activeFromUnit.name} is equivalent to ${formattedFactor} degrees ${activeToUnit.name}.`
+          : `There are ${formattedFactor} ${activeToUnit.name} in 1 ${activeFromUnit.name}.`;
+          
+        const methodText = isTemp 
+          ? `To convert ${activeFromUnit.name} to ${activeToUnit.name}, you use a specific temperature formula involving an offset. Our free online calculator handles this complex conversion automatically.`
+          : `To convert ${activeFromUnit.name} to ${activeToUnit.name}, you multiply the value by ${formattedFactor}. Our free online calculator handles this mathematical conversion automatically.`;
+
         schema.push({
           "@context": "https://schema.org",
           "@type": "FAQPage",
           mainEntity: [
             {
               "@type": "Question",
+              name: isTemp ? `What is 1 ${activeFromUnit.name} in ${activeToUnit.name}?` : `How many ${activeToUnit.name} are in 1 ${activeFromUnit.name}?`,
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: amountText,
+              },
+            },
+            {
+              "@type": "Question",
               name: `How do I convert ${activeFromUnit.name} to ${activeToUnit.name}?`,
               acceptedAnswer: {
                 "@type": "Answer",
-                text: `To convert ${activeFromUnit.name} to ${activeToUnit.name}, multiply or divide the value depending on the conversion factor. Our free calculator handles this automatically.`,
+                text: methodText,
               },
             },
             {
@@ -713,7 +747,7 @@ export default function App() {
                 "@type": "Answer",
                 text:
                   activeFromUnit.description ||
-                  `A ${activeFromUnit.name} is a unit of ${activeCategory.name.toLowerCase()}.`,
+                  `A ${activeFromUnit.name} is a typical unit of ${activeCategory.name.toLowerCase()}.`,
               },
             },
           ],
@@ -791,18 +825,49 @@ export default function App() {
                 </div>
               </div>
               <AnimatePresence>
-                {isSearchFocused && suggestions.length > 0 && (
+                {isSearchFocused && (suggestions.length > 0 || (!searchQuery && favorites.length > 0)) && (
                   <motion.div
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 5 }}
                     className="absolute top-11 left-0 right-0 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-100 dark:border-neutral-700 overflow-hidden"
                   >
-                    {suggestions.map((sug, i) => (
+                    {!searchQuery && favorites.length > 0 && (
+                      <div className="px-4 py-2 text-xs font-semibold text-neutral-500 bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700">
+                        Saved Conversions
+                      </div>
+                    )}
+                    {!searchQuery && favorites.map((fav, i) => {
+                      const cat = categories.find(c => c.id === fav.cat);
+                      const fUnit = cat?.units.find(u => u.id === fav.fu);
+                      const tUnit = cat?.units.find(u => u.id === fav.tu);
+                      if (!fUnit || !tUnit) return null;
+                      return (
+                        <button
+                          key={`fav-${i}`}
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors flex items-center justify-between group"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            selectSuggestion({
+                              categoryId: fav.cat,
+                              fromId: fav.fu,
+                              toId: fav.tu,
+                            });
+                          }}
+                        >
+                          <span>{fUnit.name} to {tUnit.name}</span>
+                          <Star className="w-3 h-3 text-amber-500 fill-current opacity-50 group-hover:opacity-100 transition-opacity" />
+                        </button>
+                      );
+                    })}
+                    {searchQuery && suggestions.map((sug, i) => (
                       <button
                         key={i}
                         className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors"
-                        onClick={() => selectSuggestion(sug)}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          selectSuggestion(sug);
+                        }}
                       >
                         {sug.text}
                       </button>
@@ -887,18 +952,49 @@ export default function App() {
           />
         </div>
         <AnimatePresence>
-          {isSearchFocused && suggestions.length > 0 && (
+          {isSearchFocused && (suggestions.length > 0 || (!searchQuery && favorites.length > 0)) && (
             <motion.div
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 5 }}
               className="absolute top-14 left-4 right-4 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-100 dark:border-neutral-700 overflow-hidden z-20"
             >
-              {suggestions.map((sug, i) => (
+              {!searchQuery && favorites.length > 0 && (
+                <div className="px-4 py-2 text-xs font-semibold text-neutral-500 bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700">
+                  Saved Conversions
+                </div>
+              )}
+              {!searchQuery && favorites.map((fav, i) => {
+                const cat = categories.find(c => c.id === fav.cat);
+                const fUnit = cat?.units.find(u => u.id === fav.fu);
+                const tUnit = cat?.units.find(u => u.id === fav.tu);
+                if (!fUnit || !tUnit) return null;
+                return (
+                  <button
+                    key={`mobile-fav-${i}`}
+                    className="w-full text-left px-4 py-3 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors flex items-center justify-between group border-b border-neutral-100 dark:border-neutral-800 last:border-0"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      selectSuggestion({
+                        categoryId: fav.cat,
+                        fromId: fav.fu,
+                        toId: fav.tu,
+                      });
+                    }}
+                  >
+                    <span>{fUnit.name} to {tUnit.name}</span>
+                    <Star className="w-3 h-3 text-amber-500 fill-current opacity-50 group-hover:opacity-100 transition-opacity" />
+                  </button>
+                );
+              })}
+              {searchQuery && suggestions.map((sug, i) => (
                 <button
                   key={i}
                   className="w-full text-left px-4 py-3 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors border-b border-neutral-100 dark:border-neutral-800 last:border-0"
-                  onClick={() => selectSuggestion(sug)}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    selectSuggestion(sug);
+                  }}
                 >
                   {sug.text}
                 </button>
@@ -913,8 +1009,19 @@ export default function App() {
         {/* Left Column (Main App + Content) */}
         <div className="flex-1 max-w-3xl mx-auto w-full">
           <div className="text-center mb-10">
-            <h1 className="text-4xl md:text-5xl font-semibold tracking-tight mb-4 text-neutral-900 dark:text-white">
+            <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-4xl md:text-5xl font-semibold tracking-tight mb-4 text-neutral-900 dark:text-white">
               Convert {activeFromUnit?.name} to {activeToUnit?.name}
+              <button
+                onClick={toggleFavorite}
+                className={`flex-shrink-0 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full transition-colors ${
+                  isFavorited
+                    ? "bg-amber-100 text-amber-500 dark:bg-amber-500/20 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-500/30"
+                    : "bg-neutral-100 text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600 dark:bg-[#1a1a1a] dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-neutral-300"
+                }`}
+                title={isFavorited ? "Saved to Favorites" : "Save this conversion"}
+              >
+                <Star className={`w-5 h-5 md:w-6 md:h-6 ${isFavorited ? "fill-current" : ""}`} />
+              </button>
             </h1>
             <p className="text-neutral-500 dark:text-neutral-400 text-lg font-light">
               Fast, accurate, and completely free {category.replace("_", " ")} conversion tool.
@@ -986,12 +1093,26 @@ export default function App() {
                         setTimeout(() => toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none'), 3000);
                       }
                     }}
+                    onFocus={(e) => e.target.select()}
                     autoFocus
                     className="w-full bg-transparent text-4xl md:text-5xl lg:text-6xl font-light focus:outline-none text-neutral-900 dark:text-white pr-20 tracking-tight"
                     placeholder="0"
                     inputMode="decimal"
                   />
                   <div className="absolute right-0 flex items-center gap-1 opacity-0 group-focus-within:opacity-100 hover:opacity-100 focus:opacity-100 transition-opacity">
+                    {valFrom && valFrom !== "0" && (
+                      <button
+                        onClick={() => {
+                          setValFrom("");
+                          setValTo("");
+                        }}
+                        className="p-2 text-neutral-300 hover:text-neutral-500 transition-colors"
+                        title="Clear input"
+                        aria-label="Clear input"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                      </button>
+                    )}
                     {(window as any).SpeechRecognition || (window as any).webkitSpeechRecognition ? (
                       <button
                         onClick={() => {
@@ -1070,13 +1191,13 @@ export default function App() {
                     activeCategoryId={category}
                   />
                 </div>
-                <div className="relative flex items-center mt-3">
+                <div className="flex items-center gap-2 mt-3">
                   <motion.div
                     key={valTo}
                     initial={{ scale: 0.98, opacity: 0.8 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.15 }}
-                    className="w-full"
+                    className="flex-1 min-w-0"
                   >
                   <input
                     aria-label={`To value in ${activeToUnit?.name || 'unit'}`}
@@ -1103,7 +1224,8 @@ export default function App() {
                         setTimeout(() => toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none'), 3000);
                       }
                     }}
-                    className="w-full bg-transparent text-4xl md:text-5xl lg:text-6xl font-light focus:outline-none text-neutral-900 dark:text-white pr-10 tracking-tight"
+                    onFocus={(e) => e.target.select()}
+                    className="w-full bg-transparent text-4xl md:text-5xl lg:text-6xl font-light focus:outline-none text-neutral-900 dark:text-white truncate tracking-tight"
                     placeholder="0"
                     inputMode="decimal"
                   />
@@ -1111,13 +1233,14 @@ export default function App() {
                   {valTo && (
                     <button
                       onClick={handleCopy}
-                      className="absolute right-0 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors p-2"
+                      className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors"
                       aria-label="Copy result"
+                      title="Copy result"
                     >
                       {copied ? (
-                        <Check className="w-6 h-6 text-green-500" />
+                        <Check className="w-5 h-5 text-green-500" />
                       ) : (
-                        <Copy className="w-6 h-6 opacity-0 group-focus-within:opacity-100 hover:opacity-100 focus:opacity-100" />
+                        <Copy className="w-5 h-5" />
                       )}
                     </button>
                   )}
@@ -1158,15 +1281,6 @@ export default function App() {
               >
                 <Copy className="w-4 h-4" />{" "}
                 {copied ? "Copied!" : "Copy Result"}
-              </button>
-              <button
-                onClick={toggleFavorite}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${isFavorited ? "bg-amber-500/10 text-amber-600 dark:text-amber-400" : "bg-neutral-100 dark:bg-[#1a1a1a] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300"}`}
-              >
-                <Star
-                  className={`w-4 h-4 ${isFavorited ? "fill-current" : ""}`}
-                />{" "}
-                {isFavorited ? "Saved" : "Save"}
               </button>
               <button
                 onClick={handleShare}
@@ -1372,6 +1486,43 @@ export default function App() {
               )}
             </AnimatePresence>
           </motion.div>
+
+          {/* Frequently Asked Questions */}
+          <div className="mt-8 bg-white dark:bg-[#111111] rounded-3xl p-8 md:p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-neutral-100 dark:border-neutral-800">
+            <h3 className="text-2xl font-semibold tracking-tight mb-6">Frequently Asked Questions</h3>
+            <div className="space-y-6">
+              <div className="prose prose-neutral dark:prose-invert max-w-none">
+                <h4 className="text-lg font-medium text-neutral-800 dark:text-neutral-200 mb-2 mt-0">
+                  {category === "temperature" ? `What is 1 ${activeFromUnit.name} in ${activeToUnit.name}?` : `How many ${activeToUnit.name} are in 1 ${activeFromUnit.name}?`}
+                </h4>
+                <p className="text-neutral-600 dark:text-neutral-400 font-light leading-relaxed mb-0">
+                  {category === "temperature" 
+                    ? `1 degree ${activeFromUnit.name} is equivalent to ${parseFloat(convert(1, unitFrom, unitTo, category).toFixed(6))} degrees ${activeToUnit.name}.`
+                    : `There are ${parseFloat(convert(1, unitFrom, unitTo, category).toFixed(6))} ${activeToUnit.name} in 1 ${activeFromUnit.name}.`
+                  }
+                </p>
+              </div>
+              <div className="prose prose-neutral dark:prose-invert max-w-none">
+                <h4 className="text-lg font-medium text-neutral-800 dark:text-neutral-200 mb-2 mt-0">
+                  How do I convert {activeFromUnit.name} to {activeToUnit.name}?
+                </h4>
+                <p className="text-neutral-600 dark:text-neutral-400 font-light leading-relaxed mb-0">
+                  {category === "temperature"
+                    ? `To convert ${activeFromUnit.name} to ${activeToUnit.name}, you use a specific temperature formula involving an offset. Our free online calculator handles this complex conversion automatically.`
+                    : `To convert ${activeFromUnit.name} to ${activeToUnit.name}, you multiply the value by ${parseFloat(convert(1, unitFrom, unitTo, category).toFixed(6))}. Our free online calculator handles this mathematical conversion automatically.`
+                  }
+                </p>
+              </div>
+              <div className="prose prose-neutral dark:prose-invert max-w-none">
+                <h4 className="text-lg font-medium text-neutral-800 dark:text-neutral-200 mb-2 mt-0">
+                  What is a {activeFromUnit.name}?
+                </h4>
+                <p className="text-neutral-600 dark:text-neutral-400 font-light leading-relaxed mb-0">
+                  {activeFromUnit.description || `A ${activeFromUnit.name} is a typical unit of ${activeCategory.name.toLowerCase()}.`}
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* Conversion Chart for Specific Categories */}
           <Suspense fallback={<div className="mt-8 h-[350px] flex items-center justify-center bg-white dark:bg-neutral-800 rounded-3xl border border-neutral-100 dark:border-neutral-700">Loading chart...</div>}>

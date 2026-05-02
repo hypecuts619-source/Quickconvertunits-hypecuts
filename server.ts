@@ -95,12 +95,12 @@ function applySEO(urlPath: string, template: string): string {
       const fromUnit = popularUnits[fromId] || { name: capitalize(fromId), symbol: capitalize(fromId) };
       const toUnit = popularUnits[toId] || { name: capitalize(toId), symbol: capitalize(toId) };
       
-      const title = `${fromUnit.symbol.toUpperCase()} to ${toUnit.symbol.toUpperCase()} Converter | ${fromUnit.name} to ${toUnit.name} Fast`;
-      const description = `Convert ${fromUnit.name.toLowerCase()} to ${toUnit.name.toLowerCase()} instantly and accurately. Enter value, select units—get results to 10 decimals. Perfect for cooking, fitness, shipping.`;
+      const title = `1 ${fromUnit.name} to ${toUnit.name} (${fromUnit.symbol} to ${toUnit.symbol}) - Free Converter`;
+      const description = `Convert 1 ${fromUnit.name.toLowerCase()} to ${toUnit.name.toLowerCase()} instantly. Free online conversion calculator. Enter value, select units—get precise results fast.`;
 
       template = template.replace(
         /<title>(.*?)<\/title>/,
-        `<title>${title} - QuickConvert</title>`
+        `<title>${title} | QuickConvert</title>`
       );
       template = template.replace(
         /<meta name="description" content="(.*?)" \/>/,
@@ -235,17 +235,38 @@ function applySEO(urlPath: string, template: string): string {
   return template;
 }
 
-async function startServer() {
-  const app = express();
-  const PORT = 3000;
+const app = express();
+const PORT = 3000;
+const isProd = process.env.NODE_ENV === "production";
 
-  // Let Vite handle API routes if needed, otherwise skip
-  app.get("/api/health", (req, res) => {
-    res.json({ status: "ok" });
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
+if (isProd) {
+  // Production routes (Synchronous)
+  const distPath = path.resolve(process.cwd(), "dist");
+  
+  // Serve static files EXCEPT index.html. In Vercel, Vercel itself handles static routing usually via vercel.json,
+  // but if it falls through to this function we will serve it.
+  app.use(express.static(distPath, { index: false }));
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  app.get("*", (req: any, res: any) => {
+    const templatePath = path.join(distPath, "index.html");
+    let template = "";
+    try {
+      template = fs.readFileSync(templatePath, "utf-8");
+    } catch (e) {
+      return res.status(500).send("index.html not found. Did you build the app?");
+    }
+
+    template = applySEO(req.path, template);
+    res.status(200).set({ "Content-Type": "text/html" }).send(template);
   });
+}
 
-  const isProd = process.env.NODE_ENV === "production";
-
+async function startServer() {
   if (!isProd) {
     console.log("Starting Vite development server...");
     const { createServer: createViteServer } = await import("vite");
@@ -267,32 +288,16 @@ async function startServer() {
       template = applySEO(req.path, template);
       res.status(200).set({ "Content-Type": "text/html" }).send(template);
     });
-  } else {
-    const distPath = path.resolve(__dirname, "dist");
-    
-    // Serve static files EXCEPT index.html
-    app.use(express.static(distPath, { index: false }));
-
-    // For all other routes, serve index.html with injected SEO tags
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    app.get("*", (req: any, res: any) => {
-      const templatePath = path.join(distPath, "index.html");
-      let template = "";
-      try {
-        template = fs.readFileSync(templatePath, "utf-8");
-      } catch (e) {
-        return res.status(500).send("index.html not found. Did you build the app?");
-      }
-
-      template = applySEO(req.path, template);
-
-      res.status(200).set({ "Content-Type": "text/html" }).send(template);
-    });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
+  // Only start listening if we are not running on Vercel
+  if (!process.env.VERCEL) {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  }
 }
 
 startServer();
+
+export default app;
