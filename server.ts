@@ -15,27 +15,43 @@ const popularUnits: Record<string, { name: string; symbol: string; factor?: numb
   // Length
   meter: { name: "Meter", symbol: "m", factor: 1, base: "length" },
   meters: { name: "Meter", symbol: "m", factor: 1, base: "length" },
+  m: { name: "Meter", symbol: "m", factor: 1, base: "length" },
   kilometer: { name: "Kilometer", symbol: "km", factor: 1000, base: "length" },
+  kilometers: { name: "Kilometer", symbol: "km", factor: 1000, base: "length" },
   km: { name: "Kilometer", symbol: "km", factor: 1000, base: "length" },
   centimeter: { name: "Centimeter", symbol: "cm", factor: 0.01, base: "length" },
+  centimeters: { name: "Centimeter", symbol: "cm", factor: 0.01, base: "length" },
   cm: { name: "Centimeter", symbol: "cm", factor: 0.01, base: "length" },
   millimeter: { name: "Millimeter", symbol: "mm", factor: 0.001, base: "length" },
+  millimeters: { name: "Millimeter", symbol: "mm", factor: 0.001, base: "length" },
   mm: { name: "Millimeter", symbol: "mm", factor: 0.001, base: "length" },
   mile: { name: "Mile", symbol: "mi", factor: 1609.344, base: "length" },
   miles: { name: "Mile", symbol: "mi", factor: 1609.344, base: "length" },
+  mi: { name: "Mile", symbol: "mi", factor: 1609.344, base: "length" },
   yard: { name: "Yard", symbol: "yd", factor: 0.9144, base: "length" },
+  yards: { name: "Yard", symbol: "yd", factor: 0.9144, base: "length" },
+  yd: { name: "Yard", symbol: "yd", factor: 0.9144, base: "length" },
   foot: { name: "Foot", symbol: "ft", factor: 0.3048, base: "length" },
   feet: { name: "Foot", symbol: "ft", factor: 0.3048, base: "length" },
+  ft: { name: "Foot", symbol: "ft", factor: 0.3048, base: "length" },
   inch: { name: "Inch", symbol: "in", factor: 0.0254, base: "length" },
   inches: { name: "Inch", symbol: "in", factor: 0.0254, base: "length" },
+  in: { name: "Inch", symbol: "in", factor: 0.0254, base: "length" },
   // Weight
   kilogram: { name: "Kilogram", symbol: "kg", factor: 1, base: "weight" },
+  kilograms: { name: "Kilogram", symbol: "kg", factor: 1, base: "weight" },
   kg: { name: "Kilogram", symbol: "kg", factor: 1, base: "weight" },
   gram: { name: "Gram", symbol: "g", factor: 0.001, base: "weight" },
+  grams: { name: "Gram", symbol: "g", factor: 0.001, base: "weight" },
   g: { name: "Gram", symbol: "g", factor: 0.001, base: "weight" },
+  milligram: { name: "Milligram", symbol: "mg", factor: 0.000001, base: "weight" },
+  mg: { name: "Milligram", symbol: "mg", factor: 0.000001, base: "weight" },
   pound: { name: "Pound", symbol: "lb", factor: 0.45359237, base: "weight" },
+  pounds: { name: "Pound", symbol: "lb", factor: 0.45359237, base: "weight" },
+  lb: { name: "Pound", symbol: "lb", factor: 0.45359237, base: "weight" },
   lbs: { name: "Pound", symbol: "lb", factor: 0.45359237, base: "weight" },
   ounce: { name: "Ounce", symbol: "oz", factor: 0.0283495231, base: "weight" },
+  ounces: { name: "Ounce", symbol: "oz", factor: 0.0283495231, base: "weight" },
   oz: { name: "Ounce", symbol: "oz", factor: 0.0283495231, base: "weight" },
   // Temperature
   celsius: { name: "Celsius", symbol: "°C", base: "temperature" },
@@ -43,25 +59,48 @@ const popularUnits: Record<string, { name: string; symbol: string; factor?: numb
   kelvin: { name: "Kelvin", symbol: "K", base: "temperature" },
   // Area
   square_meter: { name: "Square Meter", symbol: "m²", factor: 1, base: "area" },
+  square_meters: { name: "Square Meter", symbol: "m²", factor: 1, base: "area" },
   acre: { name: "Acre", symbol: "ac", factor: 4046.856, base: "area" },
+  acres: { name: "Acre", symbol: "ac", factor: 4046.856, base: "area" },
   hectare: { name: "Hectare", symbol: "ha", factor: 10000, base: "area" },
+  hectares: { name: "Hectare", symbol: "ha", factor: 10000, base: "area" },
   square_foot: { name: "Square Foot", symbol: "ft²", factor: 0.092903, base: "area" },
+  square_feet: { name: "Square Foot", symbol: "ft²", factor: 0.092903, base: "area" },
   // Volume
   liter: { name: "Liter", symbol: "L", factor: 1, base: "volume" },
+  liters: { name: "Liter", symbol: "L", factor: 1, base: "volume" },
+  l: { name: "Liter", symbol: "L", factor: 1, base: "volume" },
+  millilitre: { name: "Millilitre", symbol: "mL", factor: 0.001, base: "volume" },
+  millilitres: { name: "Millilitre", symbol: "mL", factor: 0.001, base: "volume" },
   milliliter: { name: "Milliliter", symbol: "mL", factor: 0.001, base: "volume" },
+  milliliters: { name: "Milliliter", symbol: "mL", factor: 0.001, base: "volume" },
+  ml: { name: "Milliliter", symbol: "mL", factor: 0.001, base: "volume" },
   gallon_us: { name: "US Gallon", symbol: "gal", factor: 3.78541, base: "volume" },
+  gallons: { name: "Gallon", symbol: "gal", factor: 3.78541, base: "volume" },
+  gal: { name: "Gallon", symbol: "gal", factor: 3.78541, base: "volume" },
   cup_us: { name: "US Cup", symbol: "cup", factor: 0.236588, base: "volume" },
+  cups: { name: "Cup", symbol: "cup", factor: 0.236588, base: "volume" },
   // Time
   second: { name: "Second", symbol: "s", factor: 1, base: "time" },
+  seconds: { name: "Second", symbol: "s", factor: 1, base: "time" },
+  s: { name: "Second", symbol: "s", factor: 1, base: "time" },
   minute: { name: "Minute", symbol: "min", factor: 60, base: "time" },
+  minutes: { name: "Minute", symbol: "min", factor: 60, base: "time" },
+  min: { name: "Minute", symbol: "min", factor: 60, base: "time" },
   hour: { name: "Hour", symbol: "h", factor: 3600, base: "time" },
+  hours: { name: "Hour", symbol: "h", factor: 3600, base: "time" },
+  h: { name: "Hour", symbol: "h", factor: 3600, base: "time" },
   day: { name: "Day", symbol: "d", factor: 86400, base: "time" },
+  days: { name: "Day", symbol: "d", factor: 86400, base: "time" },
+  d: { name: "Day", symbol: "d", factor: 86400, base: "time" },
   // Speed
   meter_per_second: { name: "m/s", symbol: "m/s", factor: 1, base: "speed" },
   kilometer_per_hour: { name: "km/h", symbol: "km/h", factor: 0.277778, base: "speed" },
   mile_per_hour: { name: "mph", symbol: "mph", factor: 0.44704, base: "speed" },
   kph: { name: "km/h", symbol: "km/h", factor: 0.277778, base: "speed" },
   mph: { name: "mph", symbol: "mph", factor: 0.44704, base: "speed" },
+  knots: { name: "Knots", symbol: "kn", factor: 0.514444, base: "speed" },
+  knot: { name: "Knot", symbol: "kn", factor: 0.514444, base: "speed" },
   // Currency (Base USD)
   usd: { name: "US Dollar", symbol: "$", factor: 1, base: "currency" },
   eur: { name: "Euro", symbol: "€", factor: 1.08, base: "currency" },
@@ -74,15 +113,65 @@ const popularUnits: Record<string, { name: string; symbol: string; factor?: numb
   sek: { name: "Krona", symbol: "kr", factor: 0.093, base: "currency" },
   // Power
   watt: { name: "Watt", symbol: "W", factor: 1, base: "power" },
+  watts: { name: "Watt", symbol: "W", factor: 1, base: "power" },
+  w: { name: "Watt", symbol: "W", factor: 1, base: "power" },
   kilowatt: { name: "Kilowatt", symbol: "kW", factor: 1000, base: "power" },
+  kilowatts: { name: "Kilowatt", symbol: "kW", factor: 1000, base: "power" },
+  kw: { name: "Kilowatt", symbol: "kW", factor: 1000, base: "power" },
   megawatt: { name: "Megawatt", symbol: "MW", factor: 1000000, base: "power" },
+  megawatts: { name: "Megawatt", symbol: "MW", factor: 1000000, base: "power" },
+  mw: { name: "Megawatt", symbol: "MW", factor: 1000000, base: "power" },
   horsepower: { name: "Horsepower", symbol: "hp", factor: 745.7, base: "power" },
+  hp: { name: "Horsepower", symbol: "hp", factor: 745.7, base: "power" },
   metric_horsepower: { name: "Metric Horsepower", symbol: "PS", factor: 735.5, base: "power" },
+  ps: { name: "Metric Horsepower", symbol: "PS", factor: 735.5, base: "power" },
   // Angle
   degree: { name: "Degree", symbol: "°", factor: 1, base: "angle" },
+  degrees: { name: "Degree", symbol: "°", factor: 1, base: "angle" },
+  deg: { name: "Degree", symbol: "°", factor: 1, base: "angle" },
   radian: { name: "Radian", symbol: "rad", factor: 57.2958, base: "angle" },
+  radians: { name: "Radian", symbol: "rad", factor: 57.2958, base: "angle" },
+  rad: { name: "Radian", symbol: "rad", factor: 57.2958, base: "angle" },
   gradian: { name: "Gradian", symbol: "grad", factor: 0.9, base: "angle" },
+  gradians: { name: "Gradian", symbol: "grad", factor: 0.9, base: "angle" },
+  grad: { name: "Gradian", symbol: "grad", factor: 0.9, base: "angle" },
   arcsecond: { name: "Arcsecond", symbol: "\"", factor: 0.000277, base: "angle" },
+  arcminute: { name: "Arcminute", symbol: "'", factor: 0.016666, base: "angle" },
+  // Digital Storage
+  bit: { name: "Bit", symbol: "b", factor: 0.125, base: "digital" },
+  bits: { name: "Bit", symbol: "b", factor: 0.125, base: "digital" },
+  byte: { name: "Byte", symbol: "B", factor: 1, base: "digital" },
+  bytes: { name: "Byte", symbol: "B", factor: 1, base: "digital" },
+  kilobyte: { name: "Kilobyte", symbol: "KB", factor: 1024, base: "digital" },
+  kilobytes: { name: "Kilobyte", symbol: "KB", factor: 1024, base: "digital" },
+  kb: { name: "Kilobyte", symbol: "KB", factor: 1024, base: "digital" },
+  megabyte: { name: "Megabyte", symbol: "MB", factor: 1048576, base: "digital" },
+  megabytes: { name: "Megabyte", symbol: "MB", factor: 1048576, base: "digital" },
+  mb: { name: "Megabyte", symbol: "MB", factor: 1048576, base: "digital" },
+  gigabyte: { name: "Gigabyte", symbol: "GB", factor: 1073741824, base: "digital" },
+  gigabytes: { name: "Gigabyte", symbol: "GB", factor: 1073741824, base: "digital" },
+  gb: { name: "Gigabyte", symbol: "GB", factor: 1073741824, base: "digital" },
+  terabyte: { name: "Terabyte", symbol: "TB", factor: 1099511627776, base: "digital" },
+  terabytes: { name: "Terabyte", symbol: "TB", factor: 1099511627776, base: "digital" },
+  tb: { name: "Terabyte", symbol: "TB", factor: 1099511627776, base: "digital" },
+  // Pressure
+  pascal: { name: "Pascal", symbol: "Pa", factor: 1, base: "pressure" },
+  pascals: { name: "Pascal", symbol: "Pa", factor: 1, base: "pressure" },
+  pa: { name: "Pascal", symbol: "Pa", factor: 1, base: "pressure" },
+  bar: { name: "Bar", symbol: "bar", factor: 100000, base: "pressure" },
+  bars: { name: "Bar", symbol: "bar", factor: 100000, base: "pressure" },
+  psi: { name: "PSI", symbol: "psi", factor: 6894.76, base: "pressure" },
+  atm: { name: "Atmosphere", symbol: "atm", factor: 101325, base: "pressure" },
+  atmosphere: { name: "Atmosphere", symbol: "atm", factor: 101325, base: "pressure" },
+  // Frequency
+  hertz: { name: "Hertz", symbol: "Hz", factor: 1, base: "frequency" },
+  hz: { name: "Hertz", symbol: "Hz", factor: 1, base: "frequency" },
+  kilohertz: { name: "Kilohertz", symbol: "kHz", factor: 1000, base: "frequency" },
+  khz: { name: "Kilohertz", symbol: "kHz", factor: 1000, base: "frequency" },
+  megahertz: { name: "Megahertz", symbol: "MHz", factor: 1000000, base: "frequency" },
+  mhz: { name: "Megahertz", symbol: "MHz", factor: 1000000, base: "frequency" },
+  gigahertz: { name: "Gigahertz", symbol: "GHz", factor: 1000000000, base: "frequency" },
+  ghz: { name: "Gigahertz", symbol: "GHz", factor: 1000000000, base: "frequency" },
 };
 
 let cachedTemplate = "";
@@ -127,7 +216,7 @@ function applySEO(urlPath: string, template: string): string {
   
   if (urlPath && urlPath.includes("-to-")) {
     const parts = urlPath.split("-to-");
-    if (parts.length === 2) {
+    if (parts.length === 2 && parts[0] && parts[1]) {
       const fromId = parts[0];
       const toId = parts[1];
       
@@ -171,7 +260,13 @@ function applySEO(urlPath: string, template: string): string {
       
       let formulaText = `To calculate, you multiply the ${fromUnit.name} value by the conversion factor.`;
       if (fromUnit.base === 'temperature') {
-        formulaText = `Temperature conversions rely on specific formulas rather than a simple multiplier.`;
+        if (fromId === 'celsius' && toId === 'fahrenheit') formulaText = `The formula to convert Celsius to Fahrenheit is: <strong>(°C × 9/5) + 32 = °F</strong>.`;
+        else if (fromId === 'fahrenheit' && toId === 'celsius') formulaText = `The formula to convert Fahrenheit to Celsius is: <strong>(°F − 32) × 5/9 = °C</strong>.`;
+        else if (fromId === 'celsius' && toId === 'kelvin') formulaText = `The formula to convert Celsius to Kelvin is: <strong>°C + 273.15 = K</strong>.`;
+        else if (fromId === 'kelvin' && toId === 'celsius') formulaText = `The formula to convert Kelvin to Celsius is: <strong>K − 273.15 = °C</strong>.`;
+        else if (fromId === 'fahrenheit' && toId === 'kelvin') formulaText = `The formula to convert Fahrenheit to Kelvin is: <strong>(°F − 32) × 5/9 + 273.15 = K</strong>.`;
+        else if (fromId === 'kelvin' && toId === 'fahrenheit') formulaText = `The formula to convert Kelvin to Fahrenheit is: <strong>(K − 273.15) × 9/5 + 32 = °F</strong>.`;
+        else formulaText = `Temperature conversions rely on specific formulas rather than a simple multiplier.`;
       } else if (fromUnit.factor && toUnit.factor) {
         let conversionRatio = fromUnit.factor / toUnit.factor;
         formulaText = `The conversion factor is approximately <strong>${formatValue(conversionRatio)}</strong>. Therefore, 1 ${fromUnit.name} is equal to ${val1} ${toUnit.name}.`;

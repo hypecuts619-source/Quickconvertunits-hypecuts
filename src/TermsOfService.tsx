@@ -47,6 +47,34 @@ export default function TermsOfService() {
               In no event shall QuickConvert or its affiliates be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with your use of the website.
             </p>
           </section>
+
+          <section>
+            <h2 className="text-xl font-medium mb-4 text-neutral-800 dark:text-neutral-200">5. User Conduct</h2>
+            <p>
+              You agree to use our website only for lawful purposes. You are prohibited from using the site to engage in any activity that could damage, disable, or impair our servers or networks.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-medium mb-4 text-neutral-800 dark:text-neutral-200">6. Intellectual Property</h2>
+            <p>
+              The content, features, and functionality of this website are owned by QuickConvert and are protected by international copyright, trademark, and other intellectual property laws.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-medium mb-4 text-neutral-800 dark:text-neutral-200">7. Governing Law</h2>
+            <p>
+              These Terms shall be governed and construed in accordance with the laws of your jurisdiction, without regard to its conflict of law provisions.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-medium mb-4 text-neutral-800 dark:text-neutral-200">8. Changes to Terms</h2>
+            <p>
+              We reserve the right, at our sole discretion, to modify or replace these Terms at any time. By continuing to access or use our website after those revisions become effective, you agree to be bound by the revised terms.
+            </p>
+          </section>
         </div>
       </div>
     </div>

@@ -142,6 +142,7 @@ export const categories: UnitCategory[] = [
       { id: 'bar', name: 'Bar', symbol: 'bar', factor: 100000, description: 'A metric unit of pressure, exactly equal to 100,000 Pa, roughly approximating atmospheric pressure on Earth at sea level.' },
       { id: 'psi', name: 'Pound per Square Inch', symbol: 'psi', factor: 6894.75729, description: 'Pounds per square inch, an imperial unit of pressure widely used in the US for tires, scuba tanks, and natural gas lines.' },
       { id: 'atmosphere', name: 'Standard Atmosphere', symbol: 'atm', factor: 101325, description: 'Standard atmosphere, commonly used as a reference pressure for chemical reactions and denoting depth pressures in diving.' },
+      { id: 'atm', name: 'Standard Atmosphere (Short)', symbol: 'atm', factor: 101325, description: 'Standard atmosphere abbreviation.' },
       { id: 'torr', name: 'Torr', symbol: 'Torr', factor: 133.322368, description: 'A unit of pressure based on an absolute scale, approximating the pressure of 1 mm of mercury, used in high-vacuum physics and medicine.' },
     ],
   },
@@ -236,6 +237,17 @@ export const categories: UnitCategory[] = [
       { id: 'miles_per_gallon_uk', name: 'Miles per Gallon (UK)', symbol: 'mpg (UK)', factor: 0.35400619, description: 'A measure of how far a vehicle can travel on one imperial gallon of fuel.' }
       // liters per 100km is inversely proportional, not linear, so we'll omit it here or implement a special case later.
     ]
+  },
+  {
+    id: 'frequency',
+    name: 'Frequency',
+    baseUnit: 'hertz',
+    units: [
+      { id: 'hertz', name: 'Hertz', symbol: 'Hz', factor: 1, description: 'The SI unit of frequency, defined as one cycle per second, named after Heinrich Hertz.' },
+      { id: 'kilohertz', name: 'Kilohertz', symbol: 'kHz', factor: 1000, description: 'One thousand cycles per second, used in radio broadcasting and audio frequencies.' },
+      { id: 'megahertz', name: 'Megahertz', symbol: 'MHz', factor: 1000000, description: 'One million cycles per second, used for FM radio, television, and microprocessors.' },
+      { id: 'gigahertz', name: 'Gigahertz', symbol: 'GHz', factor: 1000000000, description: 'One billion cycles per second, used in satellite communications, radar, and computer CPUs.' },
+    ],
   },
   {
     id: 'time_zone',
