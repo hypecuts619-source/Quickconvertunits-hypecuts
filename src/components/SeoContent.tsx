@@ -1,11 +1,13 @@
 import React from 'react';
 import { convert } from '../lib/units';
+import { useTranslation } from 'react-i18next';
 
 export function SeoContent({ 
   unitFrom, unitTo, category, categories
 }: {
   unitFrom: string, unitTo: string, category: string, categories: any[]
 }) {
+  const { t } = useTranslation();
   const cat = categories.find(c => c.id === category);
   const fUnit = cat?.units.find((u: any) => u.id === unitFrom);
   const tUnit = cat?.units.find((u: any) => u.id === unitTo);
@@ -23,25 +25,29 @@ export function SeoContent({
 
   const commonValues = [1, 2, 3, 4, 5, 10, 20, 50, 100, 500, 1000];
   
+  const fUnitName = t(`units.${fUnit.id}`, fUnit.name);
+  const tUnitName = t(`units.${tUnit.id}`, tUnit.name);
+  const catName = cat ? t(`categories.${cat.id}`, cat.name).toLowerCase() : 'measurement';
+
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none mb-10 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-2xl prose-h3:text-lg prose-p:font-light prose-p:leading-relaxed prose-p:text-neutral-600 dark:prose-p:text-neutral-400">
-      <h2>{fUnit.name} to {tUnit.name} Converter</h2>
-      <p>{fUnit.description || `Instantly convert ${fUnit.name} (${fUnit.symbol}) to ${tUnit.name} (${tUnit.symbol}) with our high-precision online calculator.`} {tUnit.description ? ` ${tUnit.description}` : ""}</p>
+      <h2>{t("seoTitle", "{{fromUnit}} to {{toUnit}} Converter", { fromUnit: fUnitName, toUnit: tUnitName })}</h2>
+      <p>{fUnit.description || t("seoDescription", "Instantly convert {{fromUnit}} ({{fromSymbol}}) to {{toUnit}} ({{toSymbol}}) with our high-precision online calculator.", { fromUnit: fUnitName, fromSymbol: fUnit.symbol, toUnit: tUnitName, toSymbol: tUnit.symbol })} {tUnit.description ? ` ${tUnit.description}` : ""}</p>
       
-      <h3>How to Convert {fUnit.name} to {tUnit.name}</h3>
+      <h3>{t("seoHowTo", "How to Convert {{fromUnit}} to {{toUnit}}", { fromUnit: fUnitName, toUnit: tUnitName })}</h3>
       <p>
-        To manually convert {fUnit.name} to {tUnit.name}, multiply the value in {fUnit.name} by {" "}
+        {t("seoFormulaDesc1", "To manually convert {{fromUnit}} to {{toUnit}}, multiply the value in {{fromUnit}} by", { fromUnit: fUnitName, toUnit: tUnitName })} {" "}
         <strong>{formatNum(convFactor)}</strong>. 
-        For example, 5 {fUnit.symbol} would be exactly {formatNum(5 * convFactor)} {tUnit.symbol}. Memorizing this formula and performing manual math is slow and prone to errors. Our real-time calculator handles this for you instantly.
+        {t("seoFormulaDesc2", "For example, 5 {{fromSymbol}} would be exactly {{result}} {{toSymbol}}. Memorizing this formula and performing manual math is slow and prone to errors. Our real-time calculator handles this for you instantly.", { fromSymbol: fUnit.symbol, result: formatNum(5 * convFactor), toSymbol: tUnit.symbol })}
       </p>
 
-      <h3>{fUnit.name} to {tUnit.name} Conversion Table</h3>
+      <h3>{t("seoTable", "{{fromUnit}} to {{toUnit}} Conversion Table", { fromUnit: fUnitName, toUnit: tUnitName })}</h3>
       <div className="not-prose overflow-x-auto my-6 border border-neutral-200 dark:border-neutral-800 rounded-xl max-w-sm mx-auto shadow-sm">
         <table className="w-full text-sm text-center">
           <thead className="bg-neutral-50 dark:bg-[#1a1a1a] border-b border-neutral-200 dark:border-neutral-800 text-neutral-500 font-medium">
             <tr>
-              <th className="px-4 py-3">{fUnit.name} ({fUnit.symbol})</th>
-              <th className="px-4 py-3">{tUnit.name} ({tUnit.symbol})</th>
+              <th className="px-4 py-3">{fUnitName} ({fUnit.symbol})</th>
+              <th className="px-4 py-3">{tUnitName} ({tUnit.symbol})</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/50">
@@ -55,21 +61,21 @@ export function SeoContent({
         </table>
       </div>
 
-      <h3>Frequently Asked Questions</h3>
-      <h4>How many {tUnit.name} are in 1 {fUnit.name}?</h4>
-      <p>There are exactly {formatNum(convFactor)} {tUnit.name} in 1 {fUnit.name}.</p>
+      <h3>{t("seoFaq", "Frequently Asked Questions")}</h3>
+      <h4>{t("seoFaq1Q", "How many {{toUnit}} are in 1 {{fromUnit}}?", { toUnit: tUnitName, fromUnit: fUnitName })}</h4>
+      <p>{t("seoFaq1A", "There are exactly {{result}} {{toUnit}} in 1 {{fromUnit}}.", { result: formatNum(convFactor), toUnit: tUnitName, fromUnit: fUnitName })}</p>
       
-      <h4>How do you convert {fUnit.name} to {tUnit.name}?</h4>
-      <p>Simply multiply your value in {fUnit.name} by {formatNum(convFactor)} to get the equivalent in {tUnit.name}. Our converter does this instantly for you.</p>
+      <h4>{t("seoFaq2Q", "How do you convert {{fromUnit}} to {{toUnit}}?", { fromUnit: fUnitName, toUnit: tUnitName })}</h4>
+      <p>{t("seoFaq2A", "Simply multiply your value in {{fromUnit}} by {{factor}} to get the equivalent in {{toUnit}}. Our converter does this instantly for you.", { fromUnit: fUnitName, factor: formatNum(convFactor), toUnit: tUnitName })}</p>
 
-      <h4>What is {fUnit.name}?</h4>
-      <p>{fUnit.description || `${fUnit.name} is a unit of measurement used for ${cat?.name.toLowerCase()}.`} Its abbreviation is <strong>{fUnit.symbol}</strong>.</p>
+      <h4>{t("seoFaq3Q", "What is {{unit}}?", { unit: fUnitName })}</h4>
+      <p>{fUnit.description || t("seoUnitDesc", "{{unit}} is a unit of measurement used for {{category}}.", { unit: fUnitName, category: catName })} {t("seoAbbreviation", "Its abbreviation is", { symbol: fUnit.symbol })} <strong>{fUnit.symbol}</strong>.</p>
 
-      <h4>What is {tUnit.name}?</h4>
-      <p>{tUnit.description || `${tUnit.name} is a unit of measurement used for ${cat?.name.toLowerCase()}.`} Its abbreviation is <strong>{tUnit.symbol}</strong>.</p>
+      <h4>{t("seoFaq4Q", "What is {{unit}}?", { unit: tUnitName })}</h4>
+      <p>{tUnit.description || t("seoUnitDesc", "{{unit}} is a unit of measurement used for {{category}}.", { unit: tUnitName, category: catName })} {t("seoAbbreviation", "Its abbreviation is", { symbol: tUnit.symbol })} <strong>{tUnit.symbol}</strong>.</p>
       
-      <h4>Is 10 {fUnit.symbol} more than 10 {tUnit.symbol}?</h4>
-      <p>By comparing them, 10 {fUnit.symbol} equals {formatNum(10 * convFactor)} {tUnit.symbol}. So {convFactor > 1 ? `10 ${fUnit.symbol} is more than 10 ${tUnit.symbol}.` : `10 ${fUnit.symbol} is less than 10 ${tUnit.symbol}.`}</p>
+      <h4>{t("seoFaq5Q", "Is 10 {{fromSymbol}} more than 10 {{toSymbol}}?", { fromSymbol: fUnit.symbol, toSymbol: tUnit.symbol })}</h4>
+      <p>{t("seoFaq5A1", "By comparing them, 10 {{fromSymbol}} equals {{result}} {{toSymbol}}.", { fromSymbol: fUnit.symbol, result: formatNum(10 * convFactor), toSymbol: tUnit.symbol })} {convFactor > 1 ? t("seoMoreThan", "So 10 {{fromSymbol}} is more than 10 {{toSymbol}}.", { fromSymbol: fUnit.symbol, toSymbol: tUnit.symbol }) : t("seoLessThan", "So 10 {{fromSymbol}} is less than 10 {{toSymbol}}.", { fromSymbol: fUnit.symbol, toSymbol: tUnit.symbol })}</p>
     </div>
   );
 }

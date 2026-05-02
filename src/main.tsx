@@ -3,6 +3,7 @@ import {createRoot} from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { registerSW } from 'virtual:pwa-register';
 import './index.css';
+import './lib/i18n';
 
 const App = lazy(() => import('./App.tsx'));
 const PrivacyPolicy = lazy(() => import('./PrivacyPolicy.tsx'));

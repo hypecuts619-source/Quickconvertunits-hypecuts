@@ -4,6 +4,8 @@ import { getSuggestions, convert, categories, formatNumber } from "./lib/units";
 import { categorySeoContent } from "./lib/seoContent";
 import { trackConversionEvent, trackFunnelStep } from "./lib/analytics";
 import { SeoContent } from "./components/SeoContent";
+import { LanguageSelector } from "./components/LanguageSelector";
+import { useTranslation } from "react-i18next";
 import { PopularConversions, POPULAR_CONVERSIONS } from "./components/PopularConversions";
 import {
   ArrowRightLeft,
@@ -255,7 +257,7 @@ function PwaPrompt() {
            <Download className="w-5 h-5 text-primary-600 dark:text-primary-400" />
          </div>
          <div>
-           <h4 className="font-semibold text-neutral-900 dark:text-white text-sm">Install QuickConvert</h4>
+           <h4 className="font-semibold text-neutral-900 dark:text-white text-sm">{t("installApp", "Install QuickConvert")}</h4>
            <p className="text-xs text-neutral-500 dark:text-neutral-400">Use offline anywhere</p>
          </div>
       </div>
@@ -302,6 +304,13 @@ const getUnitIdsFromPath = (path: string) => {
 };
 
 export default function App() {
+  const { t, i18n } = useTranslation();
+  
+  // RTL Support check
+  useEffect(() => {
+    document.documentElement.dir = i18n.dir();
+  }, [i18n, i18n.language]);
+
   const { conversion } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -535,7 +544,7 @@ export default function App() {
       const toast = document.getElementById('error-toast');
       if (toast) {
         // Simple visual improvement
-        toast.textContent = "✅ Result copied to clipboard!";
+        toast.textContent = "✅ " + t("copied", "Result copied to clipboard!");
         toast.className = "fixed bottom-5 left-1/2 -translate-x-1/2 z-50 py-3 px-5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-full shadow-lg text-sm font-medium transition-all duration-300";
         setTimeout(() => toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none'), 2500);
       }
@@ -833,7 +842,7 @@ export default function App() {
             className="bg-amber-500 text-amber-950 px-4 py-2 text-sm font-medium text-center flex items-center justify-center gap-2 overflow-hidden"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m2 2 20 20"/><path d="M8.53 8.53C5.52 9.57 2 12 2 12l2 2.67c2.5-1.57 5-2.5 7.5-2.62M16.74 16.74c1.9-.37 3.9-.99 5.26-1.4L20 12c-1.4 1-3.1 1.77-5 2.15M13 13h.01M22 6s-4-3-10-3c-2.4 0-4.6.6-6.6 1.7"/></svg>
-            You're currently offline. Core conversions still work locally!
+            {t("offlineMode", "You're currently offline. Core conversions still work locally!")}
           </motion.div>
         )}
       </AnimatePresence>
@@ -856,7 +865,7 @@ export default function App() {
               alt="QuickConvert Logo"
               className="w-6 h-6"
             />
-            <span>QuickConvert</span>
+            <span>{t("appName", "QuickConvert")}</span>
           </a>
 
           <div className="flex items-center gap-4 flex-1 justify-end">
@@ -865,9 +874,9 @@ export default function App() {
               <div className="relative">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
                 <input
-                  aria-label="Search top conversions"
+                  aria-label={t("searchPlaceholder", "Search top conversions")}
                   type="text"
-                  placeholder="e.g. meters to feet"
+                  placeholder={t("searchPlaceholder", "Search for units (⌘K)")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setIsSearchFocused(true)}
@@ -988,6 +997,8 @@ export default function App() {
                 <Moon className="w-5 h-5" />
               )}
             </button>
+            <div className="hidden sm:block border-l border-neutral-200 dark:border-neutral-700 h-6 mx-2"></div>
+            <LanguageSelector />
           </div>
         </div>
       </header>
@@ -997,9 +1008,9 @@ export default function App() {
         <div className="relative">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
           <input
-            aria-label="Search categories"
+            aria-label={t("searchPlaceholder", "Search categories")}
             type="text"
-            placeholder="Search conversions..."
+            placeholder={t("searchPlaceholder", "Search conversions...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setIsSearchFocused(true)}
@@ -1096,7 +1107,7 @@ export default function App() {
                     : "bg-white dark:bg-[#1a1a1a] text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-[#222] border border-neutral-200/80 dark:border-neutral-800/80 hover:text-neutral-900 dark:hover:text-white"
                 }`}
               >
-                {c.name}
+                {t(`categories.${c.id}`, c.name)}
               </button>
             ))}
           </div>
@@ -1113,7 +1124,7 @@ export default function App() {
               {/* FROM */}
               <div className="flex-1 w-full bg-neutral-50/50 dark:bg-[#161616] rounded-3xl p-6 border border-neutral-100 dark:border-neutral-800 focus-within:border-primary-500 dark:focus-within:border-primary-400 focus-within:ring-4 focus-within:ring-primary-500/10 dark:focus-within:ring-primary-400/10 transition-all relative group">
                 <label className="text-[10px] uppercase tracking-widest text-neutral-400 dark:text-neutral-500 font-semibold mb-3 block">
-                  From
+                  {t("from", "From")}
                 </label>
                 <div className="relative">
                   <UnitSelector
@@ -1236,7 +1247,7 @@ export default function App() {
               <button
                 onClick={handleSwap}
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 bg-white dark:bg-[#1e1e1e] text-neutral-500 dark:text-neutral-400 p-3 md:p-4 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)] border border-neutral-100 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-[#252525] hover:scale-105 active:scale-95 transition-all focus:outline-none focus:ring-4 focus:ring-primary-500/10 hover:text-primary-600 dark:hover:text-primary-400 group"
-                aria-label="Swap units"
+                aria-label={t("swap", "Swap units")}
               >
                 <ArrowRightLeft className="w-5 h-5 pointer-events-none group-hover:rotate-180 transition-transform duration-500" />
               </button>
@@ -1244,7 +1255,7 @@ export default function App() {
               {/* TO */}
               <div className="flex-1 w-full bg-neutral-50/50 dark:bg-[#161616] rounded-3xl p-6 border border-neutral-100 dark:border-neutral-800 focus-within:border-primary-500 dark:focus-within:border-primary-400 focus-within:ring-4 focus-within:ring-primary-500/10 dark:focus-within:ring-primary-400/10 transition-all relative group">
                 <label className="text-[10px] uppercase tracking-widest text-neutral-400 dark:text-neutral-500 font-semibold mb-3 block">
-                  To
+                  {t("to", "To")}
                 </label>
                 <div className="relative">
                   <UnitSelector
@@ -1297,8 +1308,8 @@ export default function App() {
                     <button
                       onClick={handleCopy}
                       className="flex-shrink-0 flex items-center justify-center gap-2 px-4 h-12 rounded-xl bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/40 text-primary-600 dark:text-primary-400 font-medium transition-colors shadow-sm"
-                      aria-label="Copy result"
-                      title="Copy result"
+                      aria-label={t("copy", "Copy result")}
+                      title={t("copy", "Copy result")}
                     >
                       {copied ? (
                         <>
@@ -1338,7 +1349,7 @@ export default function App() {
                   <RefreshCw
                     className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`}
                   />
-                  {isRefreshing ? "Updating rates..." : "Fetch Real-Time Rates"}
+                  {isRefreshing ? t("updatingRates", "Updating rates...") : t("refreshRates", "Fetch Real-Time Rates")}
                 </button>
               )}
             </div>
@@ -1375,7 +1386,7 @@ export default function App() {
                 onClick={handleClear}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-neutral-100 dark:bg-[#1a1a1a] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-sm font-medium text-neutral-700 dark:text-neutral-300 transition-colors"
               >
-                <RefreshCw className="w-4 h-4" /> Reset
+                <RefreshCw className="w-4 h-4" /> {t("reset", "Reset")}
               </button>
             </div>
 
@@ -1391,15 +1402,15 @@ export default function App() {
                     <div className="flex items-center gap-2 mb-4">
                       <Grid className="w-5 h-5 text-primary-500" />
                       <h3 className="font-semibold text-neutral-800 dark:text-neutral-200 tracking-tight">
-                        Bulk Conversion
+                        {t("bulkConversion", "Bulk Conversion")}
                       </h3>
                     </div>
                     <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-6">
-                      Converting{" "}
+                      {t("converting", "Converting")}{" "}
                       <strong className="text-neutral-800 dark:text-neutral-200">
-                        {valFrom} {activeFromUnit?.name}
+                        {valFrom} {activeFromUnit?.name && t(`units.${activeFromUnit.name}`, activeFromUnit.name)}
                       </strong>{" "}
-                      to all {activeCategory.name.toLowerCase()} units.
+                      {t("toAllUnits", "to all {{category}} units", { category: t(`categories.${activeCategory.id}`, activeCategory.name).toLowerCase() })}
                     </p>
 
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -1745,7 +1756,7 @@ export default function App() {
                   <div className="flex items-center gap-2">
                     <History className="w-5 h-5 text-primary-500" />
                     <h3 className="font-semibold text-lg tracking-tight">
-                      History
+                      {t("history", "History")}
                     </h3>
                   </div>
                   {historyItems.length > 0 && (
@@ -1756,7 +1767,7 @@ export default function App() {
                       }}
                       className="text-xs font-semibold text-neutral-400 hover:text-red-500 transition-colors uppercase tracking-wider"
                     >
-                      Clear
+                      {t("clearHistory", "Clear")}
                     </button>
                   )}
                 </div>
@@ -1765,9 +1776,7 @@ export default function App() {
                   <div className="h-[200px] flex flex-col items-center justify-center text-center">
                     <History className="w-12 h-12 text-neutral-200 dark:text-neutral-800 mb-3" />
                     <p className="text-neutral-500 dark:text-neutral-400 text-sm font-light">
-                      Your recent conversions
-                      <br />
-                      will appear here.
+                      {t("noHistory", "Your recent conversions will appear here.")}
                     </p>
                   </div>
                 ) : (
@@ -1926,8 +1935,7 @@ export default function App() {
           <div className="mt-16 pt-8 border-t border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 text-sm flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
             <div>
               <p className="mb-1">
-                &copy; {new Date().getFullYear()} QuickConvert. Built for fast,
-                reliable unit conversions.
+                &copy; {new Date().getFullYear()} QuickConvert. {t("footerText", "Built for fast, accurate conversions.")}
               </p>
               <p className="opacity-80 font-medium">🛡️ Strictly Local: Your conversion data never leaves your device.</p>
             </div>
@@ -1973,7 +1981,7 @@ export default function App() {
             <div className="bg-white dark:bg-[#111111] border border-neutral-100 dark:border-neutral-800 rounded-2xl p-5 shadow-sm overflow-hidden">
               <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 mb-4 tracking-tight flex items-center gap-2">
                 <Star className="w-4 h-4 text-amber-500" />
-                Popular Conversions
+                {t("popular", "Popular Conversions")}
               </h3>
               <div className="flex flex-col gap-1">
                 {POPULAR_CONVERSIONS.slice(0, 8).map((conv, i) => (
@@ -1992,7 +2000,7 @@ export default function App() {
                     }}
                     className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800/50 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 group transition-colors"
                   >
-                    <span>{conv.label}</span>
+                    <span>{t(`units.${conv.from}`, conv.label.split(' to ')[0])} {t("to", "to")} {t(`units.${conv.to}`, conv.label.split(' to ')[1])}</span>
                     <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                   </a>
                 ))}
