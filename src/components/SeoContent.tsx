@@ -1,6 +1,7 @@
 import React from 'react';
 import { convert } from '../lib/units';
 import { useTranslation } from 'react-i18next';
+import { categorySeoContent } from '../lib/seoContent';
 
 export function SeoContent({ 
   unitFrom, unitTo, category, categories
@@ -29,12 +30,21 @@ export function SeoContent({
   const tUnitName = t(`units.${tUnit.id}`, tUnit.name);
   const catName = cat ? t(`categories.${cat.id}`, cat.name).toLowerCase() : 'measurement';
 
+  const catSeoHtml = categorySeoContent[category];
+
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none mb-10 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-2xl prose-h3:text-lg prose-p:font-light prose-p:leading-relaxed prose-p:text-neutral-600 dark:prose-p:text-neutral-400">
       <h2>{t("seoTitle", "{{fromUnit}} to {{toUnit}} Converter", { fromUnit: fUnitName, toUnit: tUnitName })}</h2>
       <p>{fUnit.description || t("seoDescription", "Instantly convert {{fromUnit}} ({{fromSymbol}}) to {{toUnit}} ({{toSymbol}}) with our high-precision online calculator.", { fromUnit: fUnitName, fromSymbol: fUnit.symbol, toUnit: tUnitName, toSymbol: tUnit.symbol })} {tUnit.description ? ` ${tUnit.description}` : ""}</p>
       
-      <h3>{t("seoHowTo", "How to Convert {{fromUnit}} to {{toUnit}}", { fromUnit: fUnitName, toUnit: tUnitName })}</h3>
+      {catSeoHtml && (
+        <div 
+          className="mt-8 pt-8 border-t border-neutral-100 dark:border-neutral-800"
+          dangerouslySetInnerHTML={{ __html: catSeoHtml }} 
+        />
+      )}
+
+      <h3 className="mt-8">{t("seoHowTo", "How to Convert {{fromUnit}} to {{toUnit}}", { fromUnit: fUnitName, toUnit: tUnitName })}</h3>
       <p>
         {t("seoFormulaDesc1", "To manually convert {{fromUnit}} to {{toUnit}}, multiply the value in {{fromUnit}} by", { fromUnit: fUnitName, toUnit: tUnitName })} {" "}
         <strong>{formatNum(convFactor)}</strong>. 

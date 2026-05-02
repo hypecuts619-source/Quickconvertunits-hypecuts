@@ -201,6 +201,41 @@ export const categories: UnitCategory[] = [
       { id: 'krw', name: 'South Korean Won', symbol: '₩', factor: 1300.0, description: 'The South Korean Won, the official currency of South Korea, issued by the Bank of Korea.' },
       { id: 'aed', name: 'UAE Dirham', symbol: 'د.إ', factor: 3.67, description: 'The United Arab Emirates Dirham, the official currency of the UAE, pegged to the US Dollar.' },
     ],
+  },
+  {
+    id: 'power',
+    name: 'Power',
+    baseUnit: 'watt',
+    units: [
+      { id: 'watt', name: 'Watt', symbol: 'W', factor: 1, description: 'The SI unit of power, equivalent to one joule per second, used to specify the rate at which electrical energy is dissipated.' },
+      { id: 'kilowatt', name: 'Kilowatt', symbol: 'kW', factor: 1000, description: 'One thousand watts, typically used to express the output power of engines and the power consumption of electric motors.' },
+      { id: 'megawatt', name: 'Megawatt', symbol: 'MW', factor: 1000000, description: 'One million watts, commonly used to measure the output of power plants or the power consumption of large facilities.' },
+      { id: 'horsepower', name: 'Horsepower (Mechanical)', symbol: 'hp', factor: 745.699872, description: 'A unit of power denoting the rate at which work is done, famously established by James Watt to compare steam engines with draft horses.' },
+      { id: 'metric_horsepower', name: 'Metric Horsepower', symbol: 'PS', factor: 735.49875, description: 'The metric equivalent of horsepower, defined as the power required to raise a mass of 75 kilograms against Earth\'s gravity over one meter in one second.' }
+    ],
+  },
+  {
+    id: 'angle',
+    name: 'Angle',
+    baseUnit: 'degree',
+    units: [
+      { id: 'degree', name: 'Degree', symbol: '°', factor: 1, description: 'A measurement of a plane angle, representing 1/360 of a full rotation.' },
+      { id: 'radian', name: 'Radian', symbol: 'rad', factor: 57.295779513, description: 'The SI unit for measuring angles, defined such that an angle of one radian subtends an arc of length equal to the radius.' },
+      { id: 'gradian', name: 'Gradian', symbol: 'grad', factor: 0.9, description: 'A unit of measurement of an angle, equivalent to 1/400 of a turn or 9/10 of a degree, used in surveying.' },
+      { id: 'arcminute', name: 'Arcminute', symbol: '\'', factor: 0.0166666667, description: 'A unit of angular measurement equal to 1/60 of one degree.' },
+      { id: 'arcsecond', name: 'Arcsecond', symbol: '"', factor: 0.000277777778, description: 'A unit of angular measurement equal to 1/60 of an arcminute or 1/3600 of a degree, used in astronomy.' }
+    ],
+  },
+  {
+    id: 'fuel',
+    name: 'Fuel Economy',
+    baseUnit: 'km_per_liter',
+    units: [
+      { id: 'km_per_liter', name: 'Kilometers per Liter', symbol: 'km/L', factor: 1, description: 'The distance in kilometers that a vehicle can travel on one liter of fuel.' },
+      { id: 'miles_per_gallon', name: 'Miles per Gallon (US)', symbol: 'mpg', factor: 0.425143707, description: 'A measure of how far a vehicle can travel on one US gallon of fuel.' },
+      { id: 'miles_per_gallon_uk', name: 'Miles per Gallon (UK)', symbol: 'mpg (UK)', factor: 0.35400619, description: 'A measure of how far a vehicle can travel on one imperial gallon of fuel.' }
+      // liters per 100km is inversely proportional, not linear, so we'll omit it here or implement a special case later.
+    ]
   }
 ];
 

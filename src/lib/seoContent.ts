@@ -88,5 +88,28 @@ export const categorySeoContent: Record<string, string> = {
     
     <h3>PSI, Bar, and Pascals</h3>
     <p>When checking tire pressure, you'll likely use Pounds per Square Inch (PSI) or Bar. 1 Bar is roughly 14.5 PSI. In atmospheric science and deep-sea diving, understanding the conversion between Atmospheres (atm), Torrs, and Pascals dictates safety protocols. Rely on our tools for exact scientific pressure adjustments.</p>
+  `,
+  cooking: `
+    <h2>Cooking Measurements Conversion</h2>
+    <p>Cooking is a science, and accuracy matters when transitioning between metric and imperial recipes. Convert effortlessly between cups, tablespoons, teaspoons, milliliters, and fluid ounces.</p>
+    
+    <h3>Global Baking and Scaling</h3>
+    <p>Trying a British recipe that uses milliliters instead of US cups? A slight miscalculation can ruin a bake. Our cooking calculator ensures that your ingredient proportions stay exactly as the chef intended, letting you scale recipes up or down with total confidence.</p>
+  `,
+  currency: `
+    <h2>Real-Time Currency Exchange</h2>
+    <p>Convert world currencies including US Dollars, Euros, British Pounds, and Japanese Yen. We use up-to-date exchange rates so your financial conversions are always accurate. Whether you're traveling, trading, or managing international business, get instantaneous currency conversions.</p>
+  `,
+  power: `
+    <h2>Power Conversion Calculator</h2>
+    <p>Easily convert between Watts, Kilowatts, Horsepower, and other measurements of power. Understanding power output is crucial for engineering, mechanics, and electrical work. Use our calculator to instantly determine equivalent power metrics.</p>
+  `,
+  angle: `
+    <h2>Angle Conversion Tool</h2>
+    <p>Translate geometric measurements between Degrees, Radians, Gradians, and Arcminutes. Whether you're working on trigonometry, navigation, or computer graphics, precise angle conversions ensure your calculations map correctly to physical or virtual spaces.</p>
+  `,
+  fuel: `
+    <h2>Fuel Economy Conversions</h2>
+    <p>Compare vehicle efficiency across different standards by converting between Kilometers per Liter and Miles per Gallon (US/UK). Make informed decisions about fuel consumption and costs whether you measure in metric or imperial units.</p>
   `
 };

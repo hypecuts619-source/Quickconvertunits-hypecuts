@@ -11,11 +11,11 @@ export function LanguageSelector() {
 
   return (
     <div className="relative flex items-center">
-      <Globe className="w-4 h-4 text-neutral-500 absolute left-2 pointer-events-none" />
+      <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-neutral-500 absolute left-2 pointer-events-none" />
       <select
         value={i18n.language}
         onChange={handleLanguageChange}
-        className="appearance-none bg-transparent pl-8 pr-6 py-1.5 text-sm font-medium text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white focus:outline-none cursor-pointer rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+        className="appearance-none bg-transparent pl-7 sm:pl-8 pr-4 sm:pr-6 py-1.5 text-xs sm:text-sm font-medium text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white focus:outline-none cursor-pointer rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
       >
         <option value="en">English</option>
         <option value="de">Deutsch</option>

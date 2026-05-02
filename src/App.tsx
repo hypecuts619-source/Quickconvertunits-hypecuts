@@ -681,8 +681,19 @@ export default function App() {
          const catName = activeCategory.name;
          const topUnits = `${activeCategory.units[0].name}s to ${activeCategory.units[1].name}s, ${activeCategory.units[2]?.name || ''}s`.replace(/ss/g, 's').replace(/, s/g, '');
          const allTopUnits = activeCategory.units.slice(0, 5).map(u => u.name.toLowerCase() + (u.name.endsWith('s') ? '' : 's')).join(", ");
+         
+         let seoSnippet = "";
+         const content = categorySeoContent[category] || "";
+         const pMatch = content.match(/<p>(.*?)<\/p>/);
+         if (pMatch) {
+            seoSnippet = pMatch[1].replace(/<[^>]+>/g, ' ').trim();
+            if (seoSnippet.length > 130) {
+              seoSnippet = seoSnippet.substring(0, 127) + "...";
+            }
+         }
+
          titleStr = `${catName} Conversion Calculator: ${topUnits} | QuickConvert`;
-         metaDescStr = `Free ${catName.toLowerCase()} unit converter for ${allTopUnits}. Precise calculations with real-time results. Convert ${catName.toLowerCase()} measurements instantly.`;
+         metaDescStr = `Free ${catName.toLowerCase()} unit converter for ${allTopUnits}. ${seoSnippet || "Precise calculations with real-time results. Convert measurements instantly."}`;
          canonicalUrlStr = `https://quickconvertunits.com/?category=${category}`;
          ogTitleStr = titleStr;
       } else {
@@ -740,6 +751,7 @@ export default function App() {
           "@context": "https://schema.org",
           "@type": "WebApplication",
           name: `${titleStr} - QuickConvert`,
+          url: canonicalUrlStr,
           applicationCategory: "UtilityApplications",
           operatingSystem: "All",
           description: metaDescStr,
@@ -855,20 +867,20 @@ export default function App() {
 
       {/* Header */}
       <header className="sticky top-0 z-20 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md border-b border-neutral-200/80 dark:border-neutral-800/80">
-        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between gap-2 sm:gap-4 overflow-hidden">
           <a 
             href="/"
-            className="flex items-center gap-2 font-bold text-xl tracking-tight text-primary-600 dark:text-primary-500 hover:opacity-80 transition-opacity focus:outline-none"
+            className="flex items-center gap-1.5 sm:gap-2 font-bold text-lg sm:text-xl tracking-tight text-primary-600 dark:text-primary-500 hover:opacity-80 transition-opacity focus:outline-none min-w-0 shrink"
           >
             <img
               src="/favicon.svg"
               alt="QuickConvert Logo"
-              className="w-6 h-6"
+              className="w-5 h-5 sm:w-6 sm:h-6 shrink-0"
             />
-            <span>{t("appName", "QuickConvert")}</span>
+            <span className="truncate">{t("appName", "QuickConvert")}</span>
           </a>
 
-          <div className="flex items-center gap-4 flex-1 justify-end">
+          <div className="flex items-center gap-1 sm:gap-2 md:gap-4 flex-1 justify-end shrink-0">
             {/* Desktop Search */}
             <div className="relative hidden md:block max-w-sm w-full">
               <div className="relative">
@@ -1095,8 +1107,8 @@ export default function App() {
             </p>
           </div>
 
-          {/* Categories (Horizontal Scroll on Mobile) */}
-          <div className="flex overflow-x-auto no-scrollbar gap-3 mb-12 pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:justify-center items-center">
+          {/* Categories */}
+          <div className="flex overflow-x-auto md:flex-wrap no-scrollbar gap-3 mb-12 pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:justify-center items-center">
             {categories.map((c) => (
               <button
                 key={c.id}
@@ -1984,7 +1996,7 @@ export default function App() {
                 {t("popular", "Popular Conversions")}
               </h3>
               <div className="flex flex-col gap-1">
-                {POPULAR_CONVERSIONS.slice(0, 8).map((conv, i) => (
+                {POPULAR_CONVERSIONS.slice(0, 12).map((conv, i) => (
                   <a
                     key={i}
                     href={`/?category=${conv.cat}&from=${conv.from}&to=${conv.to}`}
