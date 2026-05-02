@@ -115,6 +115,11 @@ function applySEO(urlPath: string, template: string): string {
         `<meta property="og:description" content="${description}" />`
       );
       template = template.replace(
+        /<link rel="canonical" href="(.*?)" \/>/,
+        `<link rel="canonical" href="https://quickconvertunits.com/${urlPath}" />`
+      );
+
+      template = template.replace(
         /<meta property="og:url" content="(.*?)" \/>/,
         `<meta property="og:url" content="https://quickconvertunits.com/${urlPath}" />`
       );
@@ -251,6 +256,10 @@ function applySEO(urlPath: string, template: string): string {
     template = template.replace(
       /<meta property="og:description" content="(.*?)" \/>/,
       `<meta property="og:description" content="${description}" />`
+    );
+    template = template.replace(
+      /<link rel="canonical" href="(.*?)" \/>/,
+      `<link rel="canonical" href="https://quickconvertunits.com/${urlPath}" />`
     );
     template = template.replace(
       /<meta property="og:url" content="(.*?)" \/>/,
