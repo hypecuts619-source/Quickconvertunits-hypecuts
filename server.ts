@@ -12,6 +12,7 @@ let currentDir = process.cwd();
 // We define a small map of the most common units to serve rich SEO tags quickly.
 // If a unit is not in this map, we fallback to formatting the URL string.
 const popularUnits: Record<string, { name: string; symbol: string; factor?: number; base?: string }> = {
+  // Length
   meter: { name: "Meter", symbol: "m", factor: 1, base: "length" },
   meters: { name: "Meter", symbol: "m", factor: 1, base: "length" },
   kilometer: { name: "Kilometer", symbol: "km", factor: 1000, base: "length" },
@@ -27,28 +28,64 @@ const popularUnits: Record<string, { name: string; symbol: string; factor?: numb
   feet: { name: "Foot", symbol: "ft", factor: 0.3048, base: "length" },
   inch: { name: "Inch", symbol: "in", factor: 0.0254, base: "length" },
   inches: { name: "Inch", symbol: "in", factor: 0.0254, base: "length" },
+  // Weight
   kilogram: { name: "Kilogram", symbol: "kg", factor: 1, base: "weight" },
   kg: { name: "Kilogram", symbol: "kg", factor: 1, base: "weight" },
   gram: { name: "Gram", symbol: "g", factor: 0.001, base: "weight" },
+  g: { name: "Gram", symbol: "g", factor: 0.001, base: "weight" },
   pound: { name: "Pound", symbol: "lb", factor: 0.45359237, base: "weight" },
   lbs: { name: "Pound", symbol: "lb", factor: 0.45359237, base: "weight" },
   ounce: { name: "Ounce", symbol: "oz", factor: 0.0283495231, base: "weight" },
+  oz: { name: "Ounce", symbol: "oz", factor: 0.0283495231, base: "weight" },
+  // Temperature
   celsius: { name: "Celsius", symbol: "°C", base: "temperature" },
   fahrenheit: { name: "Fahrenheit", symbol: "°F", base: "temperature" },
   kelvin: { name: "Kelvin", symbol: "K", base: "temperature" },
+  // Area
   square_meter: { name: "Square Meter", symbol: "m²", factor: 1, base: "area" },
   acre: { name: "Acre", symbol: "ac", factor: 4046.856, base: "area" },
   hectare: { name: "Hectare", symbol: "ha", factor: 10000, base: "area" },
   square_foot: { name: "Square Foot", symbol: "ft²", factor: 0.092903, base: "area" },
+  // Volume
   liter: { name: "Liter", symbol: "L", factor: 1, base: "volume" },
   milliliter: { name: "Milliliter", symbol: "mL", factor: 0.001, base: "volume" },
   gallon_us: { name: "US Gallon", symbol: "gal", factor: 3.78541, base: "volume" },
   cup_us: { name: "US Cup", symbol: "cup", factor: 0.236588, base: "volume" },
+  // Time
   second: { name: "Second", symbol: "s", factor: 1, base: "time" },
   minute: { name: "Minute", symbol: "min", factor: 60, base: "time" },
   hour: { name: "Hour", symbol: "h", factor: 3600, base: "time" },
-  day: { name: "Day", symbol: "d", factor: 86400, base: "time" }
+  day: { name: "Day", symbol: "d", factor: 86400, base: "time" },
+  // Speed
+  meter_per_second: { name: "m/s", symbol: "m/s", factor: 1, base: "speed" },
+  kilometer_per_hour: { name: "km/h", symbol: "km/h", factor: 0.277778, base: "speed" },
+  mile_per_hour: { name: "mph", symbol: "mph", factor: 0.44704, base: "speed" },
+  kph: { name: "km/h", symbol: "km/h", factor: 0.277778, base: "speed" },
+  mph: { name: "mph", symbol: "mph", factor: 0.44704, base: "speed" },
+  // Currency (Base USD)
+  usd: { name: "US Dollar", symbol: "$", factor: 1, base: "currency" },
+  eur: { name: "Euro", symbol: "€", factor: 1.08, base: "currency" },
+  gbp: { name: "Pound", symbol: "£", factor: 1.25, base: "currency" },
+  inr: { name: "Rupee", symbol: "₹", factor: 0.012, base: "currency" },
+  rub: { name: "Ruble", symbol: "₽", factor: 0.011, base: "currency" },
+  zar: { name: "Rand", symbol: "R", factor: 0.053, base: "currency" },
+  brl: { name: "Real", symbol: "R$", factor: 0.2, base: "currency" },
+  mxn: { name: "Peso", symbol: "$", factor: 0.057, base: "currency" },
+  sek: { name: "Krona", symbol: "kr", factor: 0.093, base: "currency" },
+  // Power
+  watt: { name: "Watt", symbol: "W", factor: 1, base: "power" },
+  kilowatt: { name: "Kilowatt", symbol: "kW", factor: 1000, base: "power" },
+  megawatt: { name: "Megawatt", symbol: "MW", factor: 1000000, base: "power" },
+  horsepower: { name: "Horsepower", symbol: "hp", factor: 745.7, base: "power" },
+  metric_horsepower: { name: "Metric Horsepower", symbol: "PS", factor: 735.5, base: "power" },
+  // Angle
+  degree: { name: "Degree", symbol: "°", factor: 1, base: "angle" },
+  radian: { name: "Radian", symbol: "rad", factor: 57.2958, base: "angle" },
+  gradian: { name: "Gradian", symbol: "grad", factor: 0.9, base: "angle" },
+  arcsecond: { name: "Arcsecond", symbol: "\"", factor: 0.000277, base: "angle" },
 };
+
+let cachedTemplate = "";
 
 function formatValue(val: number): string {
   // Try to keep it readable, avoid scientific notation if possible
@@ -296,17 +333,36 @@ const app = express();
 const PORT = 3000;
 const isProd = process.env.NODE_ENV === "production" || !!process.env.VERCEL || !!process.env.VERCEL_ENV;
 
+let distStaticPath = path.resolve(process.cwd(), "dist");
+if (!fs.existsSync(distStaticPath)) {
+  distStaticPath = path.resolve(currentDir, "..", "dist");
+}
+
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
+// Explicit routes for crawlers to avoid any ambiguity
+app.get("/robots.txt", (req, res) => {
+  const p = path.resolve(isProd ? path.join(distStaticPath, "robots.txt") : "public/robots.txt");
+  if (fs.existsSync(p)) return res.sendFile(p);
+  res.status(200).send("User-agent: *\nAllow: /");
+});
+
+app.get("/ads.txt", (req, res) => {
+  const p = path.resolve(isProd ? path.join(distStaticPath, "ads.txt") : "public/ads.txt");
+  if (fs.existsSync(p)) return res.sendFile(p);
+  res.status(404).send("ads.txt not found");
+});
+
+app.get("/sitemap.xml", (req, res) => {
+  const p = path.resolve(isProd ? path.join(distStaticPath, "sitemap.xml") : "public/sitemap.xml");
+  if (fs.existsSync(p)) return res.sendFile(p);
+  res.status(404).send("sitemap.xml not found");
+});
+
 if (isProd) {
   // Production routes (Synchronous)
-  
-  let distStaticPath = path.resolve(process.cwd(), "dist");
-  if (!fs.existsSync(distStaticPath)) {
-    distStaticPath = path.resolve(currentDir, "..", "dist");
-  }
   
   app.use(express.static(distStaticPath, { index: false }));
   
@@ -334,46 +390,47 @@ if (isProd) {
        } catch (e) {}
     }
 
-    let templatePath = path.resolve(__dirname, "dist", "index.html");
-    if (!fs.existsSync(templatePath)) {
-      templatePath = path.resolve(process.cwd(), "dist", "index.html");
-    }
-    if (!fs.existsSync(templatePath)) {
-      templatePath = path.resolve(__dirname, "..", "dist", "index.html");
-    }
-    if (!fs.existsSync(templatePath)) {
-      templatePath = path.resolve(currentDir, "dist", "index.html");
-    }
-
-    let template = "";
-    try {
+    if (!cachedTemplate) {
+      let templatePath = path.resolve(__dirname, "dist", "index.html");
       if (!fs.existsSync(templatePath)) {
-        throw new Error("File not found at " + templatePath);
+        templatePath = path.resolve(process.cwd(), "dist", "index.html");
       }
-      template = fs.readFileSync(templatePath, "utf-8");
-    } catch (e: any) {
-      // If it's a static file request that reached here, 404 instead of 500
-      if (requestedUrlInfo.includes(".") && !requestedUrlInfo.endsWith(".html")) {
-        return res.status(404).send("File not found: " + requestedUrlInfo);
+      if (!fs.existsSync(templatePath)) {
+        templatePath = path.resolve(__dirname, "..", "dist", "index.html");
+      }
+      if (!fs.existsSync(templatePath)) {
+        templatePath = path.resolve(currentDir, "dist", "index.html");
       }
 
-      let debugInfo = "";
-      try { debugInfo += "CWD: " + process.cwd(); } catch(e){}
-      try { debugInfo += " | __dirname: " + __dirname; } catch(e){}
-      try { debugInfo += " | CWD files: " + fs.readdirSync(process.cwd()).join(", "); } catch(e){}
-      try { 
-        const distP = path.resolve(process.cwd(), "dist");
-        if (fs.existsSync(distP)) {
-          debugInfo += " | dist files: " + fs.readdirSync(distP).join(", ");
-        } else {
-          debugInfo += " | dist folder missing at " + distP;
+      try {
+        if (!fs.existsSync(templatePath)) {
+          throw new Error("File not found at " + templatePath);
         }
-      } catch(e){}
-      return res.status(500).send("index.html not found. Path: " + templatePath + " | " + debugInfo + " | Error: " + e.message);
+        cachedTemplate = fs.readFileSync(templatePath, "utf-8");
+      } catch (e: any) {
+        // If it's a static file request that reached here, 404 instead of 500
+        if (requestedUrlInfo.includes(".") && !requestedUrlInfo.endsWith(".html")) {
+          return res.status(404).send("File not found: " + requestedUrlInfo);
+        }
+
+        let debugInfo = "";
+        try { debugInfo += "CWD: " + process.cwd(); } catch(e){}
+        try { debugInfo += " | __dirname: " + __dirname; } catch(e){}
+        try { debugInfo += " | CWD files: " + fs.readdirSync(process.cwd()).join(", "); } catch(e){}
+        try { 
+          const distP = path.resolve(process.cwd(), "dist");
+          if (fs.existsSync(distP)) {
+            debugInfo += " | dist files: " + fs.readdirSync(distP).join(", ");
+          } else {
+            debugInfo += " | dist folder missing at " + distP;
+          }
+        } catch(e){}
+        return res.status(500).send("index.html not found. Path: " + templatePath + " | " + debugInfo + " | Error: " + e.message);
+      }
     }
 
     try {
-      template = applySEO(requestedUrlInfo.split("?")[0], template);
+      const template = applySEO(requestedUrlInfo.split("?")[0], cachedTemplate);
       res.status(200).set({ "Content-Type": "text/html" }).send(template);
     } catch (e: any) {
       return res.status(500).send("SEO Error: " + e.message + " stack: " + e.stack);
