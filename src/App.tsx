@@ -32,43 +32,17 @@ import { motion, AnimatePresence } from "motion/react";
 const ConversionChart = lazy(() => import("./components/ConversionChart"));
 
 const POPULAR = [
-  { label: "Kilometers → Miles", cat: "length", fu: "kilometer", tu: "mile" },
-  { label: "Miles → Kilometers", cat: "length", fu: "mile", tu: "kilometer" },
-  { label: "Kilograms → Pounds", cat: "weight", fu: "kilogram", tu: "pound" },
-  { label: "Pounds → Kilograms", cat: "weight", fu: "pound", tu: "kilogram" },
-  {
-    label: "Celsius → Fahrenheit",
-    cat: "temperature",
-    fu: "celsius",
-    tu: "fahrenheit",
-  },
-  {
-    label: "Fahrenheit → Celsius",
-    cat: "temperature",
-    fu: "fahrenheit",
-    tu: "celsius",
-  },
-  { label: "Meters → Feet", cat: "length", fu: "meter", tu: "foot" },
-  { label: "Feet → Centimeters", cat: "length", fu: "foot", tu: "centimeter" },
-  {
-    label: "Inches → Centimeters",
-    cat: "length",
-    fu: "inch",
-    tu: "centimeter",
-  },
-  { label: "Liters → Gallons", cat: "volume", fu: "liter", tu: "us_gallon" },
-  { label: "Gallons → Liters", cat: "volume", fu: "us_gallon", tu: "liter" },
-  {
-    label: "Gigabytes → Megabytes",
-    cat: "data",
-    fu: "gigabyte",
-    tu: "megabyte",
-  },
-  { label: "Hectares → Acres", cat: "area", fu: "hectare", tu: "acre" },
-  { label: "Acres → Hectares", cat: "area", fu: "acre", tu: "hectare" },
-  { label: "Square Meters → Square Feet", cat: "area", fu: "square_meter", tu: "square_foot" },
-  { label: "km/h → mph", cat: "speed", fu: "kilometer_per_hour", tu: "mile_per_hour" },
-  { label: "mph → km/h", cat: "speed", fu: "mile_per_hour", tu: "kilometer_per_hour" },
+  { label: "kg to lbs", cat: "weight", fu: "kilogram", tu: "pound" },
+  { label: "inches to cm", cat: "length", fu: "inch", tu: "centimeter" },
+  { label: "cm to inches", cat: "length", fu: "centimeter", tu: "inch" },
+  { label: "lbs to kg", cat: "weight", fu: "pound", tu: "kilogram" },
+  { label: "feet to meters", cat: "length", fu: "foot", tu: "meter" },
+  { label: "miles to km", cat: "length", fu: "mile", tu: "kilometer" },
+  { label: "mm to inches", cat: "length", fu: "millimeter", tu: "inch" },
+  { label: "Celsius to Fahrenheit", cat: "temperature", fu: "celsius", tu: "fahrenheit" },
+  { label: "Fahrenheit to Celsius", cat: "temperature", fu: "fahrenheit", tu: "celsius" },
+  { label: "Liters to Gallons", cat: "volume", fu: "liter", tu: "us_gallon" },
+  { label: "km/h to mph", cat: "speed", fu: "kilometer_per_hour", tu: "mile_per_hour" },
 ];
 
 const FORMULAS = [
@@ -295,6 +269,28 @@ function PwaPrompt() {
 
 
 
+const getSEOUrlPath = (fromId: string, toId: string) => {
+  if (fromId === 'kilogram' && toId === 'pound') return 'kg-to-lbs';
+  if (fromId === 'inch' && toId === 'centimeter') return 'inches-to-cm';
+  if (fromId === 'centimeter' && toId === 'inch') return 'cm-to-inches';
+  if (fromId === 'pound' && toId === 'kilogram') return 'lbs-to-kg';
+  if (fromId === 'foot' && toId === 'meter') return 'feet-to-meters';
+  if (fromId === 'mile' && toId === 'kilometer') return 'miles-to-km';
+  if (fromId === 'millimeter' && toId === 'inch') return 'mm-to-inches';
+  return `${fromId}-to-${toId}`;
+};
+
+const getUnitIdsFromPath = (path: string) => {
+  if (path === 'kg-to-lbs') return ['kilogram', 'pound'];
+  if (path === 'inches-to-cm') return ['inch', 'centimeter'];
+  if (path === 'cm-to-inches') return ['centimeter', 'inch'];
+  if (path === 'lbs-to-kg') return ['pound', 'kilogram'];
+  if (path === 'feet-to-meters') return ['foot', 'meter'];
+  if (path === 'miles-to-km') return ['mile', 'kilometer'];
+  if (path === 'mm-to-inches') return ['millimeter', 'inch'];
+  return path.split('-to-');
+};
+
 export default function App() {
   const { conversion } = useParams();
   const navigate = useNavigate();
@@ -311,7 +307,7 @@ export default function App() {
   // Initialize state from URL params if present
   const [category, setCategory] = useState(() => {
     if (conversion) {
-      const parts = conversion.split("-to-");
+      const parts = getUnitIdsFromPath(conversion);
       if (parts.length === 2) {
         for (const cat of categories) {
           if (cat.units.some(u => u.id === parts[0].toLowerCase()) && cat.units.some(u => u.id === parts[1].toLowerCase())) {
@@ -325,7 +321,7 @@ export default function App() {
   });
   const [unitFrom, setUnitFrom] = useState(() => {
     if (conversion) {
-      const parts = conversion.split("-to-");
+      const parts = getUnitIdsFromPath(conversion);
       if (parts.length === 2) {
         return parts[0].toLowerCase();
       }
@@ -337,7 +333,7 @@ export default function App() {
   });
   const [unitTo, setUnitTo] = useState(() => {
     if (conversion) {
-      const parts = conversion.split("-to-");
+      const parts = getUnitIdsFromPath(conversion);
       if (parts.length === 2) {
         return parts[1].toLowerCase();
       }
@@ -629,12 +625,12 @@ export default function App() {
          const valPrefix = valFrom && valFrom !== "1" && valFrom !== "0" ? `${valFrom} ` : "";
          titleStr = `${activeFromUnit.symbol.toUpperCase()} to ${activeToUnit.symbol.toUpperCase()} Converter | ${valPrefix}${activeFromUnit.name} to ${activeToUnit.name} Fast`;
          metaDescStr = `Convert ${activeFromUnit.name.toLowerCase()} to ${activeToUnit.name.toLowerCase()} instantly and accurately. Enter value, select units—get results to 10 decimals. Perfect for cooking, fitness, shipping.`;
-         canonicalUrlStr = `https://quickconvertunits.com/${unitFrom}-to-${unitTo}`;
+         canonicalUrlStr = `https://quickconvertunits.com/${getSEOUrlPath(unitFrom, unitTo)}`;
          ogTitleStr = `${valPrefix}${activeFromUnit.name} to ${activeToUnit.name} Conversion Calculator - QuickConvert`;
          
          // Only navigate cleanly if we are already on a converter page OR if it's the first time landing on a specific URL
          // This syncs the URL with the values e.g. adding ?val= without redirecting homepage visitors.
-         navigate(`/${unitFrom}-to-${unitTo}${valFrom && valFrom !== "1" ? `?val=${valFrom}` : ""}`, { replace: true });
+         navigate(`/${getSEOUrlPath(unitFrom, unitTo)}${valFrom && valFrom !== "1" ? `?val=${valFrom}` : ""}`, { replace: true });
       }
 
       document.title = titleStr;
@@ -1687,16 +1683,144 @@ export default function App() {
               </div>
             </div>
 
-            <h2 className="text-2xl font-semibold mb-4 tracking-tight">
-              How to convert {activeFromUnit?.name} to {activeToUnit?.name}
-            </h2>
-            <p className="mb-6 leading-relaxed font-light text-neutral-600 dark:text-neutral-400">
-              Our {activeCategory.name.toLowerCase()} converter makes it easy to
-              convert between {activeFromUnit?.name.toLowerCase()} and{" "}
-              {activeToUnit?.name.toLowerCase()}. Simply enter the value you
-              want to convert in the input fields above, and the calculator will
-              automatically update with the correct result.
-            </p>
+            {/* Dedicated Specific SEO Content Block */}
+            {unitFrom === "kilogram" && unitTo === "pound" && (
+              <div className="prose prose-neutral dark:prose-invert max-w-none mb-10 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-2xl prose-h3:text-lg prose-p:font-light prose-p:leading-relaxed prose-p:text-neutral-600 dark:prose-p:text-neutral-400">
+                <h2>KG to LBS Converter</h2>
+                <p>Welcome to the ultimate tool to convert kg to lbs instantly. Whether you're tracking your health journey, measuring international shipping details, or looking up heavy materials, you need an accurate kilograms to pounds calculator. We provide reliable accuracy down to the decimal.</p>
+                
+                <h3>How to Convert KG to LBS</h3>
+                <p>To manually convert kilograms (kg) to pounds (lbs), you multiply the weight in kilograms by <strong>2.20462</strong>. For example, if you have 5 kg, the calculation is 5 × 2.20462 = 11.02 lbs. However, memorizing this formula and performing manual math is slow and prone to errors. Our real-time calculator handles this for you instantly.</p>
+                
+                <h3>Common Uses for KG to LBS Conversions</h3>
+                <ul>
+                  <li><strong>Fitness and Health:</strong> Most international gyms and health equipment (like Olympic barbells and bumper plates) are measured in kilograms. If you're following an American fitness plan, you'll constantly need to know your lifts and body weight in pounds.</li>
+                  <li><strong>Shipping and Logistics:</strong> International freight, airlines, and courier services use kilograms to calculate mass. Converting this to pounds ensures you understand the exact limits before packing your luggage or shipping a heavy pallet.</li>
+                  <li><strong>Baking and Cooking:</strong> Many European recipes list heavy ingredient quantities in kilograms rather than pounds for precise food scaling.</li>
+                </ul>
+                
+                <h3>Frequently Asked Questions</h3>
+                <h4>How many pounds are in 1 kilogram?</h4>
+                <p>There are approximately 2.20462 pounds in exactly 1 kilogram.</p>
+                <h4>Is 50kg heavier than 100 lbs?</h4>
+                <p>Yes, 50 kg is equal to 110.23 lbs, making it heavier than 100 lbs.</p>
+              </div>
+            )}
+            
+            {unitFrom === "inch" && unitTo === "centimeter" && (
+               <div className="prose prose-neutral dark:prose-invert max-w-none mb-10 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-2xl prose-h3:text-lg prose-p:font-light prose-p:leading-relaxed prose-p:text-neutral-600 dark:prose-p:text-neutral-400">
+                 <h2>Inches to CM Converter</h2>
+                 <p>Quickly and precisely convert inches to centimeters (in to cm) with our free tool. Whether you're reviewing electronics screen sizes, tackling a DIY home project, or reading international blueprints, understanding the metric equivalent to inches is crucial for accuracy.</p>
+                 
+                 <h3>How to Convert Inches to CM</h3>
+                 <p>The standard conversion factor dictates that 1 inch is exactly equal to <strong>2.54 centimeters</strong>. To translate your measurement, simply multiply the number of inches by 2.54. For example, a standard 12-inch ruler is 12 × 2.54 = 30.48 cm long. Using our calculator saves you the hassle of manual math.</p>
+                 
+                 <h3>Common Uses for Inches to CM Conversions</h3>
+                 <ul>
+                   <li><strong>Screen Sizes:</strong> Televisions, computer monitors, and smartphone screens are globally marketed in inches (e.g., a "55-inch TV" or "6-inch phone"). Converting this to centimeters provides a clearer idea of physical dimensions for room planning.</li>
+                   <li><strong>Clothing and Textiles:</strong> Waist sizes and inseams often use inches. Converting to centimeters ensures you purchase the correct fit when shopping with international retailers.</li>
+                   <li><strong>Engineering and Machining:</strong> Transitioning between imperial blueprints and metric materials requires precise conversions to prevent catastrophic measurement errors.</li>
+                 </ul>
+                 
+                 <h3>Frequently Asked Questions</h3>
+                 <h4>What is 1 inch in cm?</h4>
+                 <p>One inch is exactly 2.54 centimeters.</p>
+                 <h4>How many cm are in 12 inches?</h4>
+                 <p>There are 30.48 centimeters in 12 inches (or 1 foot).</p>
+               </div>
+            )}
+
+            {unitFrom === "centimeter" && unitTo === "inch" && (
+               <div className="prose prose-neutral dark:prose-invert max-w-none mb-10 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-2xl prose-h3:text-lg prose-p:font-light prose-p:leading-relaxed prose-p:text-neutral-600 dark:prose-p:text-neutral-400">
+                 <h2>CM to Inches Converter</h2>
+                 <p>Easily convert centimeters to inches (cm to in) with our fast online calculator. Perfect for converting international measurements back to the imperial system for sewing, drafting, or human height.</p>
+                 
+                 <h3>How to Convert Centimeters to Inches</h3>
+                 <p>To convert from metric centimeters back to imperial inches, divide the value by 2.54 (or multiply by 0.3937). For instance, 50 centimeters ÷ 2.54 = approximately 19.685 inches. Our reliable calculator instantly performs this math for free.</p>
+                 
+                 <h3>Common Uses for CM to Inches</h3>
+                 <ul>
+                   <li><strong>Measuring Height:</strong> Most of the world records human height in centimeters. Translating a height of 175 cm to inches helps individuals familiar with feet and inches understand the measurement clearly.</li>
+                   <li><strong>Medical Data:</strong> Doctors frequently use centimeters to record physiological dimensions. Translating this to inches can make personal health records easier to read.</li>
+                   <li><strong>Arts and Crafts:</strong> Buying imported fabrics, art canvases, or frames often involves centimeter measurements that you'll need to fit into your US-based projects.</li>
+                 </ul>
+               </div>
+            )}
+
+            {unitFrom === "pound" && unitTo === "kilogram" && (
+               <div className="prose prose-neutral dark:prose-invert max-w-none mb-10 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-2xl prose-h3:text-lg prose-p:font-light prose-p:leading-relaxed prose-p:text-neutral-600 dark:prose-p:text-neutral-400">
+                 <h2>LBS to KG Converter</h2>
+                 <p>Accurately convert pounds to kilograms (lbs to kg) in a single step. Our calculator provides high-precision answers for logistics, healthcare, and bodybuilding applications.</p>
+                 
+                 <h3>How to Convert LBS to KG</h3>
+                 <p>To get kilograms, multiply your pounds by <strong>0.453592</strong> (or divide by 2.20462). This means 150 lbs is equal to 150 × 0.453592 = 68.04 kg. For exact results without the heavy lifting, our straightforward calculator handles the complex decimals behind the scenes.</p>
+                 
+                 <h3>Common Uses for LBS to KG</h3>
+                 <ul>
+                   <li><strong>Aviation Allowances:</strong> International airlines strictly enforce luggage weight limits in kilograms, typically around 23 kg. Knowing how many pounds this corresponds to stops unexpected oversized baggage fees.</li>
+                   <li><strong>Medical Dosing:</strong> Many medical prescriptions are based on "mg per kg of body weight." Knowing your exact mass in kilograms rather than pounds ensures critical dosage accuracy.</li>
+                 </ul>
+               </div>
+            )}
+            
+            {unitFrom === "foot" && unitTo === "meter" && (
+               <div className="prose prose-neutral dark:prose-invert max-w-none mb-10 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-2xl prose-h3:text-lg prose-p:font-light prose-p:leading-relaxed prose-p:text-neutral-600 dark:prose-p:text-neutral-400">
+                 <h2>Feet to Meters Converter</h2>
+                 <p>Instantly convert feet to meters (ft to m). Essential for civil engineering, track and field, and real estate, allowing you to bridge imperial scales to metric precision.</p>
+                 <h3>How to Convert Feet to Meters</h3>
+                 <p>Since 1 meter is roughly 3.28084 feet, you divide your total feet by 3.28084 (or multiply by 0.3048). Thus, 10 feet equals exactly 3.048 meters.</p>
+               </div>
+            )}
+
+            {unitFrom === "mile" && unitTo === "kilometer" && (
+               <div className="prose prose-neutral dark:prose-invert max-w-none mb-10 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-2xl prose-h3:text-lg prose-p:font-light prose-p:leading-relaxed prose-p:text-neutral-600 dark:prose-p:text-neutral-400">
+                 <h2>Miles to KM Converter</h2>
+                 <p>Quickly convert miles to kilometers (mi to km) for international travel, running races, or automotive specifications. Our calculator simplifies road distances effortlessly.</p>
+                 
+                 <h3>How to Convert Miles to KM</h3>
+                 <p>1 mile equals 1.60934 kilometers. To get kilometers, just multiply your miles by 1.60934. For instance, a 5-mile run is 5 × 1.60934 = 8.0467 kilometers.</p>
+                 
+                 <h3>Common Uses for Miles to KM</h3>
+                 <ul>
+                   <li><strong>Travel and Driving:</strong> U.S. speeds and distances are in miles, while most of the globe reads kilometers. Knowing the conversion prevents speeding tickets abroad.</li>
+                   <li><strong>Running and Cycling:</strong> Popular event distances like "10K" drops the mystery when you convert them (10 kilometers is roughly 6.2 miles).</li>
+                 </ul>
+               </div>
+            )}
+
+            {unitFrom === "millimeter" && unitTo === "inch" && (
+               <div className="prose prose-neutral dark:prose-invert max-w-none mb-10 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-2xl prose-h3:text-lg prose-p:font-light prose-p:leading-relaxed prose-p:text-neutral-600 dark:prose-p:text-neutral-400">
+                 <h2>MM to Inches Converter</h2>
+                 <p>Convert millimeters to inches (mm to in) instantly. Highly useful for precision engineering, 3D printing, jewelry, and mechanical parts.</p>
+                 
+                 <h3>How to Convert MM to Inches</h3>
+                 <p>Divide the millimeter value by 25.4 to get inches (since 1 inch = 25.4 mm). For instance, 50 mm is 50 ÷ 25.4 = 1.9685 inches. Our reliable calculator does the fraction math for you!</p>
+               </div>
+            )}
+
+            {!(
+               // If it's not one of our dedicated SEO pages, render the generic text instead
+               (unitFrom === "kilogram" && unitTo === "pound") ||
+               (unitFrom === "inch" && unitTo === "centimeter") ||
+               (unitFrom === "centimeter" && unitTo === "inch") ||
+               (unitFrom === "pound" && unitTo === "kilogram") ||
+               (unitFrom === "foot" && unitTo === "meter") ||
+               (unitFrom === "mile" && unitTo === "kilometer") ||
+               (unitFrom === "millimeter" && unitTo === "inch")
+            ) && (
+              <>
+                <h2 className="text-2xl font-semibold mb-4 tracking-tight">
+                  How to convert {activeFromUnit?.name} to {activeToUnit?.name}
+                </h2>
+                <p className="mb-6 leading-relaxed font-light text-neutral-600 dark:text-neutral-400">
+                  Our {activeCategory.name.toLowerCase()} converter makes it easy to
+                  convert between {activeFromUnit?.name.toLowerCase()} and{" "}
+                  {activeToUnit?.name.toLowerCase()}. Simply enter the value you
+                  want to convert in the input fields above, and the calculator will
+                  automatically update with the correct result.
+                </p>
+              </>
+            )}
 
             <div className="grid md:grid-cols-2 gap-6 my-10">
               {/* Conversion Table generated correctly using the convert function */}

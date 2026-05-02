@@ -33,12 +33,29 @@ for (const post of blogPosts) {
   addUrl(`/blog/${post.slug}`, "0.8", "monthly");
 }
 
+const getSEOUrlPath = (fromId, toId) => {
+  if (fromId === 'kilogram' && toId === 'pound') return '/kg-to-lbs';
+  if (fromId === 'inch' && toId === 'centimeter') return '/inches-to-cm';
+  if (fromId === 'centimeter' && toId === 'inch') return '/cm-to-inches';
+  if (fromId === 'pound' && toId === 'kilogram') return '/lbs-to-kg';
+  if (fromId === 'foot' && toId === 'meter') return '/feet-to-meters';
+  if (fromId === 'mile' && toId === 'kilometer') return '/miles-to-km';
+  if (fromId === 'millimeter' && toId === 'inch') return '/mm-to-inches';
+  return `/${fromId}-to-${toId}`;
+};
+
 // All valid conversion combinations
 for (const category of categories) {
   for (const fromUnit of category.units) {
     for (const toUnit of category.units) {
       if (fromUnit.id !== toUnit.id) {
-        addUrl(`/${fromUnit.id}-to-${toUnit.id}`, "0.7", "monthly");
+        let path = getSEOUrlPath(fromUnit.id, toUnit.id);
+        // bump priority of top 10 keywords
+        let priority = "0.7";
+        if (["/kg-to-lbs", "/inches-to-cm", "/cm-to-inches", "/lbs-to-kg", "/feet-to-meters", "/miles-to-km", "/mm-to-inches"].includes(path)) {
+          priority = "0.9";
+        }
+        addUrl(path, priority, "monthly");
       }
     }
   }
