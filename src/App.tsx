@@ -756,10 +756,15 @@ export default function App() {
       ogTitleStr = titleStr;
     } else {
       const valPrefix = valFrom && valFrom !== "1" && valFrom !== "0" ? `${valFrom} ` : "";
-      titleStr = `${valPrefix}${activeFromUnit.name} to ${activeToUnit.name} (${activeFromUnit.symbol} to ${activeToUnit.symbol}) - ${activeCategory.name} Converter`;
-      metaDescStr = `Convert ${valPrefix}${activeFromUnit.name.toLowerCase()} to ${activeToUnit.name.toLowerCase()} instantly. Free online ${activeCategory.name.toLowerCase()} conversion calculator. Enter value, select units—get precise results fast.`;
+      const pluralFrom = activeFromUnit.name.endsWith('s') ? activeFromUnit.name : `${activeFromUnit.name}s`;
+      const pluralTo = activeToUnit.name.endsWith('s') ? activeToUnit.name : `${activeToUnit.name}s`;
+      const symFrom = activeFromUnit.symbol;
+      const symTo = activeToUnit.symbol;
+      
+      titleStr = `${valPrefix}${pluralFrom} to ${pluralTo} (${symFrom} to ${symTo}) Converter - Free Tool`;
+      metaDescStr = `Convert ${valPrefix}${pluralFrom.toLowerCase()} to ${pluralTo.toLowerCase()} instantly. 1 ${symFrom} = ${convert(1, unitFrom, unitTo, category).toPrecision(6)} ${symTo}. Free calculator with conversion table, formula, and examples. Fast and accurate.`;
       canonicalUrlStr = `https://quickconvertunits.com/${getSEOUrlPath(unitFrom, unitTo)}`;
-      ogTitleStr = `${valPrefix}${activeFromUnit.name} to ${activeToUnit.name} Conversion Calculator - QuickConvert`;
+      ogTitleStr = titleStr;
     }
 
     schema = [
@@ -788,14 +793,32 @@ export default function App() {
         value: valFrom || "1"
       });
       
-      const isTemp = category === 'temperature';
-      const amountText = isTemp
-        ? `1 degree ${activeFromUnit.name} is equivalent to ${formattedFactor} degrees ${activeToUnit.name}.`
-        : `There are ${formattedFactor} ${activeToUnit.name} in 1 ${activeFromUnit.name}.`;
-        
-      const methodText = isTemp 
-        ? `To convert ${activeFromUnit.name} to ${activeToUnit.name}, you use a specific temperature formula involving an offset. Our free online calculator handles this complex conversion automatically.`
-        : `To convert ${activeFromUnit.name} to ${activeToUnit.name}, you multiply the value by ${formattedFactor}. Our free online calculator handles this mathematical conversion automatically.`;
+      const fUnitName = t(`units.${activeFromUnit.id}`, activeFromUnit.name);
+      const tUnitName = t(`units.${activeToUnit.id}`, activeToUnit.name);
+
+      const formatNum = (num: number) => {
+        if (Number.isNaN(num)) return "0";
+        const str = Number.isInteger(num) ? num.toString() : parseFloat(num.toFixed(6)).toString();
+        const parts = str.split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return parts.join(".");
+      };
+
+      const q1 = t("seoFaq1Q", "How many {{toUnit}} are in 1 {{fromUnit}}?", { toUnit: tUnitName, fromUnit: fUnitName });
+      const a1 = t("seoFaq1A", "1 {{fromUnit}} equals exactly {{result}} {{toUnit}}.", { result: formatNum(conversionFactor), toUnit: tUnitName, fromUnit: fUnitName });
+
+      const q2 = t("seoFaq2Q", "Is 1 {{fromUnit}} more than 1 {{toUnit}}?", { fromUnit: fUnitName, toUnit: tUnitName });
+      const a2 = conversionFactor > 1 
+        ? `Yes, 1 ${fUnitName} is ${formatNum(conversionFactor)} times more than 1 ${tUnitName}.` 
+        : `No, 1 ${fUnitName} is less than 1 ${tUnitName}.`;
+
+      const q3 = t("seoFaq3Q", "How do you convert {{fromUnit}} to {{toUnit}} in your head?", { fromUnit: fUnitName, toUnit: tUnitName });
+      let a3 = "";
+      if (category === 'mass' && activeFromUnit.id === 'kilogram' && activeToUnit.id === 'pound') {
+        a3 = "A quick approximation is to double the kg value and add 10%. For example, 50 kg ≈ 50×2 + 5 = 105 lbs (actual: 110.23).";
+      } else {
+        a3 = `To roughly calculate it in your head, you can multiply the ${fUnitName} value by approximately ${formatNum(Math.round(conversionFactor * 10) / 10)}.`;
+      }
 
       schema.push({
         "@context": "https://schema.org",
@@ -803,28 +826,26 @@ export default function App() {
         mainEntity: [
           {
             "@type": "Question",
-            name: isTemp ? `What is 1 ${activeFromUnit.name} in ${activeToUnit.name}?` : `How many ${activeToUnit.name} are in 1 ${activeFromUnit.name}?`,
+            name: q1,
             acceptedAnswer: {
               "@type": "Answer",
-              text: amountText,
+              text: a1,
             },
           },
           {
             "@type": "Question",
-            name: `How do I convert ${activeFromUnit.name} to ${activeToUnit.name}?`,
+            name: q2,
             acceptedAnswer: {
               "@type": "Answer",
-              text: methodText,
+              text: a2,
             },
           },
           {
             "@type": "Question",
-            name: `What is a ${activeFromUnit.name}?`,
+            name: q3,
             acceptedAnswer: {
               "@type": "Answer",
-              text:
-                activeFromUnit.description ||
-                `A ${activeFromUnit.name} is a typical unit of ${activeCategory.name.toLowerCase()}.`,
+              text: a3,
             },
           },
         ],
@@ -1141,7 +1162,7 @@ export default function App() {
               </h1>
             ) : (
               <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-5xl font-semibold tracking-tight mb-4 text-neutral-900 dark:text-white">
-                Convert {activeFromUnit?.name} to {activeToUnit?.name}
+                {activeFromUnit?.name.endsWith('s') ? activeFromUnit?.name : `${activeFromUnit?.name}s`} to {activeToUnit?.name.endsWith('s') ? activeToUnit?.name : `${activeToUnit?.name}s`} Converter
                 <button
                   onClick={toggleFavorite}
                   className={`flex-shrink-0 flex items-center justify-center w-9 h-9 md:w-12 md:h-12 rounded-full transition-colors ${
