@@ -1,7 +1,8 @@
 import React from 'react';
-import { convert } from '../lib/units';
+import { convert, getSEOUrlPath } from '../lib/units';
 import { useTranslation } from 'react-i18next';
 import { categorySeoContent } from '../lib/seoContent';
+import { Link } from 'react-router-dom';
 
 export function SeoContent({ 
   unitFrom, unitTo, category, categories
@@ -83,9 +84,9 @@ export function SeoContent({
       <ul className="grid grid-cols-2 gap-2">
         {[50, 60, 70, 80, 90, 100].map(val => (
           <li key={val}>
-            <a href={`/${fUnit.id.replace(/_/g, '-')}-to-${tUnit.id.replace(/_/g, '-')}?val=${val}`} className="text-primary-600 dark:text-primary-400 hover:underline">
+            <Link to={`/${getSEOUrlPath(unitFrom, unitTo)}?val=${val}`} className="text-primary-600 dark:text-primary-400 hover:underline">
               {val} {fUnit.symbol} to {tUnit.symbol}
-            </a>
+            </Link>
           </li>
         ))}
       </ul>
@@ -134,14 +135,19 @@ export function SeoContent({
         <>
           <h2>{t("seoRelated", "Related Converters")}</h2>
           <ul className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            <li>
+              <Link to={`/${getSEOUrlPath(unitTo, unitFrom)}`} className="text-primary-600 dark:text-primary-400 hover:underline">
+                {t(`units.${tUnit.id}`, tUnit.name)} to {t(`units.${fUnit.id}`, fUnit.name)}
+              </Link>
+            </li>
             {cat.units
               .filter((u: any) => u.id !== unitFrom && u.id !== unitTo)
-              .slice(0, 6)
+              .slice(0, 5)
               .map((u: any) => (
                 <li key={u.id}>
-                  <a href={`/${fUnit.id.replace(/_/g, '-')}-to-${u.id.replace(/_/g, '-')}`} className="text-primary-600 dark:text-primary-400 hover:underline">
+                  <Link to={`/${getSEOUrlPath(unitFrom, u.id)}`} className="text-primary-600 dark:text-primary-400 hover:underline">
                     {t(`units.${fUnit.id}`, fUnit.name)} to {t(`units.${u.id}`, u.name)}
-                  </a>
+                  </Link>
                 </li>
             ))}
           </ul>

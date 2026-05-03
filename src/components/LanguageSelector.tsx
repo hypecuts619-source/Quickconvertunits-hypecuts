@@ -18,10 +18,15 @@ export function LanguageSelector() {
         className="appearance-none bg-transparent pl-7 sm:pl-8 pr-4 sm:pr-6 py-1.5 text-xs sm:text-sm font-medium text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white focus:outline-none cursor-pointer rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
       >
         <option value="en">English</option>
+        <option value="es">Español</option>
+        <option value="pt">Português</option>
         <option value="de">Deutsch</option>
         <option value="fr">Français</option>
+        <option value="it">Italiano</option>
+        <option value="ru">Русский</option>
         <option value="hi">हिन्दी</option>
         <option value="zh">中文</option>
+        <option value="ja">日本語</option>
         <option value="ar">العربية</option>
       </select>
       <div className="absolute right-2 pointer-events-none text-neutral-500">
