@@ -272,8 +272,7 @@ function applySEO(urlPath: string, template: string): string {
         formulaText = `The conversion factor is approximately <strong>${formatValue(conversionRatio)}</strong>. Therefore, 1 ${fromUnit.name} is equal to ${val1} ${toUnit.name}.`;
       }
       
-      const staticContent = `
-        <div style="display:none;" aria-hidden="true">
+      const staticContent = `\n      <noscript>\n        <div>
           <h1>${fromUnit.name} to ${toUnit.name} Converter</h1>
           <p>${description}</p>
           <section>
@@ -314,11 +313,12 @@ function applySEO(urlPath: string, template: string): string {
             <p>Yes, all conversions on QuickConvertUnits including ${fromUnit.name} to ${toUnit.name} are 100% free and work offline.</p>
           </section>
         </div>
-      `;
+      </noscript>
+    `;
 
       // Replace the placeholder static content with our custom SEO block
       template = template.replace(
-        /<div style="display:none;" aria-hidden="true">[\s\S]*?<\/div>/,
+        /<noscript>\n        <div>[\s\S]*?<\/div>/,
         staticContent
       );
       
@@ -384,7 +384,96 @@ function applySEO(urlPath: string, template: string): string {
   } else if (urlPath && urlPath.endsWith("-converter")) {
     const catNameRaw = urlPath.replace("-converter", "");
     const title = `${capitalize(catNameRaw)} Conversion Calculator | QuickConvert`;
-    const description = `Free ${catNameRaw.toLowerCase()} unit converter. Precise calculations with real-time results. Convert measurements instantly.`;
+    
+    const categorySpecifics: Record<string, { desc: string, intro: string, faq2: string, faq2A: string, faq3: string, faq3A: string, faq4: string, faq4A: string, tableItem1: string, tableItem2: string, tableItem3: string, tableItem4: string }> = {
+      "length": {
+        desc: "Convert length and distance measurements from meters, feet, kilometers, and miles. Real-time formatting with high precision.",
+        intro: "Instantly convert between various length and distance units, including metric and imperial systems. The conversion formula relies on standard metric prefixes or exact statutory definitions (like 1 inch = 2.54 cm).",
+        faq2: "How do I convert between imperial and metric length?",
+        faq2A: "You can use this calculator. Simply enter your imperial value (e.g. inches) to instantly see the metric equivalent (e.g. centimeters).",
+        faq3: "How do I calculate length conversions?",
+        faq3A: "You generally multiply by a conversion factor. For example, to convert meters to feet, multiply by 3.28084.",
+        faq4: "Does this length converter work for very small units?",
+        faq4A: "Yes, you can convert micrometers, millimeters, and nanometers accurately.",
+        tableItem1: "1 Meter = 3.28084 Feet",
+        tableItem2: "1 Kilometer = 0.621371 Miles",
+        tableItem3: "1 Inch = 2.54 Centimeters",
+        tableItem4: "1 Mile = 1.60934 Kilometers"
+      },
+      "weight": {
+        desc: "Convert weight and mass units instantly. Easily calculate pounds to kilograms, ounces to grams, and stone.",
+        intro: "Convert between various mass and weight units smoothly. Computations use standard international agreements, making it easy for cooking, shipping, or scientific conversions.",
+        faq2: "What is the difference between mass and weight?",
+        faq2A: "While interchangeably used in everyday life, mass measures the amount of matter, whereas weight measures gravitational force. Our converter handles standard earth-equivalent mass conversions.",
+        faq3: "What is the formula for weight conversions?",
+        faq3A: "Simply multiply the source weight by its specific conversion factor relative to the target unit.",
+        faq4: "Can I convert small cooking units?",
+        faq4A: "Yes, converting between grams and ounces is fully supported for precise baking.",
+        tableItem1: "1 Kilogram = 2.20462 Pounds",
+        tableItem2: "1 Pound = 0.453592 Kilograms",
+        tableItem3: "1 Ounce = 28.3495 Grams",
+        tableItem4: "1 Gram = 0.035274 Ounces"
+      },
+      "temperature": {
+        desc: "Convert temperatures between Celsius, Fahrenheit, and Kelvin. Precise scientific and everyday weather conversions using official scaling formulas.",
+        intro: "Transform temperature readings between differing scales. Because temperature scales have varying zero points (like 32°F roughly equalling 0°C), temperature conversions use offset formulas rather than simple multiplication.",
+        faq2: "Why does temperature conversion use addition/subtraction?",
+        faq2A: "Unlike distance or weight, Celsius and Fahrenheit scales do not start at absolute zero. They require an offset operation before applying the scaling factor.",
+        faq3: "What is the formula for Celsius to Fahrenheit?",
+        faq3A: "Multiply the Celsius temperature by 9/5 and add 32.",
+        faq4: "Can I convert to Kelvin?",
+        faq4A: "Yes, Kelvin conversions are fully supported for scientific standard calculations.",
+        tableItem1: "0 °C = 32 °F",
+        tableItem2: "100 °C = 212 °F",
+        tableItem3: "0 °C = 273.15 K",
+        tableItem4: "-40 °C = -40 °F"
+      },
+      "currency": {
+        desc: "Live currency converter for USD, EUR, GBP, INR, and more. Global exchange rates updated frequently.",
+        intro: "Calculate current exchange rates between fiat currencies. Keep in mind that real-world trading markets fluctuate constantly, so live conversion rates may vary slightly from static references.",
+        faq2: "Are the exchange rates live?",
+        faq2A: "We strive to provide relatively recent estimation based on market data for reference purposes. However, always verify with your financial institution before making transactions.",
+        faq3: "Does this include cryptocurrency?",
+        faq3A: "Currently, we focus on major global fiat currencies compared against USD, EUR, and more.",
+        faq4: "What is currency spread?",
+        faq4A: "Spread is the difference between buy and sell rates. We utilize a mid-market rate estimate for standard conversion.",
+        tableItem1: "1 USD = Variable EUR",
+        tableItem2: "1 EUR = Variable USD",
+        tableItem3: "1 GBP = Variable USD",
+        tableItem4: "1 USD = Variable INR"
+      },
+      "time-zone": {
+        desc: "Time zone converter for UTC, EST, PST, CET. Schedule global meetings and convert standard and daylight time accurately.",
+        intro: "Seamlessly translate coordinates of time between global zones. Accounting for longitude offsets and Daylight Saving Time (DST) complexities, this tool produces accurate local times anywhere.",
+        faq2: "Does this tool account for Daylight Saving Time?",
+        faq2A: "Yes, our converter accounts for variations due to DST shifts automatically depending on the specific date you enter.",
+        faq3: "Can I convert directly from PST to EST?",
+        faq3A: "Absolutely, you can select any supported From and To time regions directly.",
+        faq4: "Is UTC the same as GMT?",
+        faq4A: "For most general timekeeping purposes, yes, UTC shares the same current time standard as GMT.",
+        tableItem1: "UTC + 0 = GMT",
+        tableItem2: "UTC - 5 = EST",
+        tableItem3: "UTC - 8 = PST",
+        tableItem4: "UTC + 1 = CET"
+      }
+    };
+
+    const specifics = categorySpecifics[catNameRaw.toLowerCase()] || {
+      desc: `Free ${catNameRaw.toLowerCase()} unit converter. Precise calculations with real-time results. Convert measurements instantly.`,
+      intro: `Instantly convert between various ${catNameRaw.toLowerCase()} units. Our calculator is built for speed and precision, offering real-time conversions without page reloads.`,
+      faq2: `How accurate is this ${catNameRaw} converter?`,
+      faq2A: `Our tool uses officially recognized constants and factors up to multiple decimal places to ensure excellent accuracy.`,
+      faq3: `Is it completely free?`,
+      faq3A: `Yes, no ads or paywalls interrupt your conversion experience.`,
+      faq4: `Can I use it offline?`,
+      faq4A: `Yes, once loaded, basic math conversions work entirely in your browser.`,
+      tableItem1: `Popular ${catNameRaw} conversions natively supported`,
+      tableItem2: "Instant real-time math execution",
+      tableItem3: "High decimal precision format",
+      tableItem4: "Cross-platform browser compatibility"
+    };
+
+    const description = specifics.desc;
 
     template = template.replace(
       /<title>(.*?)<\/title>/,
@@ -411,20 +500,37 @@ function applySEO(urlPath: string, template: string): string {
       `<meta property="og:url" content="https://quickconvertunits.com/${urlPath}" />`
     );
     
-    const staticContent = `
-      <div style="display:none;" aria-hidden="true">
-        <h1>${capitalize(catNameRaw)} Converter</h1>
+    const staticContent = `\n      <noscript>\n        <div>
+        <h1>${title}</h1>
         <p>${description}</p>
         <section>
           <h2>About ${capitalize(catNameRaw)} Conversion</h2>
-          <p>Instantly convert between various ${catNameRaw.toLowerCase()} units. Our calculator is built for speed and precision, offering real-time conversions without page reloads.</p>
+          <p>${specifics.intro}</p>
+          <p>Whether you're a professional, student, or just need a quick calculation, our interface responds to inputs live.</p>
+        </section>
+        <section>
+          <h2>Popular ${capitalize(catNameRaw)} Reference Table</h2>
+          <table border="1" cellpadding="8" style="border-collapse: collapse; margin-top: 10px;">
+            <tr><th>Conversion Examples</th></tr>
+            <tr><td>${specifics.tableItem1}</td></tr>
+            <tr><td>${specifics.tableItem2}</td></tr>
+            <tr><td>${specifics.tableItem3}</td></tr>
+            <tr><td>${specifics.tableItem4}</td></tr>
+          </table>
         </section>
         <section>
           <h2>Frequently Asked Questions</h2>
           <h3>Is this ${capitalize(catNameRaw)} converter free?</h3>
-          <p>Yes, all conversions on our platform are completely free and work offline.</p>
+          <p>Yes, all conversions on our platform are completely free and work offline where supported.</p>
+          <h3>${specifics.faq2}</h3>
+          <p>${specifics.faq2A}</p>
+          <h3>${specifics.faq3}</h3>
+          <p>${specifics.faq3A}</p>
+          <h3>${specifics.faq4}</h3>
+          <p>${specifics.faq4A}</p>
         </section>
       </div>
+      </noscript>
     `;
 
     template = template.replace(
@@ -536,10 +642,17 @@ if (isProd) {
     }
 
     try {
-      const template = applySEO(requestedUrlInfo.split("?")[0], cachedTemplate);
+      let template = cachedTemplate;
+      try {
+        template = applySEO(requestedUrlInfo.split("?")[0], cachedTemplate);
+      } catch (seoErr: any) {
+        console.error("SEO Error generating template:", seoErr.message, seoErr.stack);
+        // gracefully fallback to untransformed template
+      }
       res.status(200).set({ "Content-Type": "text/html" }).send(template);
     } catch (e: any) {
-      return res.status(500).send("SEO Error: " + e.message + " stack: " + e.stack);
+      console.error("Server 500 error:", e.message, e.stack);
+      return res.status(500).send("Server Error: " + e.message + " stack: " + e.stack);
     }
   });
 }
@@ -559,8 +672,9 @@ async function startServer() {
       try {
         template = fs.readFileSync(path.resolve(currentDir, "index.html"), "utf-8");
         template = await vite.transformIndexHtml(req.originalUrl, template);
-      } catch (e) {
-        return res.status(500).send("index.html not found.");
+      } catch (e: any) {
+        console.error("Vite Transform Error:", e.message, e.stack);
+        return res.status(500).send("index.html not found, or SSR transform failed: " + e.message);
       }
 
       template = applySEO(req.path, template);

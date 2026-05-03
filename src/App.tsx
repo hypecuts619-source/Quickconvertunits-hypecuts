@@ -751,7 +751,17 @@ export default function App() {
       }
 
       titleStr = `${catName} Conversion Calculator: ${topUnits} | QuickConvert`;
-      metaDescStr = `Free ${catName.toLowerCase()} unit converter for ${allTopUnits}. ${seoSnippet || "Precise calculations with real-time results. Convert measurements instantly."}`;
+      
+      const specificDescriptions: Record<string, string> = {
+        "length": "Convert length and distance measurements from meters, feet, kilometers, and miles. Real-time formatting with high precision.",
+        "weight": "Convert weight and mass units instantly. Easily calculate pounds to kilograms, ounces to grams, and stone.",
+        "temperature": "Convert temperatures between Celsius, Fahrenheit, and Kelvin. Precise scientific and everyday weather conversions using official scaling formulas.",
+        "currency": "Live currency converter for USD, EUR, GBP, INR, and more. Global exchange rates updated frequently.",
+        "time_zone": "Time zone converter for UTC, EST, PST, CET. Schedule global meetings and convert standard and daylight time accurately."
+      };
+      
+      metaDescStr = specificDescriptions[category] || `Free ${catName.toLowerCase()} unit converter for ${allTopUnits}. ${seoSnippet || "Precise calculations with real-time results. Convert measurements instantly."}`;
+      
       canonicalUrlStr = `https://quickconvertunits.com/${category.replace(/_/g, '-')}-converter`;
       ogTitleStr = titleStr;
     } else {
@@ -1162,7 +1172,7 @@ export default function App() {
               </h1>
             ) : (
               <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-5xl font-semibold tracking-tight mb-4 text-neutral-900 dark:text-white">
-                {activeFromUnit?.name.endsWith('s') ? activeFromUnit?.name : `${activeFromUnit?.name}s`} to {activeToUnit?.name.endsWith('s') ? activeToUnit?.name : `${activeToUnit?.name}s`} Converter
+                {(activeFromUnit?.name || '').endsWith('s') ? activeFromUnit?.name : `${activeFromUnit?.name}s`} to {(activeToUnit?.name || '').endsWith('s') ? activeToUnit?.name : `${activeToUnit?.name}s`} Converter
                 <button
                   onClick={toggleFavorite}
                   className={`flex-shrink-0 flex items-center justify-center w-9 h-9 md:w-12 md:h-12 rounded-full transition-colors ${
@@ -2030,14 +2040,19 @@ export default function App() {
           </section>
 
           {/* SEO Optional Content area placeholder */}
-          <div className="mt-16 pt-8 border-t border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 text-sm flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
-            <div>
-              <p className="mb-1">
-                &copy; {new Date().getFullYear()} QuickConvert. {t("footerText", "Built for fast, accurate conversions.")}
+          <div className="mt-16 pt-8 border-t border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 text-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-center md:text-left">
+            <div className="flex-1 space-y-3">
+              <div>
+                <p className="mb-1 font-medium text-neutral-900 dark:text-neutral-200">
+                  &copy; {new Date().getFullYear()} QuickConvert. {t("footerText", "Built for fast, accurate conversions.")}
+                </p>
+                <p className="opacity-80 font-medium">🛡️ Strictly Local: Your conversion data never leaves your device.</p>
+              </div>
+              <p className="text-xs text-neutral-500 dark:text-neutral-500 leading-relaxed max-w-3xl">
+                <strong>Disclaimer:</strong> While we strive to provide accurate information, QuickConvert makes no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability or availability of the conversion calculators. Any reliance you place on such information is therefore strictly at your own risk.
               </p>
-              <p className="opacity-80 font-medium">🛡️ Strictly Local: Your conversion data never leaves your device.</p>
             </div>
-            <div className="flex flex-wrap items-center justify-center md:justify-end gap-x-4 gap-y-2">
+            <div className="flex flex-wrap items-center justify-center md:justify-end gap-x-4 gap-y-2 shrink-0">
               <Link
                 to="/about"
                 className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
