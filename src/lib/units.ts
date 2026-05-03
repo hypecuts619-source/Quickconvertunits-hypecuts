@@ -339,27 +339,43 @@ export function convert(
 export function getSuggestions(query: string) {
   if (!query || query.trim().length === 0) return [];
   const q = query.toLowerCase().trim();
+  const qWords = q.split(/\s+/).map(w => w.replace(/s$/, '')); // simple de-pluralize
   
   const results: any[] = [];
   
-  // Parse something like "kg to lbs", "meter", etc.
+  // 1. Check for specific Time Zone keywords
+  if (
+    'time zone'.includes(q) || 
+    'timezone'.includes(q) || 
+    'converter'.includes(q) ||
+    (q.includes('time') && q.includes('zone'))
+  ) {
+    results.push({
+      categoryId: 'time_zone',
+      fromId: 'time_zone',
+      toId: 'time_zone',
+      text: `Time Zone Converter`
+    });
+  }
+
+  // 2. Exact category match
+  const catMatch = categories.find(c => 
+    c.name.toLowerCase() === q || 
+    c.name.toLowerCase().replace(/\s+/g, '') === q
+  );
+
+  if (catMatch && catMatch.id !== 'time_zone') {
+    results.push({
+      categoryId: catMatch.id,
+      fromId: catMatch.units[0]?.id || "",
+      toId: catMatch.units[1]?.id || catMatch.units[0]?.id || "",
+      text: `${catMatch.name} Converter`
+    });
+  }
+  
+  // 3. Match pairs
   categories.forEach(cat => {
-    if (cat.id === 'time_zone') {
-      if (
-        'time zone'.includes(q) || 
-        'timezone'.includes(q) || 
-        'converter'.includes(q) ||
-        (q.includes('time') && q.includes('zone'))
-      ) {
-         results.push({
-           categoryId: 'time_zone',
-           fromId: 'time_zone',
-           toId: 'time_zone',
-           text: `Time Zone Converter`
-         });
-      }
-      return;
-    }
+    if (cat.id === 'time_zone') return;
 
     cat.units.forEach(u1 => {
       cat.units.forEach(u2 => {
@@ -372,29 +388,20 @@ export function getSuggestions(query: string) {
 
         const phrase1 = `${name1} to ${name2}`;
         const phrase2 = `${sym1} to ${sym2}`;
-        const phrase3 = `${sym1} to ${sym2}s`;
-        const phrase4 = `${name1}s to ${name2}s`;
         
-        const qWords = q.split(/\s+/).map(w => w.replace(/s$/, '')); // simple de-pluralize
-        
-        const matchSymbols = qWords.includes(sym1.replace(/s$/, '')) && qWords.includes(sym2.replace(/s$/, ''));
-        const matchNames = qWords.includes(name1.replace(/s$/, '')) && qWords.includes(name2.replace(/s$/, ''));
+        const matchSymbols = qWords.length > 1 && qWords.includes(sym1.replace(/s$/, '')) && qWords.includes(sym2.replace(/s$/, ''));
+        const matchNames = qWords.length > 1 && qWords.includes(name1.replace(/s$/, '')) && qWords.includes(name2.replace(/s$/, ''));
 
         if (
+          phrase1 === q ||
+          phrase2 === q ||
           phrase1.includes(q) || 
           phrase2.includes(q) || 
-          phrase3.includes(q) ||
-          phrase4.includes(q) ||
-          (q.includes(name1) && q.includes(name2)) ||
+          (qWords.length > 1 && q.includes(name1) && q.includes(name2)) ||
           matchSymbols ||
           matchNames ||
-          sym1 === q ||
-          name1.startsWith(q) ||
-          sym1.startsWith(q) ||
-          `${name1} `.startsWith(q) ||
-          `${sym1} `.startsWith(q)
+          (q.length > 1 && (name1.startsWith(q) || sym1 === q))
         ) {
-          
           // Deduplicate
           if (!results.find(r => r.fromId === u1.id && r.toId === u2.id)) {
             results.push({
@@ -409,7 +416,36 @@ export function getSuggestions(query: string) {
     });
   });
   
-  return results.slice(0, 5); // Return top 5 suggestions
+  // 4. Fallback: single unit matches
+  categories.forEach(cat => {
+    if (results.length >= 10) return;
+    cat.units.forEach(u => {
+      if (results.length >= 10) return;
+      const name = u.name.toLowerCase();
+      const sym = u.symbol.toLowerCase();
+      
+      const isMatch = name.includes(q) || 
+                      sym === q || 
+                      (q.length > 1 && name.startsWith(q)) ||
+                      (q.length > 2 && q.startsWith(name)) ||
+                      qWords.some(w => name.includes(w) || sym === w || name.startsWith(w));
+
+      if (isMatch) {
+         const other = cat.units.find(ou => ou.id !== u.id) || u;
+         const matchName = u.name.toLowerCase();
+         if (!results.find(r => r.fromId === u.id || (r.text && r.text.toLowerCase().includes(matchName)))) {
+            results.push({
+              categoryId: cat.id,
+              fromId: u.id,
+              toId: other.id,
+              text: `${u.name} Converter`
+            });
+         }
+      }
+    });
+  });
+  
+  return results.slice(0, 8); // Return top 8 suggestions
 }
 
 // Ensure categorzeQuery doesn't cause errors if not imported, replacing it with getSuggestions in App.tsx

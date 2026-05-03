@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, KeyboardEvent } from "react";
 import { Plus, Search, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -32,13 +32,16 @@ const TOP_UNITS: Record<string, string[]> = {
 export function UnitSelector({ value, onChange, units, activeCategoryId }: UnitSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const activeUnit = units.find((u) => u.id === value) || units[0];
 
   useEffect(() => {
     if (isOpen) {
       setSearch("");
+      setSelectedIndex(0);
       setTimeout(() => {
         inputRef.current?.focus();
       }, 50);
@@ -87,6 +90,41 @@ export function UnitSelector({ value, onChange, units, activeCategoryId }: UnitS
     });
   }, [units, search]);
 
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [filteredUnits]);
+
+  // Handle arrow key navigation scrolling
+  useEffect(() => {
+    if (isOpen && scrollContainerRef.current) {
+      const selectedElement = scrollContainerRef.current.querySelector(`[data-index="${selectedIndex}"]`);
+      if (selectedElement) {
+        selectedElement.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      }
+    }
+  }, [selectedIndex, isOpen]);
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (filteredUnits.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev + 1) % filteredUnits.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev - 1 + filteredUnits.length) % filteredUnits.length);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const selected = filteredUnits[selectedIndex];
+      if (selected) {
+        onChange(selected.id);
+        setIsOpen(false);
+      }
+    } else if (e.key === "Escape") {
+      setIsOpen(false);
+    }
+  };
+
   return (
     <div className="relative">
       <button
@@ -124,11 +162,12 @@ export function UnitSelector({ value, onChange, units, activeCategoryId }: UnitS
                 <Search className="w-5 h-5 text-neutral-400" />
                 <input
                   aria-label="Search units"
-                  ref={inputRef}
+                  ref= {inputRef}
                   type="text"
                   placeholder="Search units..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
+                  onKeyDown={handleKeyDown}
                   className="w-full bg-transparent border-none focus:outline-none text-neutral-900 dark:text-white"
                 />
                 <button aria-label="Close" onClick={() => setIsOpen(false)} className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full">
@@ -136,7 +175,7 @@ export function UnitSelector({ value, onChange, units, activeCategoryId }: UnitS
                 </button>
               </div>
 
-              <div className="overflow-y-auto p-4 flex-1">
+              <div className="overflow-y-auto p-4 flex-1" ref={scrollContainerRef}>
                 {!search.trim() && popularUnits.length > 0 && (
                   <div className="mb-6">
                     <h3 className="text-xs font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider mb-3">Popular Units</h3>
@@ -160,11 +199,18 @@ export function UnitSelector({ value, onChange, units, activeCategoryId }: UnitS
                     {filteredUnits.length === 0 ? (
                       <p className="text-sm text-neutral-500 text-center py-4">No units found.</p>
                     ) : (
-                      filteredUnits.map((u) => (
+                      filteredUnits.map((u, idx) => (
                         <button
                           key={u.id}
+                          data-index={idx}
                           onClick={() => { onChange(u.id); setIsOpen(false); }}
-                          className={`text-left px-4 py-3 rounded-xl text-sm transition-colors flex items-center justify-between ${value === u.id ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium' : 'hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300'}`}
+                          className={`text-left px-4 py-3 rounded-xl text-sm transition-colors flex items-center justify-between ${
+                            value === u.id 
+                              ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium' 
+                              : selectedIndex === idx
+                                ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100'
+                                : 'hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300'
+                          }`}
                         >
                           <span>{u.name}</span>
                           <span className={`font-mono ${value === u.id ? 'text-blue-500/70' : 'text-neutral-400'}`}>{u.symbol}</span>

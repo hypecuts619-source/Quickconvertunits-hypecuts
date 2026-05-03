@@ -32,3 +32,11 @@ export const trackFunnelStep = (stepName: string) => {
     }
   }
 };
+
+export const trackPageView = (url: string) => {
+  if (typeof window !== "undefined" && (window as any).gtag) {
+    (window as any).gtag("config", "G-Z7W1M7R0YB", {
+      page_path: url,
+    });
+  }
+};
