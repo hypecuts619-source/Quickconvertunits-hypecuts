@@ -457,3 +457,43 @@ export function formatNumber(num: number): string {
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   return parts.join(".");
 }
+
+export const getSEOUrlPath = (fromId: string, toId: string) => {
+  if (fromId === 'time_zone') return 'time-zone-converter';
+  if (fromId === 'kilogram' && toId === 'pound') return 'kg-to-lbs';
+  if (fromId === 'inch' && toId === 'centimeter') return 'inches-to-cm';
+  if (fromId === 'centimeter' && toId === 'inch') return 'cm-to-inches';
+  if (fromId === 'pound' && toId === 'kilogram') return 'lbs-to-kg';
+  if (fromId === 'foot' && toId === 'meter') return 'feet-to-meters';
+  if (fromId === 'mile' && toId === 'kilometer') return 'miles-to-km';
+  if (fromId === 'millimeter' && toId === 'inch') return 'mm-to-inches';
+  
+  if (fromId === 'usd' && toId === 'inr') return 'usd-to-inr';
+  if (fromId === 'mile_per_hour' && toId === 'kilometer_per_hour') return 'mph-to-kph';
+  if (fromId === 'liter' && toId === 'us_gallon') return 'liters-to-gallons';
+  if (fromId === 'acre' && toId === 'square_meter') return 'acres-to-square-meters';
+  if (fromId === 'square_foot' && toId === 'square_meter') return 'square-feet-to-square-meters';
+  if (fromId === 'celsius' && toId === 'fahrenheit') return 'celsius-to-fahrenheit';
+  if (fromId === 'fahrenheit' && toId === 'celsius') return 'fahrenheit-to-celsius';
+  return `${fromId}-to-${toId}`;
+};
+
+export const getUnitIdsFromPath = (path: string) => {
+  if (path === 'time-zone-converter') return ['time_zone', 'time_zone'];
+  if (path === 'kg-to-lbs') return ['kilogram', 'pound'];
+  if (path === 'inches-to-cm') return ['inch', 'centimeter'];
+  if (path === 'cm-to-inches') return ['centimeter', 'inch'];
+  if (path === 'lbs-to-kg') return ['pound', 'kilogram'];
+  if (path === 'feet-to-meters') return ['foot', 'meter'];
+  if (path === 'miles-to-km') return ['mile', 'kilometer'];
+  if (path === 'mm-to-inches') return ['millimeter', 'inch'];
+  
+  if (path === 'usd-to-inr') return ['usd', 'inr'];
+  if (path === 'mph-to-kph') return ['mile_per_hour', 'kilometer_per_hour'];
+  if (path === 'liters-to-gallons') return ['liter', 'us_gallon'];
+  if (path === 'acres-to-square-meters') return ['acre', 'square_meter'];
+  if (path === 'square-feet-to-square-meters') return ['square_foot', 'square_meter'];
+  if (path === 'celsius-to-fahrenheit') return ['celsius', 'fahrenheit'];
+  if (path === 'fahrenheit-to-celsius') return ['fahrenheit', 'celsius'];
+  return path.split('-to-');
+};

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef, lazy, Suspense } from "react";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
-import { getSuggestions, convert, categories, formatNumber } from "./lib/units";
+import { getSuggestions, convert, categories, formatNumber, getSEOUrlPath, getUnitIdsFromPath } from "./lib/units";
 import { categorySeoContent } from "./lib/seoContent";
 import { trackConversionEvent, trackFunnelStep, trackPageView } from "./lib/analytics";
 import { SeoContent } from "./components/SeoContent";
@@ -32,6 +32,8 @@ import {
   Download,
 } from "lucide-react";
 import { UnitSelector } from "./components/UnitSelector";
+import { Breadcrumbs } from "./components/Breadcrumbs";
+import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "motion/react";
 
 const ConversionChart = lazy(() => import("./components/ConversionChart"));
@@ -284,50 +286,7 @@ function PwaPrompt() {
 
 
 
-const getSEOUrlPath = (fromId: string, toId: string) => {
-  if (fromId === 'time_zone') return 'time-zone-converter';
-  if (fromId === 'kilogram' && toId === 'pound') return 'kg-to-lbs';
-  if (fromId === 'inch' && toId === 'centimeter') return 'inches-to-cm';
-  if (fromId === 'centimeter' && toId === 'inch') return 'cm-to-inches';
-  if (fromId === 'pound' && toId === 'kilogram') return 'lbs-to-kg';
-  if (fromId === 'foot' && toId === 'meter') return 'feet-to-meters';
-  if (fromId === 'mile' && toId === 'kilometer') return 'miles-to-km';
-  if (fromId === 'millimeter' && toId === 'inch') return 'mm-to-inches';
-  
-  if (fromId === 'usd' && toId === 'inr') return 'usd-to-inr';
-  if (fromId === 'mile_per_hour' && toId === 'kilometer_per_hour') return 'mph-to-kph';
-  if (fromId === 'liter' && toId === 'us_gallon') return 'liters-to-gallons';
-  if (fromId === 'acre' && toId === 'square_meter') return 'acres-to-square-meters';
-  if (fromId === 'square_foot' && toId === 'square_meter') return 'square-feet-to-square-meters';
-  if (fromId === 'celsius' && toId === 'fahrenheit') return 'celsius-to-fahrenheit';
-  if (fromId === 'fahrenheit' && toId === 'celsius') return 'fahrenheit-to-celsius';
-  return `${fromId}-to-${toId}`;
-};
-
-const getUnitIdsFromPath = (path: string) => {
-  if (path === 'time-zone-converter') return ['time_zone', 'time_zone'];
-  if (path === 'kg-to-lbs') return ['kilogram', 'pound'];
-  if (path === 'inches-to-cm') return ['inch', 'centimeter'];
-  if (path === 'cm-to-inches') return ['centimeter', 'inch'];
-  if (path === 'lbs-to-kg') return ['pound', 'kilogram'];
-  if (path === 'feet-to-meters') return ['foot', 'meter'];
-  if (path === 'miles-to-km') return ['mile', 'kilometer'];
-  if (path === 'mm-to-inches') return ['millimeter', 'inch'];
-  
-  if (path === 'usd-to-inr') return ['usd', 'inr'];
-  if (path === 'mph-to-kph') return ['mile_per_hour', 'kilometer_per_hour'];
-  if (path === 'liters-to-gallons') return ['liter', 'us_gallon'];
-  if (path === 'acres-to-square-meters') return ['acre', 'square_meter'];
-  if (path === 'square-feet-to-square-meters') return ['square_foot', 'square_meter'];
-  if (path === 'celsius-to-fahrenheit') return ['celsius', 'fahrenheit'];
-  if (path === 'fahrenheit-to-celsius') return ['fahrenheit', 'celsius'];
-  
-  const parts = path.split('-to-');
-  if (parts.length === 2) {
-    return [parts[0].replace(/-/g, '_'), parts[1].replace(/-/g, '_')];
-  }
-  return [];
-};
+// SEO functions have been moved to src/lib/units.ts
 
 export default function App() {
   const { t, i18n } = useTranslation();
@@ -731,232 +690,7 @@ export default function App() {
     });
   };
 
-  useEffect(() => {
-    if (category === 'time_zone') {
-       const titleStr = 'Time Zone Converter: Convert UTC, EST, PST, CET | QuickConvert';
-       const metaDescStr = 'Instantly convert between time zones to schedule global meetings easily. Supports UTC, EST, PST, standard and daylight time conversions.';
-       document.title = titleStr;
-       let metaDesc = document.querySelector('meta[name="description"]');
-       if (!metaDesc) {
-         metaDesc = document.createElement("meta");
-         metaDesc.setAttribute("name", "description");
-         document.head.appendChild(metaDesc);
-       }
-       metaDesc.setAttribute("content", metaDescStr);
-       let lkCan = document.querySelector('link[rel="canonical"]');
-       if (!lkCan) {
-         lkCan = document.createElement("link");
-         lkCan.setAttribute("rel", "canonical");
-         document.head.appendChild(lkCan);
-       }
-       lkCan.setAttribute("href", "https://quickconvertunits.com/time-zone-converter");
-       
-       let ogTitle = document.querySelector('meta[property="og:title"]');
-       if (!ogTitle) {
-         ogTitle = document.createElement("meta");
-         ogTitle.setAttribute("property", "og:title");
-         document.head.appendChild(ogTitle);
-       }
-       ogTitle.setAttribute("content", titleStr);
-       
-       let seoSchema = document.getElementById("seo-schema");
-       if (!seoSchema) {
-         seoSchema = document.createElement("script");
-         seoSchema.id = "seo-schema";
-         seoSchema.setAttribute("type", "application/ld+json");
-         document.head.appendChild(seoSchema);
-       }
-       seoSchema.innerText = JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebApplication",
-          name: titleStr,
-          url: "https://quickconvertunits.com/time-zone-converter",
-          applicationCategory: "UtilityApplications",
-          operatingSystem: "All",
-          description: metaDescStr,
-         }, null, 2);
-       navigate('/time-zone-converter', { replace: true });
-       return;
-    }
-
-    if (activeFromUnit && activeToUnit) {
-      const isHomepage = location.pathname === "/" && !location.search.includes("val=");
-      const isCategoryPage = location.pathname.endsWith("-converter") && !location.pathname.includes("-to-") && location.pathname !== "/time-zone-converter";
-      const isSpecificConverter = location.pathname !== "/" && !isCategoryPage;
-
-      let titleStr = "";
-      let metaDescStr = "";
-      let canonicalUrlStr = "";
-      let ogTitleStr = "";
-
-      if (isHomepage) {
-         titleStr = "Quick Unit Converter | Free Online Translation Tool for Measurements";
-         metaDescStr = "Instantly convert units like meters to feet, kg to lbs, or cups to grams. Fast, accurate, no ads interrupting. Try now—no sign-up needed.";
-         canonicalUrlStr = "https://quickconvertunits.com/";
-         ogTitleStr = titleStr;
-
-         const defaultFrom = activeCategory.units[0]?.id;
-         const defaultTo = activeCategory.units[1]?.id || defaultFrom;
-         if (unitFrom !== defaultFrom || unitTo !== defaultTo) {
-           navigate(`/${getSEOUrlPath(unitFrom, unitTo)}${valFrom && valFrom !== "1" ? `?val=${valFrom}` : ""}`);
-         }
-      } else if (isCategoryPage) {
-         const catName = activeCategory.name;
-         const topUnits = `${activeCategory.units[0].name}s to ${activeCategory.units[1].name}s, ${activeCategory.units[2]?.name || ''}s`.replace(/ss/g, 's').replace(/, s/g, '');
-         const allTopUnits = activeCategory.units.slice(0, 5).map(u => u.name.toLowerCase() + (u.name.endsWith('s') ? '' : 's')).join(", ");
-         
-         let seoSnippet = "";
-         const content = categorySeoContent[category] || "";
-         const pMatch = content.match(/<p>(.*?)<\/p>/);
-         if (pMatch) {
-            seoSnippet = pMatch[1].replace(/<[^>]+>/g, ' ').trim();
-            if (seoSnippet.length > 130) {
-              seoSnippet = seoSnippet.substring(0, 127) + "...";
-            }
-         }
-
-         titleStr = `${catName} Conversion Calculator: ${topUnits} | QuickConvert`;
-         metaDescStr = `Free ${catName.toLowerCase()} unit converter for ${allTopUnits}. ${seoSnippet || "Precise calculations with real-time results. Convert measurements instantly."}`;
-         canonicalUrlStr = `https://quickconvertunits.com/${category.replace(/_/g, '-')}-converter`;
-         ogTitleStr = titleStr;
-         
-         // If the user changed units explicitly, we should navigate them to the pair page
-         const defaultFrom = activeCategory.units[0]?.id;
-         const defaultTo = activeCategory.units[1]?.id || defaultFrom;
-         if (unitFrom !== defaultFrom || unitTo !== defaultTo) {
-           navigate(`/${getSEOUrlPath(unitFrom, unitTo)}${valFrom && valFrom !== "1" ? `?val=${valFrom}` : ""}`, { replace: true });
-         }
-      } else {
-         const valPrefix = valFrom && valFrom !== "1" && valFrom !== "0" ? `${valFrom} ` : "";
-         titleStr = `${valPrefix}${activeFromUnit.name} to ${activeToUnit.name} (${activeFromUnit.symbol} to ${activeToUnit.symbol}) - ${activeCategory.name} Converter`;
-         metaDescStr = `Convert ${valPrefix}${activeFromUnit.name.toLowerCase()} to ${activeToUnit.name.toLowerCase()} instantly. Free online ${activeCategory.name.toLowerCase()} conversion calculator. Enter value, select units—get precise results fast.`;
-         canonicalUrlStr = `https://quickconvertunits.com/${getSEOUrlPath(unitFrom, unitTo)}`;
-         ogTitleStr = `${valPrefix}${activeFromUnit.name} to ${activeToUnit.name} Conversion Calculator - QuickConvert`;
-         
-         // Only navigate cleanly if we are already on a converter page OR if it's the first time landing on a specific URL
-         // This syncs the URL with the values e.g. adding ?val= without redirecting homepage visitors.
-         navigate(`/${getSEOUrlPath(unitFrom, unitTo)}${valFrom && valFrom !== "1" ? `?val=${valFrom}` : ""}`, { replace: true });
-      }
-
-      document.title = titleStr;
-
-      // SEO Meta Description
-      let metaDesc = document.querySelector('meta[name="description"]');
-      if (!metaDesc) {
-        metaDesc = document.createElement("meta");
-        metaDesc.setAttribute("name", "description");
-        document.head.appendChild(metaDesc);
-      }
-      metaDesc.setAttribute("content", metaDescStr);
-
-      // SEO Canonical URL
-      let canonical = document.querySelector('link[rel="canonical"]');
-      if (!canonical) {
-        canonical = document.createElement("link");
-        canonical.setAttribute("rel", "canonical");
-        document.head.appendChild(canonical);
-      }
-      canonical.setAttribute("href", canonicalUrlStr);
-
-      // SEO Open Graph / Twitter
-      let ogTitle = document.querySelector('meta[property="og:title"]');
-      if (!ogTitle) {
-        ogTitle = document.createElement("meta");
-        ogTitle.setAttribute("property", "og:title");
-        document.head.appendChild(ogTitle);
-      }
-      ogTitle.setAttribute("content", ogTitleStr);
-
-      // SEO Structured Data (JSON-LD)
-      let script = document.querySelector("#seo-schema");
-      if (!script) {
-        script = document.createElement("script");
-        script.id = "seo-schema";
-        script.setAttribute("type", "application/ld+json");
-        document.head.appendChild(script);
-      }
-      
-      const schema: any[] = [
-        {
-          "@context": "https://schema.org",
-          "@type": "WebApplication",
-          name: `${titleStr} - QuickConvert`,
-          url: canonicalUrlStr,
-          applicationCategory: "UtilityApplications",
-          operatingSystem: "All",
-          description: metaDescStr,
-          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-        }
-      ];
-
-      // Only add specific conversion rich results on particular converter pages
-      if (isSpecificConverter && activeFromUnit && activeToUnit && category !== 'time_zone') {
-        const conversionFactor = convert(1, unitFrom, unitTo, category);
-        const formattedFactor = parseFloat(conversionFactor.toFixed(6));
-        
-        schema.push({
-          "@context": "https://schema.org",
-          "@type": "Action",
-          name: `Converting ${activeFromUnit.name} to ${activeToUnit.name}`,
-          fromUnit: activeFromUnit.name,
-          toUnit: activeToUnit.name,
-          value: valFrom || "1"
-        });
-        
-        const isTemp = category === 'temperature';
-        const amountText = isTemp
-          ? `1 degree ${activeFromUnit.name} is equivalent to ${formattedFactor} degrees ${activeToUnit.name}.`
-          : `There are ${formattedFactor} ${activeToUnit.name} in 1 ${activeFromUnit.name}.`;
-          
-        const methodText = isTemp 
-          ? `To convert ${activeFromUnit.name} to ${activeToUnit.name}, you use a specific temperature formula involving an offset. Our free online calculator handles this complex conversion automatically.`
-          : `To convert ${activeFromUnit.name} to ${activeToUnit.name}, you multiply the value by ${formattedFactor}. Our free online calculator handles this mathematical conversion automatically.`;
-
-        schema.push({
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          mainEntity: [
-            {
-              "@type": "Question",
-              name: isTemp ? `What is 1 ${activeFromUnit.name} in ${activeToUnit.name}?` : `How many ${activeToUnit.name} are in 1 ${activeFromUnit.name}?`,
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: amountText,
-              },
-            },
-            {
-              "@type": "Question",
-              name: `How do I convert ${activeFromUnit.name} to ${activeToUnit.name}?`,
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: methodText,
-              },
-            },
-            {
-              "@type": "Question",
-              name: `What is a ${activeFromUnit.name}?`,
-              acceptedAnswer: {
-                "@type": "Answer",
-                text:
-                  activeFromUnit.description ||
-                  `A ${activeFromUnit.name} is a typical unit of ${activeCategory.name.toLowerCase()}.`,
-              },
-            },
-          ],
-        });
-      }
-
-      script.textContent = JSON.stringify(schema);
-    }
-  }, [
-    category,
-    unitFrom,
-    unitTo,
-    activeFromUnit,
-    activeToUnit,
-    activeCategory,
-    valFrom,
-  ]);
+  // Removed manual SEO useEffect
 
   useEffect(() => {
     setCompareUnits((prev) => {
@@ -970,10 +704,177 @@ export default function App() {
     });
   }, [category, unitFrom, unitTo]);
 
+  // --- Lift SEO State --- //
+  const isHomepage = location.pathname === "/" && !location.search.includes("val=");
+  const isCategoryPage = location.pathname.endsWith("-converter") && !location.pathname.includes("-to-") && location.pathname !== "/time-zone-converter";
+  const isSpecificConverter = location.pathname !== "/" && !isCategoryPage;
+
+  let titleStr = "";
+  let metaDescStr = "";
+  let canonicalUrlStr = "";
+  let ogTitleStr = "";
+  let schema: any[] = [];
+
+  if (category === 'time_zone') {
+    titleStr = 'Time Zone Converter: Convert UTC, EST, PST, CET | QuickConvert';
+    metaDescStr = 'Instantly convert between time zones to schedule global meetings easily. Supports UTC, EST, PST, standard and daylight time conversions.';
+    canonicalUrlStr = "https://quickconvertunits.com/time-zone-converter";
+    ogTitleStr = titleStr;
+    schema = [{
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: titleStr,
+      url: canonicalUrlStr,
+      applicationCategory: "UtilityApplications",
+      operatingSystem: "All",
+      description: metaDescStr,
+    }];
+  } else if (activeFromUnit && activeToUnit) {
+    if (isHomepage) {
+      titleStr = "Quick Unit Converter | Free Online Translation Tool for Measurements";
+      metaDescStr = "Instantly convert units like meters to feet, kg to lbs, or cups to grams. Fast, accurate, no ads interrupting. Try now—no sign-up needed.";
+      canonicalUrlStr = "https://quickconvertunits.com/";
+      ogTitleStr = titleStr;
+    } else if (isCategoryPage) {
+      const catName = activeCategory.name;
+      const topUnits = `${activeCategory.units[0].name}s to ${activeCategory.units[1].name}s, ${activeCategory.units[2]?.name || ''}s`.replace(/ss/g, 's').replace(/, s/g, '');
+      const allTopUnits = activeCategory.units.slice(0, 5).map(u => u.name.toLowerCase() + (u.name.endsWith('s') ? '' : 's')).join(", ");
+      
+      let seoSnippet = "";
+      const content = categorySeoContent[category] || "";
+      const pMatch = content.match(/<p>(.*?)<\/p>/);
+      if (pMatch) {
+        seoSnippet = pMatch[1].replace(/<[^>]+>/g, ' ').trim();
+        if (seoSnippet.length > 130) {
+          seoSnippet = seoSnippet.substring(0, 127) + "...";
+        }
+      }
+
+      titleStr = `${catName} Conversion Calculator: ${topUnits} | QuickConvert`;
+      metaDescStr = `Free ${catName.toLowerCase()} unit converter for ${allTopUnits}. ${seoSnippet || "Precise calculations with real-time results. Convert measurements instantly."}`;
+      canonicalUrlStr = `https://quickconvertunits.com/${category.replace(/_/g, '-')}-converter`;
+      ogTitleStr = titleStr;
+    } else {
+      const valPrefix = valFrom && valFrom !== "1" && valFrom !== "0" ? `${valFrom} ` : "";
+      titleStr = `${valPrefix}${activeFromUnit.name} to ${activeToUnit.name} (${activeFromUnit.symbol} to ${activeToUnit.symbol}) - ${activeCategory.name} Converter`;
+      metaDescStr = `Convert ${valPrefix}${activeFromUnit.name.toLowerCase()} to ${activeToUnit.name.toLowerCase()} instantly. Free online ${activeCategory.name.toLowerCase()} conversion calculator. Enter value, select units—get precise results fast.`;
+      canonicalUrlStr = `https://quickconvertunits.com/${getSEOUrlPath(unitFrom, unitTo)}`;
+      ogTitleStr = `${valPrefix}${activeFromUnit.name} to ${activeToUnit.name} Conversion Calculator - QuickConvert`;
+    }
+
+    schema = [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        name: `${titleStr} - QuickConvert`,
+        url: canonicalUrlStr,
+        applicationCategory: "UtilityApplications",
+        operatingSystem: "All",
+        description: metaDescStr,
+        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      }
+    ];
+
+    if (isSpecificConverter && activeFromUnit && activeToUnit && category !== 'time_zone') {
+      const conversionFactor = convert(1, unitFrom, unitTo, category);
+      const formattedFactor = parseFloat(conversionFactor.toFixed(6));
+      
+      schema.push({
+        "@context": "https://schema.org",
+        "@type": "Action",
+        name: `Converting ${activeFromUnit.name} to ${activeToUnit.name}`,
+        fromUnit: activeFromUnit.name,
+        toUnit: activeToUnit.name,
+        value: valFrom || "1"
+      });
+      
+      const isTemp = category === 'temperature';
+      const amountText = isTemp
+        ? `1 degree ${activeFromUnit.name} is equivalent to ${formattedFactor} degrees ${activeToUnit.name}.`
+        : `There are ${formattedFactor} ${activeToUnit.name} in 1 ${activeFromUnit.name}.`;
+        
+      const methodText = isTemp 
+        ? `To convert ${activeFromUnit.name} to ${activeToUnit.name}, you use a specific temperature formula involving an offset. Our free online calculator handles this complex conversion automatically.`
+        : `To convert ${activeFromUnit.name} to ${activeToUnit.name}, you multiply the value by ${formattedFactor}. Our free online calculator handles this mathematical conversion automatically.`;
+
+      schema.push({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: [
+          {
+            "@type": "Question",
+            name: isTemp ? `What is 1 ${activeFromUnit.name} in ${activeToUnit.name}?` : `How many ${activeToUnit.name} are in 1 ${activeFromUnit.name}?`,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: amountText,
+            },
+          },
+          {
+            "@type": "Question",
+            name: `How do I convert ${activeFromUnit.name} to ${activeToUnit.name}?`,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: methodText,
+            },
+          },
+          {
+            "@type": "Question",
+            name: `What is a ${activeFromUnit.name}?`,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text:
+                activeFromUnit.description ||
+                `A ${activeFromUnit.name} is a typical unit of ${activeCategory.name.toLowerCase()}.`,
+            },
+          },
+        ],
+      });
+    }
+  }
+
+  // Handle auto-routing logic that was in useEffect safely
+  useEffect(() => {
+    if (category === 'time_zone' && location.pathname !== '/time-zone-converter') {
+      navigate('/time-zone-converter', { replace: true });
+    } else if (category !== 'time_zone' && activeFromUnit && activeToUnit) {
+      if (isHomepage) {
+         const defaultFrom = activeCategory.units[0]?.id;
+         const defaultTo = activeCategory.units[1]?.id || defaultFrom;
+         if (unitFrom !== defaultFrom || unitTo !== defaultTo) {
+           navigate(`/${getSEOUrlPath(unitFrom, unitTo)}${valFrom && valFrom !== "1" ? `?val=${valFrom}` : ""}`);
+         }
+      } else if (isCategoryPage) {
+         const defaultFrom = activeCategory.units[0]?.id;
+         const defaultTo = activeCategory.units[1]?.id || defaultFrom;
+         if (unitFrom !== defaultFrom || unitTo !== defaultTo) {
+           navigate(`/${getSEOUrlPath(unitFrom, unitTo)}${valFrom && valFrom !== "1" ? `?val=${valFrom}` : ""}`, { replace: true });
+         }
+      } else {
+         navigate(`/${getSEOUrlPath(unitFrom, unitTo)}${valFrom && valFrom !== "1" ? `?val=${valFrom}` : ""}`, { replace: true });
+      }
+    }
+  }, [category, unitFrom, unitTo, valFrom]); // Minimal dependencies to just handle routing
+
   return (
     <div
       className={`min-h-screen text-neutral-900 dark:text-neutral-100 font-sans transition-colors duration-200 relative overflow-hidden`}
     >
+      <Helmet>
+        <title>{titleStr}</title>
+        <meta name="description" content={metaDescStr} />
+        <link rel="canonical" href={canonicalUrlStr} />
+        <meta property="og:title" content={ogTitleStr} />
+        <meta property="og:description" content={metaDescStr} />
+        <meta property="og:url" content={canonicalUrlStr} />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={ogTitleStr} />
+        <meta name="twitter:description" content={metaDescStr} />
+        <script type="application/ld+json">
+          {JSON.stringify(schema)}
+        </script>
+      </Helmet>
+
       {/* Offline Banner */}
       <AnimatePresence>
         {isOffline && (
@@ -1227,6 +1128,12 @@ export default function App() {
       <div className="max-w-7xl mx-auto px-4 py-6 md:py-12 flex flex-col lg:flex-row gap-8 pb-24 md:pb-12 relative z-10">
         {/* Left Column (Main App + Content) */}
         <div className="flex-1 max-w-3xl mx-auto w-full">
+          <Breadcrumbs 
+            category={{id: category, name: activeCategory.name}} 
+            unitFrom={{name: activeFromUnit?.name || ''}} 
+            unitTo={{name: activeToUnit?.name || ''}} 
+            isSpecificConverter={isSpecificConverter} 
+          />
           <div className="text-center mb-10">
             {category === 'time_zone' ? (
               <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-5xl font-semibold tracking-tight mb-4 text-neutral-900 dark:text-white">
