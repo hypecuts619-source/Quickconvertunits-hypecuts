@@ -78,7 +78,7 @@ export const categorySeoContent: Record<string, string> = {
     <h3>What's the difference between Celsius and Fahrenheit?</h3>
     <p>Celsius is based on the freezing (0°) and boiling (100°) points of water. Fahrenheit uses different reference points with water freezing at 32° and boiling at 212°.</p>
   `,
-  mass: `
+  weight: `
     <h2>About Weight and Mass Conversion</h2>
     <p>Weight conversion is essential for shipping, cooking, health tracking, and scientific experiments. It involves converting between units like kilograms, pounds, grams, and ounces.</p>
     <p><strong>Metric Units</strong> like grams and kilograms are the standard for scientific work and most global commerce.</p>

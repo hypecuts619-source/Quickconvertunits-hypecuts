@@ -83,7 +83,7 @@ const FORMULAS = [
     title: "Kilograms → Pounds",
     code: "lb = kg × 2.20462",
     note: "1 kg ≈ 2.205 pounds",
-    link: { cat: "mass", from: "kilogram", to: "pound" },
+    link: { cat: "weight", from: "kilogram", to: "pound" },
   },
   {
     title: "Meters → Feet",
@@ -299,6 +299,39 @@ export default function App() {
   useEffect(() => {
     trackPageView(location.pathname + location.search);
   }, [location]);
+
+  // Sync state with URL params
+  useEffect(() => {
+    if (conversion) {
+      if (conversion === "time-zone-converter") {
+        setCategory("time_zone");
+        return;
+      }
+      if (conversion.endsWith("-converter")) {
+        const potentialCat = conversion.replace("-converter", "").replace(/-/g, "_");
+        const foundCat = categories.find(c => c.id === potentialCat);
+        if (foundCat) {
+          setCategory(foundCat.id);
+          setUnitFrom(foundCat.units[0]?.id || "");
+          setUnitTo(foundCat.units[1]?.id || foundCat.units[0]?.id || "");
+          return;
+        }
+      }
+      const parts = getUnitIdsFromPath(conversion);
+      if (parts.length === 2) {
+        for (const cat of categories) {
+          const u1 = cat.units.find(u => u.id === parts[0].toLowerCase());
+          const u2 = cat.units.find(u => u.id === parts[1].toLowerCase());
+          if (u1 && u2) {
+            setCategory(cat.id);
+            setUnitFrom(u1.id);
+            setUnitTo(u2.id);
+            return;
+          }
+        }
+      }
+    }
+  }, [conversion]);
 
   // RTL Support check
   useEffect(() => {
@@ -665,9 +698,9 @@ export default function App() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleSwap, handleCopy]);
 
-  const activeCategory = categories.find((c) => c.id === category)!;
-  const activeFromUnit = activeCategory.units.find((u) => u.id === unitFrom);
-  const activeToUnit = activeCategory.units.find((u) => u.id === unitTo);
+  const activeCategory = categories.find((c) => c.id === category) || categories[0];
+  const activeFromUnit = activeCategory.units.find((u) => u.id === unitFrom) || activeCategory.units[0];
+  const activeToUnit = activeCategory.units.find((u) => u.id === unitTo) || activeCategory.units[1] || activeCategory.units[0];
 
   const isFavorited = useMemo(() => {
     return favorites.some(
@@ -716,6 +749,19 @@ export default function App() {
   let ogTitleStr = "";
   let schema: any[] = [];
 
+  const getFAQsFromHtml = (html: string) => {
+    const faqs: { question: string; answer: string }[] = [];
+    const h3Regex = /<h3>(.*?)<\/h3>\s*<p>(.*?)<\/p>/gs;
+    let match;
+    while ((match = h3Regex.exec(html)) !== null) {
+      faqs.push({
+        question: match[1].replace(/<[^>]+>/g, '').trim(),
+        answer: match[2].replace(/<[^>]+>/g, '').trim(),
+      });
+    }
+    return faqs;
+  };
+
   if (category === 'time_zone') {
     titleStr = 'Time Zone Converter: Convert UTC, EST, PST, CET | QuickConvert';
     metaDescStr = 'Instantly convert between time zones to schedule global meetings easily. Supports UTC, EST, PST, standard and daylight time conversions.';
@@ -732,11 +778,21 @@ export default function App() {
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     }];
   } else if (activeFromUnit && activeToUnit) {
+    let customFAQs: { question: string; answer: string }[] = [];
+    const pluralFrom = activeFromUnit.name.endsWith('s') ? activeFromUnit.name : `${activeFromUnit.name}s`;
+    const pluralTo = activeToUnit.name.endsWith('s') ? activeToUnit.name : `${activeToUnit.name}s`;
+    
     if (isHomepage) {
       titleStr = "Quick Unit Converter | Free Online Translation Tool for Measurements";
       metaDescStr = "Instantly convert units like meters to feet, kg to lbs, or cups to grams. Fast, accurate, no ads interrupting. Try now—no sign-up needed.";
       canonicalUrlStr = "https://quickconvertunits.com/";
       ogTitleStr = titleStr;
+      customFAQs = [
+        { question: "Is this unit converter free?", answer: "Yes, QuickConvert is 100% free to use. There are no registration requirements and no limits on the number of conversions you can perform." },
+        { question: "How accurate are the results?", answer: "Our calculator uses industry-standard conversion factors and provides results accurate up to 6 decimal places for most measurements." },
+        { question: "Does it work on mobile devices?", answer: "Yes, the website is fully responsive and works perfectly on smartphones, tablets, and desktop computers." },
+        { question: "Do I need an internet connection?", answer: "Once the page is loaded, the core conversion engine works offline in your browser, making it extremely fast and accessible anywhere." }
+      ];
     } else if (isCategoryPage) {
       const catName = activeCategory.name;
       const topUnits = `${activeCategory.units[0].name}s to ${activeCategory.units[1].name}s, ${activeCategory.units[2]?.name || ''}s`.replace(/ss/g, 's').replace(/, s/g, '');
@@ -744,6 +800,8 @@ export default function App() {
       
       let seoSnippet = "";
       const content = categorySeoContent[category] || "";
+      customFAQs = getFAQsFromHtml(content);
+
       const pMatch = content.match(/<p>(.*?)<\/p>/);
       if (pMatch) {
         seoSnippet = pMatch[1].replace(/<[^>]+>/g, ' ').trim();
@@ -771,12 +829,10 @@ export default function App() {
       const symbolToPath = getSEOUrlPath(unitFrom, unitTo);
       const customSeo = customSeoData[symbolToPath];
 
-      const pluralFrom = activeFromUnit.name.endsWith('s') ? activeFromUnit.name : `${activeFromUnit.name}s`;
-      const pluralTo = activeToUnit.name.endsWith('s') ? activeToUnit.name : `${activeToUnit.name}s`;
-
       if (customSeo) {
         titleStr = customSeo.title;
         metaDescStr = customSeo.description;
+        customFAQs = getFAQsFromHtml(customSeo.content);
       } else {
         const symFrom = activeFromUnit.symbol;
         const symTo = activeToUnit.symbol;
@@ -787,6 +843,7 @@ export default function App() {
       canonicalUrlStr = `https://quickconvertunits.com/${getSEOUrlPath(unitFrom, unitTo)}`;
       ogTitleStr = titleStr;
     }
+
 
     schema = [
       {
@@ -802,9 +859,6 @@ export default function App() {
     ];
 
     if (isSpecificConverter && activeFromUnit && activeToUnit && category !== 'time_zone') {
-      const conversionFactor = convert(1, unitFrom, unitTo, category);
-      const formattedFactor = parseFloat(conversionFactor.toFixed(6));
-      
       schema.push({
         "@context": "https://schema.org",
         "@type": "Action",
@@ -813,10 +867,25 @@ export default function App() {
         toUnit: activeToUnit.name,
         value: valFrom || "1"
       });
-      
-      const fUnitName = t(`units.${activeFromUnit.id}`, activeFromUnit.name);
-      const tUnitName = t(`units.${activeToUnit.id}`, activeToUnit.name);
+    }
 
+    if (customFAQs.length > 0) {
+      schema.push({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: customFAQs.map(faq => ({
+          "@type": "Question",
+          name: faq.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: faq.answer
+          }
+        }))
+      });
+    } else if (isSpecificConverter && activeFromUnit && activeToUnit && category !== 'time_zone') {
+      const conversionFactor = convert(1, unitFrom, unitTo, category);
+      // ... (rest of the system generated FAQs if needed, but let's keep it simple and clean)
+      // I will keep the generated ones as fallback
       const formatNum = (num: number) => {
         if (Number.isNaN(num)) return "0";
         const str = Number.isInteger(num) ? num.toString() : parseFloat(num.toFixed(6)).toString();
@@ -824,22 +893,9 @@ export default function App() {
         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         return parts.join(".");
       };
-
-      const q1 = t("seoFaq1Q", "How many {{toUnit}} are in 1 {{fromUnit}}?", { toUnit: tUnitName, fromUnit: fUnitName });
-      const a1 = t("seoFaq1A", "1 {{fromUnit}} equals exactly {{result}} {{toUnit}}.", { result: formatNum(conversionFactor), toUnit: tUnitName, fromUnit: fUnitName });
-
-      const q2 = t("seoFaq2Q", "Is 1 {{fromUnit}} more than 1 {{toUnit}}?", { fromUnit: fUnitName, toUnit: tUnitName });
-      const a2 = conversionFactor > 1 
-        ? `Yes, 1 ${fUnitName} is ${formatNum(conversionFactor)} times more than 1 ${tUnitName}.` 
-        : `No, 1 ${fUnitName} is less than 1 ${tUnitName}.`;
-
-      const q3 = t("seoFaq3Q", "How do you convert {{fromUnit}} to {{toUnit}} in your head?", { fromUnit: fUnitName, toUnit: tUnitName });
-      let a3 = "";
-      if (category === 'mass' && activeFromUnit.id === 'kilogram' && activeToUnit.id === 'pound') {
-        a3 = "A quick approximation is to double the kg value and add 10%. For example, 50 kg ≈ 50×2 + 5 = 105 lbs (actual: 110.23).";
-      } else {
-        a3 = `To roughly calculate it in your head, you can multiply the ${fUnitName} value by approximately ${formatNum(Math.round(conversionFactor * 10) / 10)}.`;
-      }
+      
+      const fUnitName = t(`units.${activeFromUnit.id}`, activeFromUnit.name);
+      const tUnitName = t(`units.${activeToUnit.id}`, activeToUnit.name);
 
       schema.push({
         "@context": "https://schema.org",
@@ -847,31 +903,26 @@ export default function App() {
         mainEntity: [
           {
             "@type": "Question",
-            name: q1,
+            name: t("seoFaq1Q", "How many {{toUnit}} are in 1 {{fromUnit}}?", { toUnit: tUnitName, fromUnit: fUnitName }),
             acceptedAnswer: {
               "@type": "Answer",
-              text: a1,
-            },
+              text: t("seoFaq1A", "1 {{fromUnit}} equals exactly {{result}} {{toUnit}}.", { result: formatNum(conversionFactor), toUnit: tUnitName, fromUnit: fUnitName })
+            }
           },
           {
             "@type": "Question",
-            name: q2,
+            name: t("seoFaq2Q", "Is 1 {{fromUnit}} more than 1 {{toUnit}}?", { fromUnit: fUnitName, toUnit: tUnitName }),
             acceptedAnswer: {
               "@type": "Answer",
-              text: a2,
-            },
-          },
-          {
-            "@type": "Question",
-            name: q3,
-            acceptedAnswer: {
-              "@type": "Answer",
-              text: a3,
-            },
-          },
-        ],
+              text: conversionFactor > 1 
+                ? `Yes, 1 ${fUnitName} is ${formatNum(conversionFactor)} times more than 1 ${tUnitName}.` 
+                : `No, 1 ${fUnitName} is less than 1 ${tUnitName}.`
+            }
+          }
+        ]
       });
     }
+
   }
 
   // Handle auto-routing logic that was in useEffect safely
@@ -879,20 +930,25 @@ export default function App() {
     if (category === 'time_zone' && location.pathname !== '/time-zone-converter') {
       navigate('/time-zone-converter', { replace: true });
     } else if (category !== 'time_zone' && activeFromUnit && activeToUnit) {
+      const targetPath = `/${getSEOUrlPath(unitFrom, unitTo)}${valFrom && valFrom !== "1" ? `?val=${valFrom}` : ""}`;
+      const currentFullPath = location.pathname + location.search;
+      
       if (isHomepage) {
          const defaultFrom = activeCategory.units[0]?.id;
          const defaultTo = activeCategory.units[1]?.id || defaultFrom;
-         if (unitFrom !== defaultFrom || unitTo !== defaultTo) {
-           navigate(`/${getSEOUrlPath(unitFrom, unitTo)}${valFrom && valFrom !== "1" ? `?val=${valFrom}` : ""}`);
+         if ((unitFrom !== defaultFrom || unitTo !== defaultTo) && currentFullPath !== targetPath) {
+           navigate(targetPath);
          }
       } else if (isCategoryPage) {
          const defaultFrom = activeCategory.units[0]?.id;
          const defaultTo = activeCategory.units[1]?.id || defaultFrom;
-         if (unitFrom !== defaultFrom || unitTo !== defaultTo) {
-           navigate(`/${getSEOUrlPath(unitFrom, unitTo)}${valFrom && valFrom !== "1" ? `?val=${valFrom}` : ""}`, { replace: true });
+         if ((unitFrom !== defaultFrom || unitTo !== defaultTo) && currentFullPath !== targetPath) {
+           navigate(targetPath, { replace: true });
          }
       } else {
-         navigate(`/${getSEOUrlPath(unitFrom, unitTo)}${valFrom && valFrom !== "1" ? `?val=${valFrom}` : ""}`, { replace: true });
+         if (currentFullPath !== targetPath) {
+           navigate(targetPath, { replace: true });
+         }
       }
     }
   }, [category, unitFrom, unitTo, valFrom]); // Minimal dependencies to just handle routing
@@ -2190,8 +2246,29 @@ export default function App() {
                   <Link to="/est-to-utc" className="text-primary-600 dark:text-primary-400 hover:underline">EST to UTC</Link> | 
                   <Link to="/pst-to-est" className="text-primary-600 dark:text-primary-400 hover:underline">PST to EST</Link>
                 </div>
+
+                <h2 className="mb-4 mt-12 text-2xl font-semibold tracking-tight">Frequently Asked Questions</h2>
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-medium mb-1">Is this unit converter free?</h3>
+                    <p className="font-light text-neutral-600 dark:text-neutral-400">Yes, QuickConvert is 100% free to use. There are no registration requirements and no limits on the number of conversions you can perform.</p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium mb-1">How accurate are the results?</h3>
+                    <p className="font-light text-neutral-600 dark:text-neutral-400">Our calculator uses industry-standard conversion factors and provides results accurate up to 6 decimal places for most measurements.</p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium mb-1">Does it work on mobile devices?</h3>
+                    <p className="font-light text-neutral-600 dark:text-neutral-400">Yes, the website is fully responsive and works perfectly on smartphones, tablets, and desktop computers.</p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium mb-1">Do I need an internet connection?</h3>
+                    <p className="font-light text-neutral-600 dark:text-neutral-400">Once the page is loaded, the core conversion engine works offline in your browser, making it extremely fast and accessible anywhere.</p>
+                  </div>
+                </div>
               </div>
             )}
+
           </section>
 
           {/* SEO Optional Content area placeholder */}

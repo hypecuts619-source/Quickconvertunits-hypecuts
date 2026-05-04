@@ -154,7 +154,7 @@ export function SeoContent({
             {t("seoFaq3Q", "How do you convert {{fromUnit}} to {{toUnit}} in your head?", { fromUnit: fUnitName, toUnit: tUnitName })}
           </h3>
           <p className="mt-1">
-            {category === 'mass' && fUnit.id === 'kilogram' && tUnit.id === 'pound' 
+            {category === 'weight' && fUnit.id === 'kilogram' && tUnit.id === 'pound' 
               ? "A quick approximation is to double the kg value and add 10%. For example, 50 kg ≈ 50×2 + 5 = 105 lbs (actual: 110.23)." 
               : `To roughly calculate it in your head, you can multiply the ${fUnitName} value by approximately ${formatNum(Math.round(convFactor * 10) / 10)}.`}
           </p>
