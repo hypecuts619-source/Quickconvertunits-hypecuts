@@ -11,6 +11,10 @@ interface State {
 }
 
 export class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+  }
+
   public state: State = {
     hasError: false,
     error: null
@@ -25,8 +29,9 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public render() {
+    const props = (this as any).props;
     if (this.state.hasError) {
-      return this.props.fallback || (
+      return props.fallback || (
         <div className="p-10 text-center text-red-500">
           <h1>Something went wrong.</h1>
           <pre>{this.state.error?.message}</pre>
@@ -34,6 +39,6 @@ export class ErrorBoundary extends Component<Props, State> {
       );
     }
 
-    return this.props.children;
+    return props.children;
   }
 }

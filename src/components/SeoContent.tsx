@@ -2,6 +2,7 @@ import React from 'react';
 import { convert, getSEOUrlPath } from '../lib/units';
 import { useTranslation } from 'react-i18next';
 import { categorySeoContent } from '../lib/seoContent';
+import { customSeoData } from '../lib/customSeoData';
 import { Link } from 'react-router-dom';
 
 export function SeoContent({ 
@@ -16,6 +17,40 @@ export function SeoContent({
 
   if (!fUnit || !tUnit || fUnit.id === tUnit.id) return null;
 
+  const urlPath = getSEOUrlPath(unitFrom, unitTo);
+  const customContent = customSeoData[urlPath];
+
+  if (customContent) {
+    return (
+      <div className="prose prose-neutral dark:prose-invert max-w-none mb-10 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-2xl prose-h3:text-lg prose-p:font-light prose-p:leading-relaxed prose-p:text-neutral-600 dark:prose-p:text-neutral-400">
+        <div dangerouslySetInnerHTML={{ __html: customContent.content }} />
+        
+        {cat && cat.units.length > 2 && (
+          <div className="mt-10 pt-8 border-t border-neutral-100 dark:border-neutral-800">
+            <h2 className="mt-0">{t("seoRelated", "Related Converters")}</h2>
+            <ul className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              <li>
+                <Link to={`/${getSEOUrlPath(unitTo, unitFrom)}`} className="text-primary-600 dark:text-primary-400 hover:underline">
+                  {t(`units.${tUnit.id}`, tUnit.name)} to {t(`units.${fUnit.id}`, fUnit.name)}
+                </Link>
+              </li>
+              {cat.units
+                .filter((u: any) => u.id !== unitFrom && u.id !== unitTo)
+                .slice(0, 5)
+                .map((u: any) => (
+                  <li key={u.id}>
+                    <Link to={`/${getSEOUrlPath(unitFrom, u.id)}`} className="text-primary-600 dark:text-primary-400 hover:underline">
+                      {t(`units.${fUnit.id}`, fUnit.name)} to {t(`units.${u.id}`, u.name)}
+                    </Link>
+                  </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   const convFactor = convert(1, unitFrom, unitTo, category);
   const formatNum = (num: number) => {
     if (Number.isNaN(num)) return "0";
@@ -27,8 +62,8 @@ export function SeoContent({
 
   const commonValues = [1, 2, 3, 4, 5, 10, 20, 50, 100, 500, 1000];
   
-  const fUnitName = t(`units.${fUnit.id}`, fUnit.name);
-  const tUnitName = t(`units.${tUnit.id}`, tUnit.name);
+  const fUnitName = String(t(`units.${fUnit.id}`, fUnit.name));
+  const tUnitName = String(t(`units.${tUnit.id}`, tUnit.name));
   const catName = cat ? String(t(`categories.${cat.id}`, cat.name)).toLowerCase() : 'measurement';
 
   const catSeoHtml = categorySeoContent[category];

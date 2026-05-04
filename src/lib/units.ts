@@ -459,41 +459,145 @@ export function formatNumber(num: number): string {
 }
 
 export const getSEOUrlPath = (fromId: string, toId: string) => {
-  if (fromId === 'time_zone') return 'time-zone-converter';
-  if (fromId === 'kilogram' && toId === 'pound') return 'kg-to-lbs';
+  if (fromId === 'meter' && toId === 'foot') return 'meters-to-feet';
+  if (fromId === 'foot' && toId === 'meter') return 'feet-to-meters';
+  if (fromId === 'kilometer' && toId === 'mile') return 'km-to-miles';
+  if (fromId === 'mile' && toId === 'kilometer') return 'miles-to-km';
   if (fromId === 'inch' && toId === 'centimeter') return 'inches-to-cm';
   if (fromId === 'centimeter' && toId === 'inch') return 'cm-to-inches';
-  if (fromId === 'pound' && toId === 'kilogram') return 'lbs-to-kg';
-  if (fromId === 'foot' && toId === 'meter') return 'feet-to-meters';
-  if (fromId === 'mile' && toId === 'kilometer') return 'miles-to-km';
   if (fromId === 'millimeter' && toId === 'inch') return 'mm-to-inches';
+
+  if (fromId === 'kilogram' && toId === 'pound') return 'kg-to-lbs';
+  if (fromId === 'pound' && toId === 'kilogram') return 'lbs-to-kg';
+  if (fromId === 'gram' && toId === 'ounce') return 'grams-to-ounces';
+  if (fromId === 'ounce' && toId === 'gram') return 'ounces-to-grams';
+  if (fromId === 'metric_ton' && toId === 'pound') return 'tons-to-pounds';
   
-  if (fromId === 'usd' && toId === 'inr') return 'usd-to-inr';
-  if (fromId === 'mile_per_hour' && toId === 'kilometer_per_hour') return 'mph-to-kph';
-  if (fromId === 'liter' && toId === 'us_gallon') return 'liters-to-gallons';
-  if (fromId === 'acre' && toId === 'square_meter') return 'acres-to-square-meters';
-  if (fromId === 'square_foot' && toId === 'square_meter') return 'square-feet-to-square-meters';
   if (fromId === 'celsius' && toId === 'fahrenheit') return 'celsius-to-fahrenheit';
   if (fromId === 'fahrenheit' && toId === 'celsius') return 'fahrenheit-to-celsius';
+  if (fromId === 'celsius' && toId === 'kelvin') return 'celsius-to-kelvin';
+  if (fromId === 'kelvin' && toId === 'celsius') return 'kelvin-to-celsius';
+  
+  if (fromId === 'liter' && toId === 'us_gallon') return 'liters-to-gallons';
+  if (fromId === 'us_gallon' && toId === 'liter') return 'gallons-to-liters';
+  if (fromId === 'us_cup' && toId === 'milliliter') return 'cups-to-ml';
+  if (fromId === 'milliliter' && toId === 'us_cup') return 'ml-to-cups';
+  if (fromId === 'us_fluid_ounce' && toId === 'milliliter') return 'fl-oz-to-ml';
+  
+  if (fromId === 'mile_per_hour' && toId === 'kilometer_per_hour') return 'mph-to-kph';
+  if (fromId === 'kilometer_per_hour' && toId === 'mile_per_hour') return 'kph-to-mph';
+  if (fromId === 'knot' && toId === 'mile_per_hour') return 'knots-to-mph';
+  if (fromId === 'meter_per_second' && toId === 'kilometer_per_hour') return 'meters-per-second-to-kph';
+
+  if (fromId === 'acre' && toId === 'square_meter') return 'acres-to-square-meters';
+  if (fromId === 'square_meter' && toId === 'acre') return 'square-meters-to-acres';
+  if (fromId === 'square_foot' && toId === 'square_meter') return 'square-feet-to-square-meters';
+  if (fromId === 'hectare' && toId === 'acre') return 'hectares-to-acres';
+  if (fromId === 'acre' && toId === 'hectare') return 'acres-to-hectares';
+
+  if (fromId === 'hour' && toId === 'minute') return 'hours-to-minutes';
+  if (fromId === 'minute' && toId === 'second') return 'minutes-to-seconds';
+  if (fromId === 'day' && toId === 'hour') return 'days-to-hours';
+  if (fromId === 'week' && toId === 'day') return 'weeks-to-days';
+
+  if (fromId === 'megabyte' && toId === 'gigabyte') return 'mb-to-gb';
+  if (fromId === 'gigabyte' && toId === 'terabyte') return 'gb-to-tb';
+  if (fromId === 'bit' && toId === 'byte') return 'bits-to-bytes';
+
+  if (fromId === 'miles_per_gallon' && toId === 'km_per_liter') return 'mpg-to-kml';
+  if (fromId === 'km_per_liter' && toId === 'miles_per_gallon') return 'kml-to-mpg';
+
+  if (fromId === 'joule' && toId === 'gram_calorie') return 'joules-to-calories';
+  if (fromId === 'gram_calorie' && toId === 'joule') return 'calories-to-joules';
+  if (fromId === 'kilowatt_hour' && toId === 'joule') return 'kwh-to-joules';
+
+  if (fromId === 'bar' && toId === 'psi') return 'bar-to-psi';
+  if (fromId === 'psi' && toId === 'bar') return 'psi-to-bar';
+  if (fromId === 'atmosphere' && toId === 'psi') return 'atmospheres-to-psi';
+
+  if (fromId === 'degree' && toId === 'radian') return 'degrees-to-radians';
+  if (fromId === 'radian' && toId === 'degree') return 'radians-to-degrees';
+
+  if (fromId === 'usd' && toId === 'eur') return 'usd-to-eur';
+  if (fromId === 'eur' && toId === 'usd') return 'eur-to-usd';
+  if (fromId === 'usd' && toId === 'gbp') return 'usd-to-gbp';
+  if (fromId === 'gbp' && toId === 'usd') return 'gbp-to-usd';
+  if (fromId === 'usd' && toId === 'inr') return 'usd-to-inr';
+
+  if (fromId === 'est' && toId === 'utc') return 'est-to-utc';
+  if (fromId === 'pst' && toId === 'est') return 'pst-to-est';
+  
   return `${fromId}-to-${toId}`;
 };
 
 export const getUnitIdsFromPath = (path: string) => {
   if (path === 'time-zone-converter') return ['time_zone', 'time_zone'];
-  if (path === 'kg-to-lbs') return ['kilogram', 'pound'];
+  if (path === 'est-to-utc' || path === 'pst-to-est') return ['time_zone', 'time_zone'];
+  
+  if (path === 'meters-to-feet') return ['meter', 'foot'];
+  if (path === 'feet-to-meters') return ['foot', 'meter'];
+  if (path === 'km-to-miles') return ['kilometer', 'mile'];
+  if (path === 'miles-to-km') return ['mile', 'kilometer'];
   if (path === 'inches-to-cm') return ['inch', 'centimeter'];
   if (path === 'cm-to-inches') return ['centimeter', 'inch'];
-  if (path === 'lbs-to-kg') return ['pound', 'kilogram'];
-  if (path === 'feet-to-meters') return ['foot', 'meter'];
-  if (path === 'miles-to-km') return ['mile', 'kilometer'];
   if (path === 'mm-to-inches') return ['millimeter', 'inch'];
-  
-  if (path === 'usd-to-inr') return ['usd', 'inr'];
-  if (path === 'mph-to-kph') return ['mile_per_hour', 'kilometer_per_hour'];
-  if (path === 'liters-to-gallons') return ['liter', 'us_gallon'];
-  if (path === 'acres-to-square-meters') return ['acre', 'square_meter'];
-  if (path === 'square-feet-to-square-meters') return ['square_foot', 'square_meter'];
+
+  if (path === 'kg-to-lbs') return ['kilogram', 'pound'];
+  if (path === 'lbs-to-kg') return ['pound', 'kilogram'];
+  if (path === 'grams-to-ounces') return ['gram', 'ounce'];
+  if (path === 'ounces-to-grams') return ['ounce', 'gram'];
+  if (path === 'tons-to-pounds') return ['metric_ton', 'pound'];
+
   if (path === 'celsius-to-fahrenheit') return ['celsius', 'fahrenheit'];
   if (path === 'fahrenheit-to-celsius') return ['fahrenheit', 'celsius'];
+  if (path === 'celsius-to-kelvin') return ['celsius', 'kelvin'];
+  if (path === 'kelvin-to-celsius') return ['kelvin', 'celsius'];
+
+  if (path === 'liters-to-gallons') return ['liter', 'us_gallon'];
+  if (path === 'gallons-to-liters') return ['us_gallon', 'liter'];
+  if (path === 'cups-to-ml') return ['us_cup', 'milliliter'];
+  if (path === 'ml-to-cups') return ['milliliter', 'us_cup'];
+  if (path === 'fl-oz-to-ml') return ['us_fluid_ounce', 'milliliter'];
+
+  if (path === 'mph-to-kph') return ['mile_per_hour', 'kilometer_per_hour'];
+  if (path === 'kph-to-mph') return ['kilometer_per_hour', 'mile_per_hour'];
+  if (path === 'knots-to-mph') return ['knot', 'mile_per_hour'];
+  if (path === 'meters-per-second-to-kph') return ['meter_per_second', 'kilometer_per_hour'];
+
+  if (path === 'acres-to-square-meters') return ['acre', 'square_meter'];
+  if (path === 'square-meters-to-acres') return ['square_meter', 'acre'];
+  if (path === 'square-feet-to-square-meters') return ['square_foot', 'square_meter'];
+  if (path === 'hectares-to-acres') return ['hectare', 'acre'];
+  if (path === 'acres-to-hectares') return ['acre', 'hectare'];
+
+  if (path === 'hours-to-minutes') return ['hour', 'minute'];
+  if (path === 'minutes-to-seconds') return ['minute', 'second'];
+  if (path === 'days-to-hours') return ['day', 'hour'];
+  if (path === 'weeks-to-days') return ['week', 'day'];
+
+  if (path === 'mb-to-gb') return ['megabyte', 'gigabyte'];
+  if (path === 'gb-to-tb') return ['gigabyte', 'terabyte'];
+  if (path === 'bits-to-bytes') return ['bit', 'byte'];
+
+  if (path === 'mpg-to-kml') return ['miles_per_gallon', 'km_per_liter'];
+  if (path === 'kml-to-mpg') return ['km_per_liter', 'miles_per_gallon'];
+
+  if (path === 'joules-to-calories') return ['joule', 'gram_calorie'];
+  if (path === 'calories-to-joules') return ['gram_calorie', 'joule'];
+  if (path === 'kwh-to-joules') return ['kilowatt_hour', 'joule'];
+
+  if (path === 'bar-to-psi') return ['bar', 'psi'];
+  if (path === 'psi-to-bar') return ['psi', 'bar'];
+  if (path === 'atmospheres-to-psi') return ['atmosphere', 'psi'];
+
+  if (path === 'degrees-to-radians') return ['degree', 'radian'];
+  if (path === 'radians-to-degrees') return ['radian', 'degree'];
+
+  if (path === 'usd-to-eur') return ['usd', 'eur'];
+  if (path === 'eur-to-usd') return ['eur', 'usd'];
+  if (path === 'usd-to-gbp') return ['usd', 'gbp'];
+  if (path === 'gbp-to-usd') return ['gbp', 'usd'];
+  if (path === 'usd-to-inr') return ['usd', 'inr'];
+
   return path.split('-to-');
 };

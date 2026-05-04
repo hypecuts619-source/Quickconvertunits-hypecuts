@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef, lazy, Suspense } from "react";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { getSuggestions, convert, categories, formatNumber, getSEOUrlPath, getUnitIdsFromPath } from "./lib/units";
 import { categorySeoContent } from "./lib/seoContent";
+import { customSeoData } from "./lib/customSeoData";
 import { trackConversionEvent, trackFunnelStep, trackPageView } from "./lib/analytics";
 import { SeoContent } from "./components/SeoContent";
 import { LanguageSelector } from "./components/LanguageSelector";
@@ -725,9 +726,10 @@ export default function App() {
       "@type": "WebApplication",
       name: titleStr,
       url: canonicalUrlStr,
-      applicationCategory: "UtilityApplications",
-      operatingSystem: "All",
+      applicationCategory: "UtilitiesApplication",
+      operatingSystem: "Any",
       description: metaDescStr,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     }];
   } else if (activeFromUnit && activeToUnit) {
     if (isHomepage) {
@@ -766,13 +768,22 @@ export default function App() {
       ogTitleStr = titleStr;
     } else {
       const valPrefix = valFrom && valFrom !== "1" && valFrom !== "0" ? `${valFrom} ` : "";
+      const symbolToPath = getSEOUrlPath(unitFrom, unitTo);
+      const customSeo = customSeoData[symbolToPath];
+
       const pluralFrom = activeFromUnit.name.endsWith('s') ? activeFromUnit.name : `${activeFromUnit.name}s`;
       const pluralTo = activeToUnit.name.endsWith('s') ? activeToUnit.name : `${activeToUnit.name}s`;
-      const symFrom = activeFromUnit.symbol;
-      const symTo = activeToUnit.symbol;
-      
-      titleStr = `${valPrefix}${pluralFrom} to ${pluralTo} (${symFrom} to ${symTo}) Converter - Free Tool`;
-      metaDescStr = `Convert ${valPrefix}${pluralFrom.toLowerCase()} to ${pluralTo.toLowerCase()} instantly. 1 ${symFrom} = ${convert(1, unitFrom, unitTo, category).toPrecision(6)} ${symTo}. Free calculator with conversion table, formula, and examples. Fast and accurate.`;
+
+      if (customSeo) {
+        titleStr = customSeo.title;
+        metaDescStr = customSeo.description;
+      } else {
+        const symFrom = activeFromUnit.symbol;
+        const symTo = activeToUnit.symbol;
+        
+        titleStr = `${valPrefix}${pluralFrom} to ${pluralTo} (${symFrom} to ${symTo}) Converter - Free Tool`;
+        metaDescStr = `Convert ${valPrefix}${pluralFrom.toLowerCase()} to ${pluralTo.toLowerCase()} instantly. 1 ${symFrom} = ${convert(1, unitFrom, unitTo, category).toPrecision(6)} ${symTo}. Free calculator with conversion table, formula, and examples. Fast and accurate.`;
+      }
       canonicalUrlStr = `https://quickconvertunits.com/${getSEOUrlPath(unitFrom, unitTo)}`;
       ogTitleStr = titleStr;
     }
@@ -781,10 +792,10 @@ export default function App() {
       {
         "@context": "https://schema.org",
         "@type": "WebApplication",
-        name: `${titleStr} - QuickConvert`,
+        name: isSpecificConverter ? `${pluralFrom} to ${pluralTo} Converter` : `${titleStr}`,
         url: canonicalUrlStr,
-        applicationCategory: "UtilityApplications",
-        operatingSystem: "All",
+        applicationCategory: "UtilitiesApplication",
+        operatingSystem: "Any",
         description: metaDescStr,
         offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       }
@@ -2037,6 +2048,150 @@ export default function App() {
                 }, 10);
               }} 
             />
+
+            {isHomepage && (
+              <div className="mt-16 bg-white dark:bg-[#111111] rounded-3xl p-8 md:p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-neutral-100 dark:border-neutral-800 prose prose-neutral dark:prose-invert max-w-none">
+                <h2 className="mb-4 text-2xl font-semibold tracking-tight">Why Use QuickConvert Units?</h2>
+                <p className="font-light text-neutral-600 dark:text-neutral-400">Our free online unit converter provides instant, accurate conversions across 14 measurement categories. Whether you're converting kilograms to pounds for international shipping, Celsius to Fahrenheit for travel weather, or cups to milliliters for cooking recipes, QuickConvert delivers precise results in real-time.</p>
+                
+                <h2 className="mb-4 mt-8 text-2xl font-semibold tracking-tight">Most Popular Conversions</h2>
+                <p className="font-light text-neutral-600 dark:text-neutral-400">Millions of people search for unit conversions every day:</p>
+                <ul className="font-light text-neutral-600 dark:text-neutral-400">
+                  <li><strong>Weight conversions</strong>: Convert kg to lbs, pounds to kilograms, grams to ounces</li>
+                  <li><strong>Temperature conversions</strong>: Celsius to Fahrenheit, Fahrenheit to Celsius, Kelvin conversions</li>
+                  <li><strong>Length conversions</strong>: Miles to kilometers, feet to meters, inches to centimeters</li>
+                  <li><strong>Volume conversions</strong>: Liters to gallons, cups to ml, tablespoons to teaspoons</li>
+                  <li><strong>Cooking conversions</strong>: Recipe measurements for baking and cooking</li>
+                </ul>
+                
+                <h2 className="mb-4 mt-8 text-2xl font-semibold tracking-tight">How to Use QuickConvert</h2>
+                <ol className="font-light text-neutral-600 dark:text-neutral-400 space-y-1">
+                  <li>Select your measurement category (length, weight, temperature, etc.)</li>
+                  <li>Choose the units you want to convert from and to</li>
+                  <li>Enter your value</li>
+                  <li>Get instant, accurate results with formulas and explanations</li>
+                </ol>
+                <p className="font-light text-neutral-600 dark:text-neutral-400">All conversions are free, work offline, and provide real-time calculations without page reloads.</p>
+                
+                <h2 className="mb-4 mt-10 text-2xl font-semibold tracking-tight">Conversion Categories</h2>
+                
+                <h3 className="text-xl font-medium mt-6 mb-2">Length & Distance</h3>
+                <p className="font-light text-neutral-600 dark:text-neutral-400">Convert units like meters, feet, kilometers, miles, inches, and smaller scientific units. Essential for travel, DIY projects, and reading international specifications.</p>
+                <div className="flex flex-wrap gap-2 text-sm mt-3">
+                  <Link to="/meters-to-feet" className="text-primary-600 dark:text-primary-400 hover:underline">Meters to Feet</Link> | 
+                  <Link to="/feet-to-meters" className="text-primary-600 dark:text-primary-400 hover:underline">Feet to Meters</Link> | 
+                  <Link to="/km-to-miles" className="text-primary-600 dark:text-primary-400 hover:underline">Kilometers to Miles</Link> | 
+                  <Link to="/miles-to-km" className="text-primary-600 dark:text-primary-400 hover:underline">Miles to Kilometers</Link> | 
+                  <Link to="/inches-to-cm" className="text-primary-600 dark:text-primary-400 hover:underline">Inches to CM</Link> | 
+                  <Link to="/cm-to-inches" className="text-primary-600 dark:text-primary-400 hover:underline">CM to Inches</Link>
+                </div>
+                
+                <h3 className="text-xl font-medium mt-8 mb-2">Weight & Mass</h3>
+                <p className="font-light text-neutral-600 dark:text-neutral-400">Easily calculate kg to lbs, completely removing the headache from checking baggage allowances. Support for ounces, grams, and stone makes cooking and health tracking much easier.</p>
+                <div className="flex flex-wrap gap-2 text-sm mt-3">
+                  <Link to="/kg-to-lbs" className="text-primary-600 dark:text-primary-400 hover:underline">Kg to Lbs</Link> | 
+                  <Link to="/lbs-to-kg" className="text-primary-600 dark:text-primary-400 hover:underline">Lbs to Kg</Link> | 
+                  <Link to="/grams-to-ounces" className="text-primary-600 dark:text-primary-400 hover:underline">Grams to Ounces</Link> | 
+                  <Link to="/ounces-to-grams" className="text-primary-600 dark:text-primary-400 hover:underline">Ounces to Grams</Link>
+                </div>
+                
+                <h3 className="text-xl font-medium mt-8 mb-2">Temperature</h3>
+                <p className="font-light text-neutral-600 dark:text-neutral-400">Cross-reference Celsius and Fahrenheit effortlessly. Whether you are traveling abroad or working on scientific tasks with Kelvin, our tool handles offset formulas properly.</p>
+                <div className="flex flex-wrap gap-2 text-sm mt-3">
+                  <Link to="/celsius-to-fahrenheit" className="text-primary-600 dark:text-primary-400 hover:underline">Celsius to Fahrenheit</Link> | 
+                  <Link to="/fahrenheit-to-celsius" className="text-primary-600 dark:text-primary-400 hover:underline">Fahrenheit to Celsius</Link> | 
+                  <Link to="/celsius-to-kelvin" className="text-primary-600 dark:text-primary-400 hover:underline">Celsius to Kelvin</Link>
+                </div>
+                
+                <h3 className="text-xl font-medium mt-8 mb-2">Volume</h3>
+                <p className="font-light text-neutral-600 dark:text-neutral-400">Convert cups to milliliters or gallons to liters instantly. Highly useful for adjusting global cooking recipes or checking fluid container volumes.</p>
+                <div className="flex flex-wrap gap-2 text-sm mt-3">
+                  <Link to="/liters-to-gallons" className="text-primary-600 dark:text-primary-400 hover:underline">Liters to Gallons</Link> | 
+                  <Link to="/gallons-to-liters" className="text-primary-600 dark:text-primary-400 hover:underline">Gallons to Liters</Link> | 
+                  <Link to="/cups-to-ml" className="text-primary-600 dark:text-primary-400 hover:underline">Cups to ML</Link> | 
+                  <Link to="/ml-to-cups" className="text-primary-600 dark:text-primary-400 hover:underline">ML to Cups</Link>
+                </div>
+
+                <h3 className="text-xl font-medium mt-8 mb-2">Speed</h3>
+                <p className="font-light text-neutral-600 dark:text-neutral-400">Check the speed limit accurately by converting kilometers per hour to miles per hour. Includes meters per second and knots for aviation or maritime use.</p>
+                <div className="flex flex-wrap gap-2 text-sm mt-3">
+                  <Link to="/mph-to-kph" className="text-primary-600 dark:text-primary-400 hover:underline">MPH to KPH</Link> | 
+                  <Link to="/kph-to-mph" className="text-primary-600 dark:text-primary-400 hover:underline">KPH to MPH</Link> | 
+                  <Link to="/knots-to-mph" className="text-primary-600 dark:text-primary-400 hover:underline">Knots to MPH</Link>
+                </div>
+                
+                <h3 className="text-xl font-medium mt-8 mb-2">Area</h3>
+                <p className="font-light text-neutral-600 dark:text-neutral-400">Quickly measure land and property sizes by switching between acres, hectares, square meters, and square feet. Invaluable for real estate and surveying.</p>
+                <div className="flex flex-wrap gap-2 text-sm mt-3">
+                  <Link to="/acres-to-square-meters" className="text-primary-600 dark:text-primary-400 hover:underline">Acres to Square Meters</Link> | 
+                  <Link to="/square-feet-to-square-meters" className="text-primary-600 dark:text-primary-400 hover:underline">Square Feet to Square Meters</Link> | 
+                  <Link to="/hectares-to-acres" className="text-primary-600 dark:text-primary-400 hover:underline">Hectares to Acres</Link>
+                </div>
+
+                <h3 className="text-xl font-medium mt-8 mb-2">Time</h3>
+                <p className="font-light text-neutral-600 dark:text-neutral-400">Convert between seconds, minutes, hours, days, and larger timeframes. Track durations logically across different time scales.</p>
+                <div className="flex flex-wrap gap-2 text-sm mt-3">
+                  <Link to="/hours-to-minutes" className="text-primary-600 dark:text-primary-400 hover:underline">Hours to Minutes</Link> | 
+                  <Link to="/minutes-to-seconds" className="text-primary-600 dark:text-primary-400 hover:underline">Minutes to Seconds</Link> | 
+                  <Link to="/days-to-hours" className="text-primary-600 dark:text-primary-400 hover:underline">Days to Hours</Link>
+                </div>
+                
+                <h3 className="text-xl font-medium mt-8 mb-2">Data Storage</h3>
+                <p className="font-light text-neutral-600 dark:text-neutral-400">Compare bytes, megabytes, gigabytes, and terabytes to know exactly how much file storage is necessary for your electronic devices.</p>
+                <div className="flex flex-wrap gap-2 text-sm mt-3">
+                  <Link to="/mb-to-gb" className="text-primary-600 dark:text-primary-400 hover:underline">MB to GB</Link> | 
+                  <Link to="/gb-to-tb" className="text-primary-600 dark:text-primary-400 hover:underline">GB to TB</Link> | 
+                  <Link to="/bits-to-bytes" className="text-primary-600 dark:text-primary-400 hover:underline">Bits to Bytes</Link>
+                </div>
+                
+                <h3 className="text-xl font-medium mt-8 mb-2">Fuel Economy</h3>
+                <p className="font-light text-neutral-600 dark:text-neutral-400">Measure your vehicle's efficiency by comparing miles per gallon (MPG) to liters per 100 kilometers. Helps you budget travel costs globally.</p>
+                <div className="flex flex-wrap gap-2 text-sm mt-3">
+                  <Link to="/mpg-to-kml" className="text-primary-600 dark:text-primary-400 hover:underline">MPG to KM/L</Link> | 
+                  <Link to="/kml-to-mpg" className="text-primary-600 dark:text-primary-400 hover:underline">KM/L to MPG</Link>
+                </div>
+
+                <h3 className="text-xl font-medium mt-8 mb-2">Energy</h3>
+                <p className="font-light text-neutral-600 dark:text-neutral-400">Determine energy values between Joules, calories, and kilowatt-hours. Perfect for utility bill math and physics problems.</p>
+                <div className="flex flex-wrap gap-2 text-sm mt-3">
+                  <Link to="/joules-to-calories" className="text-primary-600 dark:text-primary-400 hover:underline">Joules to Calories</Link> | 
+                  <Link to="/calories-to-joules" className="text-primary-600 dark:text-primary-400 hover:underline">Calories to Joules</Link> | 
+                  <Link to="/kwh-to-joules" className="text-primary-600 dark:text-primary-400 hover:underline">kWh to Joules</Link>
+                </div>
+
+                <h3 className="text-xl font-medium mt-8 mb-2">Pressure</h3>
+                <p className="font-light text-neutral-600 dark:text-neutral-400">Check tire pressure or atmospheric specs by converting bar to PSI, pascal, and atmospheres. Crucial for engineering and daily maintenance.</p>
+                <div className="flex flex-wrap gap-2 text-sm mt-3">
+                  <Link to="/bar-to-psi" className="text-primary-600 dark:text-primary-400 hover:underline">Bar to PSI</Link> | 
+                  <Link to="/psi-to-bar" className="text-primary-600 dark:text-primary-400 hover:underline">PSI to Bar</Link> | 
+                  <Link to="/atmospheres-to-psi" className="text-primary-600 dark:text-primary-400 hover:underline">Atmospheres to PSI</Link>
+                </div>
+
+                <h3 className="text-xl font-medium mt-8 mb-2">Angle</h3>
+                <p className="font-light text-neutral-600 dark:text-neutral-400">Switch between degrees and radians instantly. Very helpful for mathematics, geometry, and engineering graphics calculations.</p>
+                <div className="flex flex-wrap gap-2 text-sm mt-3">
+                  <Link to="/degrees-to-radians" className="text-primary-600 dark:text-primary-400 hover:underline">Degrees to Radians</Link> | 
+                  <Link to="/radians-to-degrees" className="text-primary-600 dark:text-primary-400 hover:underline">Radians to Degrees</Link>
+                </div>
+
+                <h3 className="text-xl font-medium mt-8 mb-2">Currency</h3>
+                <p className="font-light text-neutral-600 dark:text-neutral-400">Translate value between major world fiat currencies like USD, EUR, and GBP. Uses realistic exchange rate estimations for budgeting trips and international purchases.</p>
+                <div className="flex flex-wrap gap-2 text-sm mt-3">
+                  <Link to="/usd-to-eur" className="text-primary-600 dark:text-primary-400 hover:underline">USD to EUR</Link> | 
+                  <Link to="/eur-to-usd" className="text-primary-600 dark:text-primary-400 hover:underline">EUR to USD</Link> | 
+                  <Link to="/usd-to-gbp" className="text-primary-600 dark:text-primary-400 hover:underline">USD to GBP</Link> | 
+                  <Link to="/usd-to-inr" className="text-primary-600 dark:text-primary-400 hover:underline">USD to INR</Link>
+                </div>
+                
+                <h3 className="text-xl font-medium mt-8 mb-2">Time Zone</h3>
+                <p className="font-light text-neutral-600 dark:text-neutral-400">Sync global meetings appropriately. Translate local time into UTC, EST, PST, or CET directly considering standard daylight factors.</p>
+                <div className="flex flex-wrap gap-2 text-sm mt-3">
+                  <Link to="/time-zone-converter" className="text-primary-600 dark:text-primary-400 hover:underline">Time Zone Converter</Link> | 
+                  <Link to="/est-to-utc" className="text-primary-600 dark:text-primary-400 hover:underline">EST to UTC</Link> | 
+                  <Link to="/pst-to-est" className="text-primary-600 dark:text-primary-400 hover:underline">PST to EST</Link>
+                </div>
+              </div>
+            )}
           </section>
 
           {/* SEO Optional Content area placeholder */}
