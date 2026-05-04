@@ -232,7 +232,10 @@ function PwaPrompt() {
       e.preventDefault();
       // Stash the event so it can be triggered later.
       setDeferredPrompt(e);
-      setIsPromptReady(true);
+      // Wait 30 seconds before showing the prompt
+      setTimeout(() => {
+        setIsPromptReady(true);
+      }, 30000);
     });
 
     window.addEventListener('appinstalled', () => {
@@ -574,7 +577,7 @@ export default function App() {
     setUnitFrom(unitTo);
     setUnitTo(tempUnit);
 
-    // We also swap values conceptually, but let forward conversion auto-calculate based on valFrom
+    setValFrom(valTo);
   };
 
   const handleCopy = () => {
@@ -924,6 +927,17 @@ export default function App() {
       });
     }
 
+    if (isSpecificConverter && activeCategory && activeFromUnit && activeToUnit) {
+      schema.push({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quickconvertunits.com/" },
+          { "@type": "ListItem", "position": 2, "name": activeCategory.name, "item": `https://quickconvertunits.com/${activeCategory.id.replace(/_/g, '-')}-converter` },
+          { "@type": "ListItem", "position": 3, "name": `${activeFromUnit.name} to ${activeToUnit.name}`, "item": canonicalUrlStr }
+        ]
+      });
+    }
   }
 
   // Handle auto-routing logic that was in useEffect safely
@@ -1031,7 +1045,7 @@ export default function App() {
                       selectSuggestion(suggestions[0]);
                     }
                   }}
-                  className="w-full pl-9 pr-14 py-2 rounded-full bg-neutral-100 dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary-500/50 dark:focus:ring-primary-400/50 text-sm transition-shadow"
+                  className="w-full pl-9 pr-14 py-2 rounded-full bg-neutral-100 dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary-500/50 dark:focus:ring-primary-400/50 text-base md:text-sm transition-shadow"
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none">
                   <span className="text-[10px] font-medium text-neutral-400 px-1.5 py-0.5 rounded-md border border-neutral-200 dark:border-neutral-700 bg-white/50 dark:bg-neutral-900/50">⌘K</span>
@@ -1167,7 +1181,7 @@ export default function App() {
                 selectSuggestion(suggestions[0]);
               }
             }}
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-sm"
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-base md:text-sm"
           />
         </div>
         <AnimatePresence>
