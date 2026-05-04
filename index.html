@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <link rel="dns-prefetch" href="https://api.frankfurter.app" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" /></noscript>
     <title data-react-helmet="true">Quick Unit Converter | Free Online Tool</title>
     <meta data-react-helmet="true" name="description" content="Instantly convert units like meters to feet, kg to lbs, or cups to grams. Fast, accurate, no ads interrupting. Try now—no sign-up needed." />
     <meta name="keywords" content="unit converter, convert units, length conversion, weight converter, temperature conversion, currency converter" />
@@ -87,9 +92,12 @@
     </div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      // Defer loading heavy 3rd-party scripts to improve initial mobile performance
-      window.addEventListener('load', function() {
-        setTimeout(function() {
+      // Load heavy scripts only after user interaction or a timeout
+      (function() {
+        var loaded = false;
+        var loadScripts = function() {
+          if (loaded) return;
+          loaded = true;
           // AdSense
           var adsense = document.createElement('script');
           adsense.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7380090598384677';
@@ -106,8 +114,13 @@
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           gtag('config', 'G-Z7W1M7R0YB');
-        }, 1500); // Wait 1.5s after load to inject to prioritize interactive elements
-      });
+        };
+        
+        window.addEventListener('scroll', loadScripts, { passive: true, once: true });
+        window.addEventListener('mousemove', loadScripts, { passive: true, once: true });
+        window.addEventListener('touchstart', loadScripts, { passive: true, once: true });
+        setTimeout(loadScripts, 3500); // Fallback if no interaction
+      })();
     </script>
   </body>
 </html>
