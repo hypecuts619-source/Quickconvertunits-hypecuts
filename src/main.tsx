@@ -16,6 +16,25 @@ const Contact = lazy(() => import('./Contact.tsx'));
 const Blog = lazy(() => import('./Blog.tsx'));
 const BlogPost = lazy(() => import('./BlogPost.tsx'));
 
+// Delay PWA install prompt to prevent firing immediately
+let deferredPrompt: any = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Prevent Chrome 67 and earlier from automatically showing the prompt
+  e.preventDefault();
+  // Stash the event so it can be triggered later.
+  deferredPrompt = e;
+  
+  // Show prompt after 30 seconds to allow user to engage with app first
+  setTimeout(() => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => {
+        deferredPrompt = null;
+      });
+    }
+  }, 30000);
+});
+
 // Automatically register the service worker
 if ('serviceWorker' in navigator) {
   registerSW({ immediate: true });

@@ -64,7 +64,7 @@ export function TimeZoneConverter() {
             <select 
               value={fromTz} 
               onChange={(e) => setFromTz(e.target.value)}
-              className="w-full bg-white dark:bg-black border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-sm font-medium mb-4 outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full bg-white dark:bg-black border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-base md:text-sm font-medium mb-4 outline-none focus:ring-2 focus:ring-primary-500"
             >
               {MAIN_TIMEZONES.map(tz => (
                 <option key={tz.id} value={tz.id}>{tz.label}</option>
@@ -93,7 +93,7 @@ export function TimeZoneConverter() {
             <select 
               value={toTz} 
               onChange={(e) => setToTz(e.target.value)}
-              className="w-full bg-white dark:bg-black border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-sm font-medium mb-4 outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full bg-white dark:bg-black border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-base md:text-sm font-medium mb-4 outline-none focus:ring-2 focus:ring-primary-500"
             >
               {MAIN_TIMEZONES.map(tz => (
                 <option key={tz.id} value={tz.id}>{tz.label}</option>

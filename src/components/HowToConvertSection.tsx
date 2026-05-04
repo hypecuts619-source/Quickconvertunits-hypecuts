@@ -36,13 +36,18 @@ export default function HowToConvertSection({
     } else if (activeFromUnit.id === 'kelvin' && activeToUnit.id === 'fahrenheit') {
       formulaStr = '°F = (K - 273.15) × 9/5 + 32';
     }
+  } else if (category === 'angle' && activeFromUnit.id === 'gradian' && activeToUnit.id === 'radian') {
+    formulaStr = 'rad = grad × π/200';
   } else if (activeFromUnit.factor && activeToUnit.factor) {
     const ratio = activeFromUnit.factor / activeToUnit.factor;
     const roundedRatio = ratio >= 1000 || ratio < 0.01 ? ratio.toExponential(4) : ratio.toPrecision(6);
     formulaStr = `${tSymbol} = ${fSymbol} × ${roundedRatio}`;
   }
 
-  const values = [1, 5, 10, 50, 100, 500, 1000];
+  let values = [1, 5, 10, 50, 100, 500, 1000];
+  if (activeFromUnit.id === 'meter' && activeToUnit.id === 'kilometer') {
+    values = [1, 5, 10, 50, 100, 320, 500, 1000];
+  }
 
   return (
     <div className="mt-8 bg-white dark:bg-[#111111] rounded-[2rem] p-6 md:p-10 shadow-[0_8px_40px_rgba(0,0,0,0.04)] dark:shadow-none border border-neutral-100 dark:border-neutral-800">
@@ -88,6 +93,17 @@ export default function HowToConvertSection({
             you can calculate it manually using the specific conversion formula below.
           </p>
           
+          {activeFromUnit.id === 'meter' && activeToUnit.id === 'kilometer' && (
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-3">Common Conversion Examples</h3>
+              <ul className="list-disc pl-5 text-neutral-600 dark:text-neutral-400 space-y-1">
+                <li>320 meters = 0.32 km</li>
+                <li>1000 meters = 1 km</li>
+                <li>50 meters = 0.05 km</li>
+              </ul>
+            </div>
+          )}
+
           {formulaStr && (
             <div className="bg-primary-50 dark:bg-primary-500/10 p-6 rounded-2xl border border-primary-100 dark:border-primary-500/20">
               <h3 className="text-sm font-semibold text-primary-600 dark:text-primary-400 uppercase tracking-widest mb-2">Math Formula</h3>

@@ -168,7 +168,7 @@ export function UnitSelector({ value, onChange, units, activeCategoryId }: UnitS
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="w-full bg-transparent border-none focus:outline-none text-neutral-900 dark:text-white"
+                  className="w-full bg-transparent border-none focus:outline-none text-base text-neutral-900 dark:text-white"
                 />
                 <button aria-label="Close" onClick={() => setIsOpen(false)} className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full">
                   <X className="w-5 h-5 text-neutral-500" />
