@@ -38,6 +38,8 @@ import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "motion/react";
 
 const ConversionChart = lazy(() => import("./components/ConversionChart"));
+import HowToConvertSection from "./components/HowToConvertSection";
+import RelatedToolsSection from "./components/RelatedToolsSection";
 
 const POPULAR = [
   { label: "kg to lbs", cat: "weight", fu: "kilogram", tu: "pound" },
@@ -809,7 +811,7 @@ export default function App() {
         }
       }
 
-      titleStr = `${catName} Conversion Calculator: ${topUnits} | QuickConvert`;
+      titleStr = `Fast ${catName} Converter - Instant ${topUnits} [2026 Free]`;
       
       const specificDescriptions: Record<string, string> = {
         "length": "Convert length and distance measurements from meters, feet, kilometers, and miles. Real-time formatting with high precision.",
@@ -829,15 +831,15 @@ export default function App() {
       const customSeo = customSeoData[symbolToPath];
 
       if (customSeo) {
-        titleStr = customSeo.title;
+        titleStr = customSeo.title.replace("Converter", "Converter [2026 Free]");
         metaDescStr = customSeo.description;
         customFAQs = getFAQsFromHtml(customSeo.content);
       } else {
         const symFrom = activeFromUnit.symbol;
         const symTo = activeToUnit.symbol;
         
-        titleStr = `${valPrefix}${pluralFrom} to ${pluralTo} (${symFrom} to ${symTo}) Converter - Free Tool`;
-        metaDescStr = `Convert ${valPrefix}${pluralFrom.toLowerCase()} to ${pluralTo.toLowerCase()} instantly. 1 ${symFrom} = ${convert(1, unitFrom, unitTo, category).toPrecision(6)} ${symTo}. Free calculator with conversion table, formula, and examples. Fast and accurate.`;
+        titleStr = `Fast ${valPrefix}${pluralFrom} to ${pluralTo} Converter - Instant ${symFrom} to ${symTo} [2026 Free]`;
+        metaDescStr = `Convert ${valPrefix}${pluralFrom.toLowerCase()} to ${pluralTo.toLowerCase()} instantly. 1 ${symFrom} = ${convert(1, unitFrom, unitTo, category).toPrecision(6)} ${symTo}. Offline capable, free calculator with conversion table, formula, and examples. Fast and accurate.`;
       }
       canonicalUrlStr = `https://quickconvertunits.com/${getSEOUrlPath(unitFrom, unitTo)}`;
       ogTitleStr = titleStr;
@@ -847,11 +849,11 @@ export default function App() {
     schema = [
       {
         "@context": "https://schema.org",
-        "@type": "WebApplication",
+        "@type": "SoftwareApplication",
         name: isSpecificConverter ? `${pluralFrom} to ${pluralTo} Converter` : `${titleStr}`,
         url: canonicalUrlStr,
-        applicationCategory: "UtilitiesApplication",
-        operatingSystem: "Any",
+        applicationCategory: "UtilityApplication",
+        operatingSystem: "Windows, macOS, Android, iOS",
         description: metaDescStr,
         offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       }
@@ -1231,47 +1233,27 @@ export default function App() {
             unitTo={{name: activeToUnit?.name || ''}} 
             isSpecificConverter={isSpecificConverter} 
           />
-          <div className="text-center mb-10">
+          <div className="text-center mb-8">
             {category === 'time_zone' ? (
-              <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-5xl font-semibold tracking-tight mb-4 text-neutral-900 dark:text-white">
+              <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-4xl font-semibold tracking-tight mb-2 text-neutral-900 dark:text-white">
                 Time Zone Converter
               </h1>
             ) : (
-              <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-5xl font-semibold tracking-tight mb-4 text-neutral-900 dark:text-white">
+              <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-4xl font-semibold tracking-tight mb-2 text-neutral-900 dark:text-white">
                 {(activeFromUnit?.name || '').endsWith('s') ? activeFromUnit?.name : `${activeFromUnit?.name}s`} to {(activeToUnit?.name || '').endsWith('s') ? activeToUnit?.name : `${activeToUnit?.name}s`} Converter
                 <button
                   onClick={toggleFavorite}
-                  className={`flex-shrink-0 flex items-center justify-center w-9 h-9 md:w-12 md:h-12 rounded-full transition-colors ${
+                  className={`flex-shrink-0 flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full transition-colors ${
                     isFavorited
                       ? "bg-amber-100 text-amber-500 dark:bg-amber-500/20 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-500/30"
                       : "bg-neutral-100 text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600 dark:bg-[#1a1a1a] dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-neutral-300"
                   }`}
                   title={isFavorited ? "Saved to Favorites" : "Save this conversion"}
                 >
-                  <Star className={`w-4 h-4 md:w-6 md:h-6 ${isFavorited ? "fill-current" : ""}`} />
+                  <Star className={`w-4 h-4 md:w-5 md:h-5 ${isFavorited ? "fill-current" : ""}`} />
                 </button>
               </h1>
             )}
-            <p className="text-neutral-500 dark:text-neutral-400 text-lg font-light">
-              Fast, accurate, and completely free {category.replace("_", " ")} conversion tool.
-            </p>
-          </div>
-
-          {/* Categories */}
-          <div className="flex overflow-x-auto md:flex-wrap no-scrollbar gap-3 mb-12 pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:justify-center items-center">
-            {categories.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => handleCategoryChange(c.id)}
-                className={`whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-primary-500/50 flex-shrink-0 ${
-                  category === c.id
-                    ? "bg-primary-500 text-white shadow-md transform scale-105 border border-primary-600 dark:border-primary-400"
-                    : "bg-white dark:bg-[#1a1a1a] text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-[#222] border border-neutral-200/80 dark:border-neutral-800/80 hover:text-neutral-900 dark:hover:text-white"
-                }`}
-              >
-                {t(`categories.${c.id}`, c.name)}
-              </button>
-            ))}
           </div>
 
           {/* Converter Card */}
@@ -1280,7 +1262,7 @@ export default function App() {
           ) : (
           <motion.div
             layout
-            className="bg-white dark:bg-[#111111] p-6 md:p-10 rounded-[2.5rem] shadow-[0_8px_40px_rgba(0,0,0,0.04)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 relative z-10 overflow-hidden"
+            className="bg-white dark:bg-[#111111] p-6 md:p-10 rounded-[2.5rem] shadow-[0_8px_40px_rgba(0,0,0,0.04)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 relative z-10 overflow-hidden mb-8"
           >
             {/* Subtle light effect for dark mode inside card */}
             <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-primary-500/5 rounded-full blur-[80px] pointer-events-none hidden dark:block" />
@@ -1739,6 +1721,23 @@ export default function App() {
           </motion.div>
           )}
 
+          {/* Categories */}
+          <div className="flex overflow-x-auto md:flex-wrap no-scrollbar gap-3 mt-8 mb-8 pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:justify-center items-center">
+            {categories.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => handleCategoryChange(c.id)}
+                className={`whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-primary-500/50 flex-shrink-0 ${
+                  category === c.id
+                    ? "bg-primary-500 text-white shadow-md transform scale-105 border border-primary-600 dark:border-primary-400"
+                    : "bg-white dark:bg-[#1a1a1a] text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-[#222] border border-neutral-200/80 dark:border-neutral-800/80 hover:text-neutral-900 dark:hover:text-white"
+                }`}
+              >
+                {t(`categories.${c.id}`, c.name)}
+              </button>
+            ))}
+          </div>
+
           {/* Frequently Asked Questions */}
           {category !== 'time_zone' && activeFromUnit && activeToUnit && (
           <div className="mt-8 bg-white dark:bg-[#111111] rounded-3xl p-8 md:p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-neutral-100 dark:border-neutral-800">
@@ -1787,6 +1786,20 @@ export default function App() {
               theme={theme}
             />
           </Suspense>
+          
+          <HowToConvertSection
+            category={category}
+            activeFromUnit={activeFromUnit as any}
+            activeToUnit={activeToUnit as any}
+          />
+          
+          <RelatedToolsSection
+            categoryName={categories.find(c => c.id === category)?.name || category}
+            category={category}
+            activeFromUnit={activeFromUnit as any}
+            activeToUnit={activeToUnit as any}
+            units={categories.find(c => c.id === category)?.units || []}
+          />
 
           {/* AD: Below Result Ad */}
           <AdSlot

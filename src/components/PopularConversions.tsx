@@ -31,6 +31,13 @@ export const POPULAR_CONVERSIONS = [
   { from: 'horsepower', to: 'kilowatt', label: 'HP to kW', cat: 'power' },
   { from: 'degree', to: 'radian', label: 'Degrees to Radians', cat: 'angle' },
   { from: 'km_per_liter', to: 'miles_per_gallon', label: 'km/L to MPG', cat: 'fuel' },
+  { from: 'us_cup', to: 'milliliter', label: 'Cups to mL', cat: 'volume' },
+  { from: 'inch', to: 'millimeter', label: 'Inches to mm', cat: 'length' },
+  { from: 'millimeter', to: 'inch', label: 'mm to Inches', cat: 'length' },
+  { from: 'knot', to: 'mile_per_hour', label: 'Knots to MPH', cat: 'speed' },
+  { from: 'hectare', to: 'acre', label: 'Hectares to Acres', cat: 'area' },
+  { from: 'kilocalorie', to: 'kilojoule', label: 'Calories to kJ', cat: 'energy' },
+  { from: 'kilogram', to: 'metric_ton', label: 'KG to Tons', cat: 'weight' },
 ];
 
 export function PopularConversions({ onSelect }: { onSelect: (cat: string, from: string, to: string) => void }) {

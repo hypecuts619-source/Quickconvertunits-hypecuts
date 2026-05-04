@@ -223,12 +223,12 @@ function applySEO(urlPath: string, template: string): string {
       const fromUnit = popularUnits[fromId] || { name: capitalize(fromId), symbol: capitalize(fromId) };
       const toUnit = popularUnits[toId] || { name: capitalize(toId), symbol: capitalize(toId) };
       
-      const title = `1 ${fromUnit.name} to ${toUnit.name} (${fromUnit.symbol} to ${toUnit.symbol}) - Free Converter`;
+      const title = `Fast 1 ${fromUnit.name} to ${toUnit.name} Converter - Instant ${fromUnit.symbol} to ${toUnit.symbol}`;
       const description = `Convert 1 ${fromUnit.name.toLowerCase()} to ${toUnit.name.toLowerCase()} instantly. Free online conversion calculator. Enter value, select units—get precise results fast.`;
 
       template = template.replace(
         /<title[^>]*>.*?<\/title>/,
-        `<title data-react-helmet="true">${title} | QuickConvert</title>`
+        `<title data-react-helmet="true">${title}</title>`
       );
       template = template.replace(
         /<meta[^>]*name="description"[^>]*\/>/,
@@ -327,12 +327,13 @@ function applySEO(urlPath: string, template: string): string {
         "@context": "https://schema.org",
         "@graph": [
           {
-            "@type": "WebApplication",
+            "@type": "SoftwareApplication",
             "name": `${title} - QuickConvert`,
-            "applicationCategory": "UtilityApplications",
-            "operatingSystem": "All",
+            "applicationCategory": "UtilityApplication",
+            "operatingSystem": "Windows, macOS, Android, iOS",
             "description": description,
-            "url": `https://quickconvertunits.com/${urlPath}`
+            "url": `https://quickconvertunits.com/${urlPath}`,
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
           },
           {
             "@type": "HowTo",
@@ -383,7 +384,7 @@ function applySEO(urlPath: string, template: string): string {
     }
   } else if (urlPath && urlPath.endsWith("-converter")) {
     const catNameRaw = urlPath.replace("-converter", "");
-    const title = `${capitalize(catNameRaw)} Conversion Calculator | QuickConvert`;
+    const title = `Fast ${capitalize(catNameRaw)} Converter - Instant Conversions`;
     
     const categorySpecifics: Record<string, { desc: string, intro: string, faq2: string, faq2A: string, faq3: string, faq3A: string, faq4: string, faq4A: string, tableItem1: string, tableItem2: string, tableItem3: string, tableItem4: string }> = {
       "length": {
