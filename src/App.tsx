@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef, lazy, Suspense } from "react";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
-import { getSuggestions, convert, categories, formatNumber, getSEOUrlPath, getUnitIdsFromPath } from "./lib/units";
+import { getSuggestions, convert, categories, formatNumber, getSEOUrlPath, getUnitIdsFromPath, updateCurrencyRates } from "./lib/units";
 import { categorySeoContent } from "./lib/seoContent";
 import { customSeoData } from "./lib/customSeoData";
 import { trackConversionEvent, trackFunnelStep, trackPageView } from "./lib/analytics";
@@ -469,7 +469,6 @@ export default function App() {
   const handleRefreshRates = async () => {
     setIsRefreshing(true);
     try {
-      const { updateCurrencyRates } = await import("./lib/units");
       const success = await updateCurrencyRates();
       if (success) {
         setRatesUpdated((prev) => prev + 1);

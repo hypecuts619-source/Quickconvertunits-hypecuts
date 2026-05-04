@@ -2,48 +2,56 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-    <title>Quick Unit Converter | Free Online Tool</title>
-    <meta name="description" content="Instantly convert units like meters to feet, kg to lbs, or cups to grams. Fast, accurate, no ads interrupting. Try now—no sign-up needed." />
+    <title data-react-helmet="true">Quick Unit Converter | Free Online Tool</title>
+    <meta data-react-helmet="true" name="description" content="Instantly convert units like meters to feet, kg to lbs, or cups to grams. Fast, accurate, no ads interrupting. Try now—no sign-up needed." />
     <meta name="keywords" content="unit converter, convert units, length conversion, weight converter, temperature conversion, currency converter" />
     <meta name="robots" content="index, follow" />
     <!-- Replace this content attribute with your actual Google Search Console verification code -->
     <meta name="google-site-verification" content="YOUR_GOOGLE_SITE_VERIFICATION_CODE" />
-    <link rel="canonical" href="https://quickconvertunits.com/" />
+    <link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/" />
     <!-- Open Graph/Twitter Default Meta -->
-    <meta property="og:title" content="Quick Unit Converter | Free Online Tool" />
-    <meta property="og:description" content="Instantly convert units like meters to feet, kg to lbs, or cups to grams. Fast, accurate, no ads interrupting. Try now—no sign-up needed." />
-    <meta property="og:url" content="https://quickconvertunits.com/" />
-    <meta property="og:type" content="website" />
+    <meta data-react-helmet="true" property="og:title" content="Quick Unit Converter | Free Online Tool" />
+    <meta data-react-helmet="true" property="og:description" content="Instantly convert units like meters to feet, kg to lbs, or cups to grams. Fast, accurate, no ads interrupting. Try now—no sign-up needed." />
+    <meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/" />
+    <meta data-react-helmet="true" property="og:type" content="website" />
     <meta property="og:image" content="https://quickconvertunits.com/favicon.svg" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Quick Unit Converter | Free Online Tool" />
-    <meta name="twitter:description" content="Instantly convert units like meters to feet, kg to lbs, or cups to grams. Fast, accurate, no ads interrupting. Try now—no sign-up needed." />
+    <meta data-react-helmet="true" name="twitter:card" content="summary_large_image" />
+    <meta data-react-helmet="true" name="twitter:title" content="Quick Unit Converter | Free Online Tool" />
+    <meta data-react-helmet="true" name="twitter:description" content="Instantly convert units like meters to feet, kg to lbs, or cups to grams. Fast, accurate, no ads interrupting. Try now—no sign-up needed." />
     <meta name="twitter:image" content="https://quickconvertunits.com/favicon.svg" />
     <!-- Additional Meta -->
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any" />
+    <link rel="mask-icon" href="/favicon.svg" color="#10b981" />
     <!-- PWA Settings -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="ConvertUnits" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="google-adsense-account" content="ca-pub-7380090598384677" />
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7380090598384677"
-     crossorigin="anonymous"></script>
 
     <script id="seo-schema" type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "QuickConvert Units",
+      "alternateName": "Quick Unit Converter",
       "url": "https://quickconvertunits.com/",
-      "description": "Free online unit converter for temperature, weight, distance, currency and more.",
-      "applicationCategory": "Utility",
-      "operatingSystem": "All"
+      "description": "Instantly convert units like meters to feet, kg to lbs, or cups to grams. Fast, accurate, and completely free.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": "Length Conversion, Weight Conversion, Temperature Conversion, Currency Converter"
     }
     </script>
   </head>
@@ -82,6 +90,13 @@
       // Defer loading heavy 3rd-party scripts to improve initial mobile performance
       window.addEventListener('load', function() {
         setTimeout(function() {
+          // AdSense
+          var adsense = document.createElement('script');
+          adsense.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7380090598384677';
+          adsense.async = true;
+          adsense.crossOrigin = 'anonymous';
+          document.body.appendChild(adsense);
+
           // GA
           var ga = document.createElement('script');
           ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-Z7W1M7R0YB';

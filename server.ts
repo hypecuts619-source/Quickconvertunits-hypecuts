@@ -227,29 +227,29 @@ function applySEO(urlPath: string, template: string): string {
       const description = `Convert 1 ${fromUnit.name.toLowerCase()} to ${toUnit.name.toLowerCase()} instantly. Free online conversion calculator. Enter value, select units—get precise results fast.`;
 
       template = template.replace(
-        /<title>(.*?)<\/title>/,
-        `<title>${title} | QuickConvert</title>`
+        /<title[^>]*>.*?<\/title>/,
+        `<title data-react-helmet="true">${title} | QuickConvert</title>`
       );
       template = template.replace(
-        /<meta name="description" content="(.*?)" \/>/,
-        `<meta name="description" content="${description}" />`
+        /<meta[^>]*name="description"[^>]*\/>/,
+        `<meta data-react-helmet="true" name="description" content="${description}" />`
       );
       template = template.replace(
-        /<meta property="og:title" content="(.*?)" \/>/,
-        `<meta property="og:title" content="${title} - QuickConvert" />`
+        /<meta[^>]*property="og:title"[^>]*\/>/,
+        `<meta data-react-helmet="true" property="og:title" content="${title} - QuickConvert" />`
       );
       template = template.replace(
-        /<meta property="og:description" content="(.*?)" \/>/,
-        `<meta property="og:description" content="${description}" />`
+        /<meta[^>]*property="og:description"[^>]*\/>/,
+        `<meta data-react-helmet="true" property="og:description" content="${description}" />`
       );
       template = template.replace(
-        /<link rel="canonical" href="(.*?)" \/>/,
-        `<link rel="canonical" href="https://quickconvertunits.com/${urlPath}" />`
+        /<link[^>]*rel="canonical"[^>]*\/>/,
+        `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${urlPath}" />`
       );
 
       template = template.replace(
-        /<meta property="og:url" content="(.*?)" \/>/,
-        `<meta property="og:url" content="https://quickconvertunits.com/${urlPath}" />`
+        /<meta[^>]*property="og:url"[^>]*\/>/,
+        `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${urlPath}" />`
       );
       
       const val1 = calculateConversion(1, fromId, toId);
@@ -476,28 +476,28 @@ function applySEO(urlPath: string, template: string): string {
     const description = specifics.desc;
 
     template = template.replace(
-      /<title>(.*?)<\/title>/,
-      `<title>${title}</title>`
+      /<title[^>]*>.*?<\/title>/,
+      `<title data-react-helmet="true">${title}</title>`
     );
     template = template.replace(
-      /<meta name="description" content="(.*?)" \/>/,
-      `<meta name="description" content="${description}" />`
+      /<meta[^>]*name="description"[^>]*\/>/,
+      `<meta data-react-helmet="true" name="description" content="${description}" />`
     );
     template = template.replace(
-      /<meta property="og:title" content="(.*?)" \/>/,
-      `<meta property="og:title" content="${title}" />`
+      /<meta[^>]*property="og:title"[^>]*\/>/,
+      `<meta data-react-helmet="true" property="og:title" content="${title}" />`
     );
     template = template.replace(
-      /<meta property="og:description" content="(.*?)" \/>/,
-      `<meta property="og:description" content="${description}" />`
+      /<meta[^>]*property="og:description"[^>]*\/>/,
+      `<meta data-react-helmet="true" property="og:description" content="${description}" />`
     );
     template = template.replace(
-      /<link rel="canonical" href="(.*?)" \/>/,
-      `<link rel="canonical" href="https://quickconvertunits.com/${urlPath}" />`
+      /<link[^>]*rel="canonical"[^>]*\/>/,
+      `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${urlPath}" />`
     );
     template = template.replace(
-      /<meta property="og:url" content="(.*?)" \/>/,
-      `<meta property="og:url" content="https://quickconvertunits.com/${urlPath}" />`
+      /<meta[^>]*property="og:url"[^>]*\/>/,
+      `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${urlPath}" />`
     );
     
     const staticContent = `\n      <noscript>\n        <div>

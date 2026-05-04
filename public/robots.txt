@@ -7,4 +7,11 @@ Allow: /
 User-agent: Googlebot
 Allow: /
 
+User-agent: bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Applebot
+Allow: /
+
 Sitemap: https://quickconvertunits.com/sitemap.xml
