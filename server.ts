@@ -3,7 +3,7 @@ import compression from "compression";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from 'url';
-import { getCanonicalUnitId, getSEOUrlPath } from "./src/lib/units";
+import { getCanonicalUnitId, getSEOUrlPath } from "./src/lib/units.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -440,6 +440,35 @@ function applySEO(urlPath: string, template: string): string {
         schema: `<script type="application/ld+json">${JSON.stringify(schema)}</script>`
       });
     }
+  } else if (urlPath === "bmi-calculator" || urlPath === "time-zone-converter") {
+    let title = "";
+    let description = "";
+    if (urlPath === "bmi-calculator") {
+      title = "BMI Calculator: Calculate Body Mass Index Online Free";
+      description = "Free, fast, and easy-to-use BMI calculator. Check your Body Mass Index using metric or imperial units to see if you are at a healthy weight.";
+    } else {
+      title = "Time Zone Converter: Convert UTC, EST, PST, CET | QuickConvert";
+      description = "Instantly convert between time zones to schedule global meetings easily. Supports UTC, EST, PST, standard and daylight time conversions.";
+    }
+    
+    let t = template;
+    t = t.replace(/<title[^>]*>.*?<\/title>/, `<title data-react-helmet="true">${title}</title>`);
+    t = t.replace(/<meta[^>]*name="description"[^>]*\/>/, `<meta data-react-helmet="true" name="description" content="${description}" />`);
+    t = t.replace(/<meta[^>]*property="og:title"[^>]*\/>/, `<meta data-react-helmet="true" property="og:title" content="${title}" />`);
+    t = t.replace(/<meta[^>]*property="og:description"[^>]*\/>/, `<meta data-react-helmet="true" property="og:description" content="${description}" />`);
+    t = t.replace(/<link[^>]*rel="canonical"[^>]*\/>/, `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${urlPath}" />`);
+    t = t.replace(/<meta[^>]*property="og:url"[^>]*\/>/, `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${urlPath}" />`);
+    
+    const staticContent = `
+      <div style="display:none;" aria-hidden="true">
+        <div>
+          <h1>${title}</h1>
+          <p>${description}</p>
+        </div>
+      </div>
+    `;
+    t = t.replace(/<div style="display:none;" aria-hidden="true">[\s\S]*?<\/div>/, staticContent);
+    return t;
   } else if (urlPath && urlPath.endsWith("-converter")) {
     const catNameRaw = urlPath.replace("-converter", "");
     const title = `Fast ${capitalize(catNameRaw)} Converter - Instant Conversions`;

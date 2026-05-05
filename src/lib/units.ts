@@ -201,6 +201,9 @@ export const categories: UnitCategory[] = [
       { id: 'sek', name: 'Swedish Krona', symbol: 'kr', factor: 10.5, description: 'The Swedish Krona, the official currency of Sweden, functioning as a free-floating currency.' },
       { id: 'krw', name: 'South Korean Won', symbol: '₩', factor: 1300.0, description: 'The South Korean Won, the official currency of South Korea, issued by the Bank of Korea.' },
       { id: 'aed', name: 'UAE Dirham', symbol: 'د.إ', factor: 3.67, description: 'The United Arab Emirates Dirham, the official currency of the UAE, pegged to the US Dollar.' },
+      { id: 'btc', name: 'Bitcoin', symbol: 'BTC', factor: 1 / 65000, description: 'Bitcoin, the first and most widely recognized cryptocurrency.' },
+      { id: 'eth', name: 'Ethereum', symbol: 'ETH', factor: 1 / 3500, description: 'Ethereum, a decentralized, open-source blockchain with smart contract functionality.' },
+      { id: 'sol', name: 'Solana', symbol: 'SOL', factor: 1 / 150, description: 'Solana, a high-performance blockchain supporting builders around the world creating crypto apps that scale today.' },
     ],
   },
   {
@@ -234,8 +237,8 @@ export const categories: UnitCategory[] = [
     units: [
       { id: 'km_per_liter', name: 'Kilometers per Liter', symbol: 'km/L', factor: 1, description: 'The distance in kilometers that a vehicle can travel on one liter of fuel.' },
       { id: 'miles_per_gallon', name: 'Miles per Gallon (US)', symbol: 'mpg', factor: 0.425143707, description: 'A measure of how far a vehicle can travel on one US gallon of fuel.' },
-      { id: 'miles_per_gallon_uk', name: 'Miles per Gallon (UK)', symbol: 'mpg (UK)', factor: 0.35400619, description: 'A measure of how far a vehicle can travel on one imperial gallon of fuel.' }
-      // liters per 100km is inversely proportional, not linear, so we'll omit it here or implement a special case later.
+      { id: 'miles_per_gallon_uk', name: 'Miles per Gallon (UK)', symbol: 'mpg (UK)', factor: 0.35400619, description: 'A measure of how far a vehicle can travel on one imperial gallon of fuel.' },
+      { id: 'liters_per_100km', name: 'Liters per 100km', symbol: 'L/100km', factor: 1, description: 'A common metric for fuel consumption representing how many liters are needed for 100km.' }
     ]
   },
   {
@@ -253,6 +256,12 @@ export const categories: UnitCategory[] = [
     id: 'time_zone',
     name: 'Time Zone',
     baseUnit: 'utc',
+    units: [] // Special case for UI
+  },
+  {
+    id: 'bmi',
+    name: 'BMI Calculator',
+    baseUnit: 'bmi',
     units: [] // Special case for UI
   }
 ];
@@ -285,6 +294,25 @@ export async function updateCurrencyRates() {
             u.factor = 1 / data.rates[rateCode];
           }
         });
+        
+        // Fetch Crypto updates from CoinGecko
+        try {
+          const cryptoRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd');
+          const cryptoData = await cryptoRes.json();
+          if (cryptoData) {
+            const updateCrypto = (id: string, coinGeckoId: string) => {
+              const u = currencyCat.units.find(x => x.id === id);
+              if (u && cryptoData[coinGeckoId] && cryptoData[coinGeckoId].usd) {
+                u.factor = cryptoData[coinGeckoId].usd;
+              }
+            };
+            updateCrypto('btc', 'bitcoin');
+            updateCrypto('eth', 'ethereum');
+            updateCrypto('sol', 'solana');
+          }
+        } catch (err) {
+          console.error('Failed to fetch crypto prices from CoinGecko', err);
+        }
       }
       return true;
     }
@@ -302,6 +330,8 @@ export function convert(
 ): number {
   if (fromId === toId) return value;
   
+  const cat = categories.find(c => c.id === categoryId);
+
   if (categoryId === 'temperature') {
     // Convert TO Celsius first
     let celsius = value;
@@ -320,8 +350,26 @@ export function convert(
     return celsius; // toId is celsius
   }
   
+  if (categoryId === 'fuel') {
+    // Convert TO km_per_liter first (our base unit)
+    let kpl = value;
+    if (fromId === 'liters_per_100km') {
+      kpl = value === 0 ? 0 : 100 / value;
+    } else {
+      const fromUnit = cat?.units.find(u => u.id === fromId);
+      if (fromUnit) kpl = value * fromUnit.factor;
+    }
+
+    // Convert FROM km_per_liter to target
+    if (toId === 'liters_per_100km') {
+      return kpl === 0 ? 0 : 100 / kpl;
+    } else {
+      const toUnit = cat?.units.find(u => u.id === toId);
+      if (toUnit) return kpl / toUnit.factor;
+    }
+  }
+
   // Linear conversions
-  const cat = categories.find(c => c.id === categoryId);
   if (!cat) return value;
   
   const fromUnit = cat.units.find(u => u.id === fromId);

@@ -42,6 +42,7 @@ const RelatedToolsSection = lazy(() => import("./components/RelatedToolsSection"
 const SeoContent = lazy(() => import("./components/SeoContent").then(module => ({ default: module.SeoContent })));
 const PopularConversions = lazy(() => import("./components/PopularConversions").then(module => ({ default: module.PopularConversions })));
 const TimeZoneConverter = lazy(() => import("./components/TimeZoneConverter").then(module => ({ default: module.TimeZoneConverter })));
+const BMICalculator = lazy(() => import("./components/BMICalculator").then(module => ({ default: module.BMICalculator })));
 
 const QuickLinksSection = ({ fromUnit, toUnit, category }: { fromUnit: any; toUnit: any; category: string }) => {
   const nums = [1, 5, 10, 25, 50, 100, 150, 200, 250, 500, 1000];
@@ -387,6 +388,7 @@ export default function App() {
   const [category, setCategory] = useState(() => {
     if (conversion) {
       if (conversion === "time-zone-converter") return "time_zone";
+      if (conversion === "bmi-calculator") return "bmi";
       if (conversion.endsWith("-converter")) {
         const potentialCat = conversion.replace("-converter", "").replace(/-/g, "_");
         if (categories.some(c => c.id === potentialCat)) {
@@ -826,6 +828,21 @@ export default function App() {
       name: titleStr,
       url: canonicalUrlStr,
       applicationCategory: "UtilitiesApplication",
+      operatingSystem: "Any",
+      description: metaDescStr,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    }];
+  } else if (category === 'bmi') {
+    titleStr = 'BMI Calculator: Calculate Body Mass Index Online Free';
+    metaDescStr = 'Free, fast, and easy-to-use BMI calculator. Check your Body Mass Index using metric or imperial units to see if you are at a healthy weight.';
+    canonicalUrlStr = "https://quickconvertunits.com/bmi-calculator";
+    ogTitleStr = titleStr;
+    schema = [{
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: titleStr,
+      url: canonicalUrlStr,
+      applicationCategory: "HealthApplication",
       operatingSystem: "Any",
       description: metaDescStr,
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
@@ -1310,6 +1327,10 @@ export default function App() {
               <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-4xl font-semibold tracking-tight mb-2 text-neutral-900 dark:text-white">
                 Time Zone Converter
               </h1>
+            ) : category === 'bmi' ? (
+              <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-4xl font-semibold tracking-tight mb-2 text-neutral-900 dark:text-white">
+                BMI Calculator
+              </h1>
             ) : location.pathname === "/" ? (
               <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-4xl font-semibold tracking-tight mb-2 text-neutral-900 dark:text-white">
                 Quick & Accurate Unit Converter
@@ -1343,6 +1364,8 @@ export default function App() {
           {/* Converter Card */}
           {category === 'time_zone' ? (
             <TimeZoneConverter />
+          ) : category === 'bmi' ? (
+            <BMICalculator />
           ) : (
           <motion.div
             layout
