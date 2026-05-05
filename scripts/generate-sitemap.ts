@@ -3,7 +3,7 @@ import path from "path";
 import { categories } from "../src/lib/units";
 import { blogPosts } from "../src/lib/blogPosts";
 
-const DOMAIN = process.env.APP_URL || "https://quickconvertunits.com"; // Provide a default domain, or the app url
+const DOMAIN = "https://quickconvertunits.com";
 
 const sitemapPath = path.resolve(process.cwd(), "public/sitemap.xml");
 
