@@ -1,2 +1,2 @@
-import { categories, convert } from "./src/lib/units.ts";
-console.log(categories.length);
+import { getCanonicalUnitId } from "./src/lib/units";
+console.log(getCanonicalUnitId("lbs"));

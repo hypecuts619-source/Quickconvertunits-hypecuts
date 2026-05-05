@@ -16,5 +16,16 @@
       "source": "/(.*)",
       "destination": "/api/server"
     }
+  ],
+  "headers": [
+    {
+      "source": "/convert-(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=31536000, stale-while-revalidate=59"
+        }
+      ]
+    }
   ]
 }

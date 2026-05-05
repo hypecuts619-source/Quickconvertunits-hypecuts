@@ -5,6 +5,7 @@ import { categorySeoContent } from "./lib/seoContent";
 import { customSeoData } from "./lib/customSeoData";
 import { trackConversionEvent, trackFunnelStep, trackPageView } from "./lib/analytics";
 import { LanguageSelector } from "./components/LanguageSelector";
+import { FormulaBlock } from "./components/FormulaBlock";
 import { useTranslation } from "react-i18next";
 import { POPULAR_CONVERSIONS } from "./lib/constants";
 import {
@@ -451,7 +452,17 @@ export default function App() {
     const val = params.get("val");
     return val !== null ? val : "1";
   });
-  const [valTo, setValTo] = useState("");
+  
+  const [valTo, setValTo] = useState(() => {
+    const num = parseFloat(valFrom);
+    if (!isNaN(num) && category && unitFrom && unitTo) {
+      const res = convert(num, unitFrom, unitTo, category);
+      return Number.isInteger(res)
+        ? res.toString()
+        : parseFloat(res.toFixed(6)).toString();
+    }
+    return "";
+  });
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -1811,12 +1822,16 @@ export default function App() {
                 <p className="text-neutral-600 dark:text-neutral-400">
                   To convert {activeFromUnit.name} to {activeToUnit.name}, you simply apply the conversion factor.
                 </p>
-                <div className="bg-neutral-50 dark:bg-[#161616] p-4 rounded-xl border border-neutral-100 dark:border-neutral-800 font-mono text-sm md:text-base overflow-x-auto whitespace-nowrap text-neutral-800 dark:text-neutral-200">
-                  {category === "temperature" 
-                    ? `Formula varies by unit`
-                    : `$$ ${valFrom} \\text{ ${activeFromUnit.symbol}} \\times ${parseFloat(convert(1, unitFrom, unitTo, category).toFixed(6))} = ${valTo} \\text{ ${activeToUnit.symbol}} $$`
-                  }
-                </div>
+                <FormulaBlock
+                  valFrom={valFrom}
+                  fromSymbol={activeFromUnit.symbol}
+                  factor={formatNumber(convert(1, unitFrom, unitTo, category))}
+                  valTo={valTo}
+                  toSymbol={activeToUnit.symbol}
+                  category={category}
+                  fromUnitId={unitFrom}
+                  toUnitId={unitTo}
+                />
               </section>
 
               <section className="mt-10 overflow-x-auto">
@@ -1893,17 +1908,16 @@ export default function App() {
                   <p>
                     To convert <strong>{valFrom} {activeFromUnit.name.toLowerCase()}</strong> to <strong>{activeToUnit.name.toLowerCase()}</strong>, we use the following conversion formula:
                   </p>
-                  <div className="bg-neutral-50 dark:bg-neutral-900/50 p-6 rounded-2xl border border-neutral-100 dark:border-neutral-800 my-6 font-serif italic text-xl text-center">
-                    {category === 'temperature' ? (
-                      activeFromUnit.id === 'celsius' && activeToUnit.id === 'fahrenheit' 
-                        ? `(${valFrom}°C × 9/5) + 32 = ${valTo}°F`
-                        : activeFromUnit.id === 'fahrenheit' && activeToUnit.id === 'celsius'
-                        ? `(${valFrom}°F - 32) × 5/9 = ${valTo}°C`
-                        : `${activeFromUnit.symbol} to ${activeToUnit.symbol} Conversion Result: ${valTo}`
-                    ) : (
-                      `${valFrom} ${activeFromUnit.symbol} × ${formatNumber(convert(1, unitFrom, unitTo, category))} = ${valTo} ${activeToUnit.symbol}`
-                    )}
-                  </div>
+                  <FormulaBlock
+                    valFrom={valFrom}
+                    fromSymbol={activeFromUnit.symbol}
+                    factor={formatNumber(convert(1, unitFrom, unitTo, category))}
+                    valTo={valTo}
+                    toSymbol={activeToUnit.symbol}
+                    category={category}
+                    fromUnitId={unitFrom}
+                    toUnitId={unitTo}
+                  />
                   <p>
                     By applying the conversion factor of <strong>{formatNumber(convert(1, unitFrom, unitTo, category))}</strong>, we find that {valFrom} {activeFromUnit.name.toLowerCase()} is exactly {valTo} {activeToUnit.name.toLowerCase()}. This calculation is critical for accuracy in science, engineering, and everyday measurements.
                   </p>

@@ -602,13 +602,71 @@ export const getUnitIdsFromPath = (path: string) => {
   return path.split('-to-');
 };
 
+export const getCanonicalUnitId = (alias: string): string => {
+  const map: Record<string, string> = {
+    'lbs': 'pound', 'lb': 'pound', 'pounds': 'pound', 'pound': 'pound',
+    'kg': 'kilogram', 'kgs': 'kilogram', 'kilograms': 'kilogram', 'kilogram': 'kilogram',
+    'g': 'gram', 'gs': 'gram', 'grams': 'gram', 'gram': 'gram',
+    'oz': 'ounce', 'ozs': 'ounce', 'ounces': 'ounce', 'ounce': 'ounce',
+    'm': 'meter', 'meters': 'meter', 'meter': 'meter',
+    'ft': 'foot', 'feet': 'foot', 'foot': 'foot',
+    'inch': 'inch', 'inches': 'inch', 'in': 'inch',
+    'cm': 'centimeter', 'cms': 'centimeter', 'centimeters': 'centimeter', 'centimeter': 'centimeter',
+    'mm': 'millimeter', 'mms': 'millimeter', 'millimeters': 'millimeter', 'millimeter': 'millimeter',
+    'km': 'kilometer', 'kms': 'kilometer', 'kilometers': 'kilometer', 'kilometer': 'kilometer',
+    'mile': 'mile', 'miles': 'mile', 'mi': 'mile',
+    'yard': 'yard', 'yards': 'yard', 'yd': 'yard',
+    'ton': 'metric_ton', 'tons': 'metric_ton', 'metric_ton': 'metric_ton',
+    'celsius': 'celsius', 'c': 'celsius',
+    'fahrenheit': 'fahrenheit', 'f': 'fahrenheit',
+    'kelvin': 'kelvin', 'k': 'kelvin',
+    'liter': 'liter', 'liters': 'liter', 'l': 'liter',
+    'us_gallon': 'us_gallon', 'gallon': 'us_gallon', 'gallons': 'us_gallon', 'gal': 'us_gallon',
+    'us_cup': 'us_cup', 'cup': 'us_cup', 'cups': 'us_cup',
+    'milliliter': 'milliliter', 'milliliters': 'milliliter', 'ml': 'milliliter',
+    'us_fluid_ounce': 'us_fluid_ounce', 'fluid_ounce': 'us_fluid_ounce', 'fluid_ounces': 'us_fluid_ounce', 'fl_oz': 'us_fluid_ounce',
+    'mile_per_hour': 'mile_per_hour', 'mph': 'mile_per_hour',
+    'kilometer_per_hour': 'kilometer_per_hour', 'kph': 'kilometer_per_hour',
+    'meter_per_second': 'meter_per_second', 'mps': 'meter_per_second',
+    'knot': 'knot', 'knots': 'knot',
+    'acre': 'acre', 'acres': 'acre',
+    'square_meter': 'square_meter', 'square_meters': 'square_meter', 'sq_m': 'square_meter',
+    'square_foot': 'square_foot', 'square_feet': 'square_foot', 'sq_ft': 'square_foot',
+    'hectare': 'hectare', 'hectares': 'hectare', 'ha': 'hectare',
+    'hour': 'hour', 'hours': 'hour', 'hr': 'hour', 'hrs': 'hour',
+    'minute': 'minute', 'minutes': 'minute', 'min': 'minute', 'mins': 'minute',
+    'second': 'second', 'seconds': 'second', 'sec': 'second', 'secs': 'second',
+    'day': 'day', 'days': 'day',
+    'week': 'week', 'weeks': 'week',
+    'megabyte': 'megabyte', 'megabytes': 'megabyte', 'mb': 'megabyte',
+    'gigabyte': 'gigabyte', 'gigabytes': 'gigabyte', 'gb': 'gigabyte',
+    'terabyte': 'terabyte', 'terabytes': 'terabyte', 'tb': 'terabyte',
+    'bit': 'bit', 'bits': 'bit',
+    'byte': 'byte', 'bytes': 'byte',
+    'miles_per_gallon': 'miles_per_gallon', 'mpg': 'miles_per_gallon',
+    'km_per_liter': 'km_per_liter', 'kml': 'km_per_liter',
+    'joule': 'joule', 'joules': 'joule', 'j': 'joule',
+    'gram_calorie': 'gram_calorie', 'calorie': 'gram_calorie', 'calories': 'gram_calorie', 'cal': 'gram_calorie',
+    'kilowatt_hour': 'kilowatt_hour', 'kwh': 'kilowatt_hour',
+    'bar': 'bar', 'psi': 'psi',
+    'atmosphere': 'atmosphere', 'atm': 'atmosphere', 'atmospheres': 'atmosphere',
+    'degree': 'degree', 'degrees': 'degree', 'deg': 'degree',
+    'radian': 'radian', 'radians': 'radian', 'rad': 'radian',
+    'usd': 'usd', 'eur': 'eur', 'gbp': 'gbp', 'inr': 'inr',
+    'est': 'est', 'pst': 'pst', 'utc': 'utc'
+  };
+  
+  const normalized = alias.toLowerCase().replace(/-/g, '_');
+  return map[normalized] || normalized;
+};
+
 export const getParsedParamsFromPath = (path: string): { val: string | null, from: string | null, to: string | null } => {
   const match = path.match(/^convert-([\d.]+)-(.+)-to-(.+)$/);
   if (match) {
-    const rawFrom = match[2];
-    const rawTo = match[3];
+    const rawFrom = getCanonicalUnitId(match[2]);
+    const rawTo = getCanonicalUnitId(match[3]);
     const parts = getUnitIdsFromPath(`${rawFrom}-to-${rawTo}`);
-    if (parts.length === 2) {
+    if (parts.length === 2 && parts[0] === parts[0].toLowerCase()) {
       return { val: match[1], from: parts[0], to: parts[1] };
     }
     return { val: match[1], from: rawFrom, to: rawTo };

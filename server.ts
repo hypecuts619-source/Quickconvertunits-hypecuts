@@ -1,7 +1,9 @@
 import express from "express";
+import compression from "compression";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from 'url';
+import { getCanonicalUnitId, getSEOUrlPath } from "./src/lib/units";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -176,6 +178,10 @@ const popularUnits: Record<string, { name: string; symbol: string; factor?: numb
 
 let cachedTemplate = "";
 
+// Simple ISR-style cache for generated SEO fragments
+const seoCache = new Map<string, { title: string; desc: string; static: string; schema: string }>();
+const ONE_YEAR_S = 31536000;
+
 function formatValue(val: number): string {
   // Try to keep it readable, avoid scientific notation if possible
   if (val >= 10000 || val < 0.0001) {
@@ -213,6 +219,22 @@ function capitalize(str: string) {
 function applySEO(urlPath: string, template: string): string {
   // ensure leading slash is removed
   urlPath = urlPath.replace(/^\//, "");
+  const cacheKey = urlPath || 'home';
+
+  // Check ISR Cache
+  if (seoCache.has(cacheKey)) {
+    const cached = seoCache.get(cacheKey)!;
+    let t = template;
+    t = t.replace(/<title[^>]*>.*?<\/title>/, `<title data-react-helmet="true">${cached.title}</title>`);
+    t = t.replace(/<meta[^>]*name="description"[^>]*\/>/, `<meta data-react-helmet="true" name="description" content="${cached.desc}" />`);
+    t = t.replace(/<meta[^>]*property="og:title"[^>]*\/>/, `<meta data-react-helmet="true" property="og:title" content="${cached.title}" />`);
+    t = t.replace(/<meta[^>]*property="og:description"[^>]*\/>/, `<meta data-react-helmet="true" property="og:description" content="${cached.desc}" />`);
+    t = t.replace(/<link[^>]*rel="canonical"[^>]*\/>/, `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${urlPath}" />`);
+    t = t.replace(/<meta[^>]*property="og:url"[^>]*\/>/, `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${urlPath}" />`);
+    t = t.replace(/<div style="display:none;" aria-hidden="true">[\s\S]*?<\/div>/, cached.static);
+    t = t.replace(/<\/head>/, `${cached.schema}</head>`);
+    return t;
+  }
   
   if (urlPath && urlPath.includes("-to-")) {
     const parts = urlPath.split("-to-");
@@ -234,6 +256,11 @@ function applySEO(urlPath: string, template: string): string {
       
       const valText = val === 1 ? "1" : val.toString();
       const resVal = calculateConversion(val, fromId, toId);
+      
+      const canonicalFromId = getCanonicalUnitId(fromId);
+      const canonicalToId = getCanonicalUnitId(toId);
+      const canonicalPathBase = getSEOUrlPath(canonicalFromId, canonicalToId);
+      const canonicalPath = val === 1 ? canonicalPathBase : `convert-${val}-${canonicalPathBase}`;
       
       let title = `Fast ${valText} ${fromUnit.name} to ${toUnit.name} Converter - Instant ${fromUnit.symbol} to ${toUnit.symbol}`;
       if (val !== 1 && resVal !== "N/A") {
@@ -262,12 +289,12 @@ function applySEO(urlPath: string, template: string): string {
       );
       template = template.replace(
         /<link[^>]*rel="canonical"[^>]*\/>/,
-        `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${urlPath}" />`
+        `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${canonicalPath}" />`
       );
 
       template = template.replace(
         /<meta[^>]*property="og:url"[^>]*\/>/,
-        `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${urlPath}" />`
+        `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${canonicalPath}" />`
       );
       
       const val1 = calculateConversion(1, fromId, toId);
@@ -404,6 +431,14 @@ function applySEO(urlPath: string, template: string): string {
         /<\/head>/,
         `<script type="application/ld+json">${JSON.stringify(schema)}</script></head>`
       );
+
+      // Save to ISR Cache
+      seoCache.set(cacheKey, {
+        title: title,
+        desc: description,
+        static: staticContent,
+        schema: `<script type="application/ld+json">${JSON.stringify(schema)}</script>`
+      });
     }
   } else if (urlPath && urlPath.endsWith("-converter")) {
     const catNameRaw = urlPath.replace("-converter", "");
@@ -605,11 +640,20 @@ function applySEO(urlPath: string, template: string): string {
       /<div style="display:none;" aria-hidden="true">[\s\S]*?<\/div>/,
       staticContent
     );
+
+    // Save to ISR Cache
+    seoCache.set(cacheKey, {
+      title: title,
+      desc: description,
+      static: staticContent,
+      schema: "" 
+    });
   }
   return template;
 }
 
 const app = express();
+app.use(compression());
 const PORT = 3000;
 const isProd = process.env.NODE_ENV === "production" || !!process.env.VERCEL || !!process.env.VERCEL_ENV;
 
@@ -645,6 +689,16 @@ if (isProd) {
   // Production routes (Synchronous)
   
   app.use(express.static(distStaticPath, { index: false }));
+  
+  // Aggressive Edge Caching for programmatic routes
+  app.use((req, res, next) => {
+    if (req.path.includes("-to-")) {
+      res.setHeader('Cache-Control', `public, s-maxage=${ONE_YEAR_S}, stale-while-revalidate=59`);
+    } else {
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+    }
+    next();
+  });
   
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   app.get("*", (req: any, res: any) => {
