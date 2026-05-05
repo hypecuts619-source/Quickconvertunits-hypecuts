@@ -601,3 +601,17 @@ export const getUnitIdsFromPath = (path: string) => {
 
   return path.split('-to-');
 };
+
+export const getParsedParamsFromPath = (path: string): { val: string | null, from: string | null, to: string | null } => {
+  const match = path.match(/^convert-([\d.]+)-(.+)-to-(.+)$/);
+  if (match) {
+    const rawFrom = match[2];
+    const rawTo = match[3];
+    const parts = getUnitIdsFromPath(`${rawFrom}-to-${rawTo}`);
+    if (parts.length === 2) {
+      return { val: match[1], from: parts[0], to: parts[1] };
+    }
+    return { val: match[1], from: rawFrom, to: rawTo };
+  }
+  return { val: null, from: null, to: null };
+};

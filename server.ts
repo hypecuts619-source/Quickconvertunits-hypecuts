@@ -217,14 +217,32 @@ function applySEO(urlPath: string, template: string): string {
   if (urlPath && urlPath.includes("-to-")) {
     const parts = urlPath.split("-to-");
     if (parts.length === 2 && parts[0] && parts[1]) {
-      const fromId = parts[0];
+      let val = 1;
+      let fromId = parts[0];
       const toId = parts[1];
+
+      if (fromId.startsWith("convert-")) {
+        const valMatch = fromId.match(/^convert-([\d.]+)-(.*)$/);
+        if (valMatch) {
+          val = parseFloat(valMatch[1]);
+          fromId = valMatch[2];
+        }
+      }
       
       const fromUnit = popularUnits[fromId] || { name: capitalize(fromId), symbol: capitalize(fromId) };
       const toUnit = popularUnits[toId] || { name: capitalize(toId), symbol: capitalize(toId) };
       
-      const title = `Fast 1 ${fromUnit.name} to ${toUnit.name} Converter - Instant ${fromUnit.symbol} to ${toUnit.symbol}`;
-      const description = `Convert 1 ${fromUnit.name.toLowerCase()} to ${toUnit.name.toLowerCase()} instantly. Free online conversion calculator. Enter value, select units—get precise results fast.`;
+      const valText = val === 1 ? "1" : val.toString();
+      const resVal = calculateConversion(val, fromId, toId);
+      
+      let title = `Fast ${valText} ${fromUnit.name} to ${toUnit.name} Converter - Instant ${fromUnit.symbol} to ${toUnit.symbol}`;
+      if (val !== 1 && resVal !== "N/A") {
+        title = `${valText} ${fromUnit.name} to ${toUnit.name} - Convert ${valText} ${fromUnit.symbol} to ${toUnit.symbol}`;
+      }
+      
+      const description = val === 1 
+        ? `Convert 1 ${fromUnit.name.toLowerCase()} to ${toUnit.name.toLowerCase()} instantly. Free online conversion calculator. Enter value, select units—get precise results fast.`
+        : `What is ${valText} ${fromUnit.name} in ${toUnit.name}? ${valText} ${fromUnit.symbol} = ${resVal} ${toUnit.symbol}. Detailed conversion steps and formula included.`;
 
       template = template.replace(
         /<title[^>]*>.*?<\/title>/,
@@ -272,12 +290,17 @@ function applySEO(urlPath: string, template: string): string {
         formulaText = `The conversion factor is approximately <strong>${formatValue(conversionRatio)}</strong>. Therefore, 1 ${fromUnit.name} is equal to ${val1} ${toUnit.name}.`;
       }
       
-      const staticContent = `\n      <noscript>\n        <div>
-          <h1>${fromUnit.name} to ${toUnit.name} Converter</h1>
+      const staticContent = `
+      <div style="display:none;" aria-hidden="true">
+        <div>
+          <h1>${val !== 1 ? `${valText} ${fromUnit.name} to ${toUnit.name} Conversion` : `${fromUnit.name} to ${toUnit.name} Converter`}</h1>
           <p>${description}</p>
           <section>
-            <h2>How to convert ${fromUnit.name} to ${toUnit.name}</h2>
+            <h2>How to convert ${valText} ${fromUnit.name} to ${toUnit.name}</h2>
             <p>To convert a value from ${fromUnit.name} to ${toUnit.name}, simply use our fast, responsive calculator above. Enter any number into the ${fromUnit.name} field and the conversion to ${toUnit.name} will evaluate instantly. We use the most precise conversion rates available.</p>
+            ${val !== 1 && resVal !== "N/A" ? `
+              <p>Result: <strong>${valText} ${fromUnit.symbol} = ${resVal} ${toUnit.symbol}</strong></p>
+            ` : ""}
             <p><strong>Conversion Formula:</strong> ${formulaText}</p>
           </section>
           <section>
@@ -313,12 +336,12 @@ function applySEO(urlPath: string, template: string): string {
             <p>Yes, all conversions on QuickConvertUnits including ${fromUnit.name} to ${toUnit.name} are 100% free and work offline.</p>
           </section>
         </div>
-      </noscript>
+      </div>
     `;
 
       // Replace the placeholder static content with our custom SEO block
       template = template.replace(
-        /<noscript>\n        <div>[\s\S]*?<\/div>/,
+        /<div style="display:none;" aria-hidden="true">[\s\S]*?<\/div>/,
         staticContent
       );
       
@@ -456,22 +479,64 @@ function applySEO(urlPath: string, template: string): string {
         tableItem2: "UTC - 5 = EST",
         tableItem3: "UTC - 8 = PST",
         tableItem4: "UTC + 1 = CET"
+      },
+      "cooking": {
+        desc: "Accurate cooking measurement converter. Convert cups to ml, teaspoons to tablespoons, and ounces to grams.",
+        intro: "Precision in cooking and baking often requires converting between volume and weight. Our converter helps you scale recipes perfectly across international standards.",
+        faq2: "How many teaspoons are in a tablespoon?",
+        faq2A: "There are exactly 3 US teaspoons in 1 US tablespoon.",
+        faq3: "Is a US cup different from a UK cup?",
+        faq3A: "Yes, a US cup is 236.59 ml, while a traditional UK cup is often defined as 250 ml.",
+        faq4: "How many teaspoons are in a fluid ounce?",
+        faq4A: "In the US customary system, there are 6 US teaspoons in 1 US fluid ounce.",
+        tableItem1: "1 Cup = 236.59 mL",
+        tableItem2: "1 Tbsp = 14.79 mL",
+        tableItem3: "1 Tsp = 4.93 mL",
+        tableItem4: "1 Fl Oz = 29.57 mL"
+      },
+      "speed": {
+        desc: "Fast speed unit converter. Convert MPH to KPH, Knots to MPH, and Meters per Second.",
+        intro: "Convert travel speeds across different systems instantly. Ideal for understanding global speed limits or aviation and maritime navigation values.",
+        faq2: "What is 100 km/h in mph?",
+        faq2A: "100 kilometers per hour is approximately 62.14 miles per hour.",
+        faq3: "What is a Knot?",
+        faq3A: "A knot is one nautical mile per hour, which is roughly 1.15 standard miles per hour.",
+        faq4: "Is speed different from velocity?",
+        faq4A: "Speed is a scalar quantity (just magnitude), while velocity is a vector (magnitude and direction).",
+        tableItem1: "100 km/h = 62.14 mph",
+        tableItem2: "1 knot = 1.15 mph",
+        tableItem3: "1 m/s = 3.6 km/h",
+        tableItem4: "60 mph = 96.56 km/h"
+      },
+      "area": {
+        desc: "Convert area units like square feet to square meters, acres to hectares, and square miles.",
+        intro: "Calculate land and property sizes accurately. Essential for real estate, construction, and global landscaping projects.",
+        faq2: "How many acres are in a hectare?",
+        faq2A: "There are approximately 2.471 acres in 1 hectare.",
+        faq3: "How many square feet are in a square meter?",
+        faq3A: "1 square meter equals approximately 10.764 square feet.",
+        faq4: "What is a square mile in kilometers?",
+        faq4A: "1 square mile is approximately 2.59 square kilometers.",
+        tableItem1: "1 Hectare = 2.47 Acres",
+        tableItem2: "1 Sq Meter = 10.76 Sq Ft",
+        tableItem3: "1 Acre = 43,560 Sq Ft",
+        tableItem4: "1 Sq Mile = 640 Acres"
       }
     };
 
     const specifics = categorySpecifics[catNameRaw.toLowerCase()] || {
       desc: `Free ${catNameRaw.toLowerCase()} unit converter. Precise calculations with real-time results. Convert measurements instantly.`,
       intro: `Instantly convert between various ${catNameRaw.toLowerCase()} units. Our calculator is built for speed and precision, offering real-time conversions without page reloads.`,
-      faq2: `How accurate is this ${catNameRaw} converter?`,
-      faq2A: `Our tool uses officially recognized constants and factors up to multiple decimal places to ensure excellent accuracy.`,
-      faq3: `Is it completely free?`,
-      faq3A: `Yes, no ads or paywalls interrupt your conversion experience.`,
-      faq4: `Can I use it offline?`,
-      faq4A: `Yes, once loaded, basic math conversions work entirely in your browser.`,
-      tableItem1: `Popular ${catNameRaw} conversions natively supported`,
-      tableItem2: "Instant real-time math execution",
+      faq2: `How is ${catNameRaw} conversion calculated?`,
+      faq2A: `Our tool uses officially recognized constants and factors to ensure excellent accuracy according to international standards.`,
+      faq3: `Is this a reliable tool?`,
+      faq3A: `Yes, we utilize standard mathematical formulas up to multiple decimal places for precision.`,
+      faq4: `Can I use this on mobile?`,
+      faq4A: `Yes, the interface is fully responsive and works perfectly on all modern smartphones and tablets.`,
+      tableItem1: `Popular ${catNameRaw} conversions supported`,
+      tableItem2: "Instant real-time execution",
       tableItem3: "High decimal precision format",
-      tableItem4: "Cross-platform browser compatibility"
+      tableItem4: "Cross-platform compatibility"
     };
 
     const description = specifics.desc;
@@ -501,37 +566,39 @@ function applySEO(urlPath: string, template: string): string {
       `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${urlPath}" />`
     );
     
-    const staticContent = `\n      <noscript>\n        <div>
-        <h1>${title}</h1>
-        <p>${description}</p>
-        <section>
-          <h2>About ${capitalize(catNameRaw)} Conversion</h2>
-          <p>${specifics.intro}</p>
-          <p>Whether you're a professional, student, or just need a quick calculation, our interface responds to inputs live.</p>
-        </section>
-        <section>
-          <h2>Popular ${capitalize(catNameRaw)} Reference Table</h2>
-          <table border="1" cellpadding="8" style="border-collapse: collapse; margin-top: 10px;">
-            <tr><th>Conversion Examples</th></tr>
-            <tr><td>${specifics.tableItem1}</td></tr>
-            <tr><td>${specifics.tableItem2}</td></tr>
-            <tr><td>${specifics.tableItem3}</td></tr>
-            <tr><td>${specifics.tableItem4}</td></tr>
-          </table>
-        </section>
-        <section>
-          <h2>Frequently Asked Questions</h2>
-          <h3>Is this ${capitalize(catNameRaw)} converter free?</h3>
-          <p>Yes, all conversions on our platform are completely free and work offline where supported.</p>
-          <h3>${specifics.faq2}</h3>
-          <p>${specifics.faq2A}</p>
-          <h3>${specifics.faq3}</h3>
-          <p>${specifics.faq3A}</p>
-          <h3>${specifics.faq4}</h3>
-          <p>${specifics.faq4A}</p>
-        </section>
+    const staticContent = `
+      <div style="display:none;" aria-hidden="true">
+        <div>
+          <h1>${title}</h1>
+          <p>${description}</p>
+          <section>
+            <h2>About ${capitalize(catNameRaw)} Conversion</h2>
+            <p>${specifics.intro}</p>
+            <p>Whether you're a professional, student, or just need a quick calculation, our interface responds to inputs live.</p>
+          </section>
+          <section>
+            <h2>Popular ${capitalize(catNameRaw)} Reference Table</h2>
+            <table border="1" cellpadding="8" style="border-collapse: collapse; margin-top: 10px;">
+              <tr><th>Conversion Examples</th></tr>
+              <tr><td>${specifics.tableItem1}</td></tr>
+              <tr><td>${specifics.tableItem2}</td></tr>
+              <tr><td>${specifics.tableItem3}</td></tr>
+              <tr><td>${specifics.tableItem4}</td></tr>
+            </table>
+          </section>
+          <section>
+            <h2>Frequently Asked Questions</h2>
+            <h3>How do I use this ${capitalize(catNameRaw)} converter?</h3>
+            <p>Simply enter the value you wish to convert in the 'From' field, select your units, and the result will appear instantly. Our platform works on both desktop and mobile browsers.</p>
+            <h3>${specifics.faq2}</h3>
+            <p>${specifics.faq2A}</p>
+            <h3>${specifics.faq3}</h3>
+            <p>${specifics.faq3A}</p>
+            <h3>${specifics.faq4}</h3>
+            <p>${specifics.faq4A}</p>
+          </section>
+        </div>
       </div>
-      </noscript>
     `;
 
     template = template.replace(

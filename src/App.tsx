@@ -1,14 +1,12 @@
 import { useState, useEffect, useMemo, useRef, lazy, Suspense } from "react";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
-import { getSuggestions, convert, categories, formatNumber, getSEOUrlPath, getUnitIdsFromPath, updateCurrencyRates } from "./lib/units";
+import { getSuggestions, convert, categories, formatNumber, getSEOUrlPath, getUnitIdsFromPath, getParsedParamsFromPath, updateCurrencyRates } from "./lib/units";
 import { categorySeoContent } from "./lib/seoContent";
 import { customSeoData } from "./lib/customSeoData";
 import { trackConversionEvent, trackFunnelStep, trackPageView } from "./lib/analytics";
-import { SeoContent } from "./components/SeoContent";
 import { LanguageSelector } from "./components/LanguageSelector";
 import { useTranslation } from "react-i18next";
-import { PopularConversions, POPULAR_CONVERSIONS } from "./components/PopularConversions";
-import { TimeZoneConverter } from "./components/TimeZoneConverter";
+import { POPULAR_CONVERSIONS } from "./lib/constants";
 import {
   ArrowRightLeft,
   Sun,
@@ -38,8 +36,39 @@ import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "motion/react";
 
 const ConversionChart = lazy(() => import("./components/ConversionChart"));
-import HowToConvertSection from "./components/HowToConvertSection";
-import RelatedToolsSection from "./components/RelatedToolsSection";
+const HowToConvertSection = lazy(() => import("./components/HowToConvertSection"));
+const RelatedToolsSection = lazy(() => import("./components/RelatedToolsSection"));
+const SeoContent = lazy(() => import("./components/SeoContent").then(module => ({ default: module.SeoContent })));
+const PopularConversions = lazy(() => import("./components/PopularConversions").then(module => ({ default: module.PopularConversions })));
+const TimeZoneConverter = lazy(() => import("./components/TimeZoneConverter").then(module => ({ default: module.TimeZoneConverter })));
+
+const QuickLinksSection = ({ fromUnit, toUnit, category }: { fromUnit: any; toUnit: any; category: string }) => {
+  const nums = [1, 5, 10, 25, 50, 100, 150, 200, 250, 500, 1000];
+  const uPath = getSEOUrlPath(fromUnit.id, toUnit.id);
+  
+  return (
+    <div className="mt-12 mb-12">
+      <div className="flex items-center gap-2 mb-6">
+        <TrendingUp className="w-5 h-5 text-primary-500" />
+        <h3 className="text-xl font-semibold tracking-tight">Common {fromUnit.name} to {toUnit.name} Conversions</h3>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+        {nums.map(n => (
+          <Link
+            key={n}
+            to={`/convert-${n}-${uPath}`}
+            className="flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-[#111111] border border-neutral-100 dark:border-neutral-800 hover:border-primary-200 dark:hover:border-primary-900/40 hover:bg-primary-50/10 transition-all group"
+          >
+            <span className="text-sm font-medium text-neutral-600 dark:text-neutral-300 group-hover:text-primary-600 dark:group-hover:text-primary-400">
+              {n} {fromUnit.symbol} to {toUnit.symbol}
+            </span>
+            <ArrowRight className="w-3.5 h-3.5 text-neutral-300 group-hover:text-primary-500 transition-all group-hover:translate-x-0.5" />
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const POPULAR = [
   { label: "kg to lbs", cat: "weight", fu: "kilogram", tu: "pound" },
@@ -322,7 +351,8 @@ export default function App() {
           return;
         }
       }
-      const parts = getUnitIdsFromPath(conversion);
+      const parsed = getParsedParamsFromPath(conversion);
+      const parts = parsed.from && parsed.to ? [parsed.from, parsed.to] : getUnitIdsFromPath(conversion);
       if (parts.length === 2) {
         for (const cat of categories) {
           const u1 = cat.units.find(u => u.id === parts[0].toLowerCase());
@@ -331,6 +361,7 @@ export default function App() {
             setCategory(cat.id);
             setUnitFrom(u1.id);
             setUnitTo(u2.id);
+            if (parsed.val) setValFrom(parsed.val);
             return;
           }
         }
@@ -361,7 +392,8 @@ export default function App() {
           return potentialCat;
         }
       }
-      const parts = getUnitIdsFromPath(conversion);
+      const parsed = getParsedParamsFromPath(conversion);
+      const parts = parsed.from && parsed.to ? [parsed.from, parsed.to] : getUnitIdsFromPath(conversion);
       if (parts.length === 2) {
         for (const cat of categories) {
           if (cat.units.some(u => u.id === parts[0].toLowerCase()) && cat.units.some(u => u.id === parts[1].toLowerCase())) {
@@ -380,7 +412,8 @@ export default function App() {
          const acat = categories.find(c => c.id === potentialCat);
          if (acat) return acat.units[0]?.id || "";
       }
-      const parts = getUnitIdsFromPath(conversion);
+      const parsed = getParsedParamsFromPath(conversion);
+      const parts = parsed.from && parsed.to ? [parsed.from, parsed.to] : getUnitIdsFromPath(conversion);
       if (parts.length === 2) {
         return parts[0].toLowerCase();
       }
@@ -397,7 +430,8 @@ export default function App() {
          const acat = categories.find(c => c.id === potentialCat);
          if (acat) return acat.units[1]?.id || acat.units[0]?.id || "";
       }
-      const parts = getUnitIdsFromPath(conversion);
+      const parsed = getParsedParamsFromPath(conversion);
+      const parts = parsed.from && parsed.to ? [parsed.from, parsed.to] : getUnitIdsFromPath(conversion);
       if (parts.length === 2) {
         return parts[1].toLowerCase();
       }
@@ -409,6 +443,10 @@ export default function App() {
   });
 
   const [valFrom, setValFrom] = useState(() => {
+    if (conversion) {
+      const parsed = getParsedParamsFromPath(conversion);
+      if (parsed.val !== null) return parsed.val;
+    }
     const params = new URLSearchParams(window.location.search);
     const val = params.get("val");
     return val !== null ? val : "1";
@@ -829,11 +867,12 @@ export default function App() {
       canonicalUrlStr = `https://quickconvertunits.com/${category.replace(/_/g, '-')}-converter`;
       ogTitleStr = titleStr;
     } else {
+      const isNumericPath = location.pathname.startsWith('/convert-');
       const valPrefix = valFrom && valFrom !== "1" && valFrom !== "0" ? `${valFrom} ` : "";
       const symbolToPath = getSEOUrlPath(unitFrom, unitTo);
       const customSeo = customSeoData[symbolToPath];
 
-      if (customSeo) {
+      if (customSeo && !isNumericPath) {
         titleStr = customSeo.title.replace("Converter", "Converter [2026 Free]");
         metaDescStr = customSeo.description;
         customFAQs = getFAQsFromHtml(customSeo.content);
@@ -841,10 +880,18 @@ export default function App() {
         const symFrom = activeFromUnit.symbol;
         const symTo = activeToUnit.symbol;
         
-        titleStr = `Fast ${valPrefix}${pluralFrom} to ${pluralTo} Converter - Instant ${symFrom} to ${symTo} [2026 Free]`;
-        metaDescStr = `Convert ${valPrefix}${pluralFrom.toLowerCase()} to ${pluralTo.toLowerCase()} instantly. 1 ${symFrom} = ${convert(1, unitFrom, unitTo, category).toPrecision(6)} ${symTo}. Offline capable, free calculator with conversion table, formula, and examples. Fast and accurate.`;
+        if (isNumericPath && valFrom) {
+          titleStr = `${valFrom} ${activeFromUnit.name} to ${activeToUnit.name} - Convert ${valFrom} ${pluralFrom} to ${pluralTo}`;
+          const resultVal = convert(parseFloat(valFrom), unitFrom, unitTo, category);
+          metaDescStr = `What is ${valFrom} ${activeFromUnit.name} in ${activeToUnit.name}? ${valFrom} ${symFrom} = ${formatNumber(resultVal)} ${symTo}. Detailed conversion steps and formula included.`;
+        } else {
+          titleStr = `Fast ${valPrefix}${pluralFrom} to ${pluralTo} Converter - Instant ${symFrom} to ${symTo} [2026 Free]`;
+          metaDescStr = `Convert ${valPrefix}${pluralFrom.toLowerCase()} to ${pluralTo.toLowerCase()} instantly. 1 ${symFrom} = ${convert(1, unitFrom, unitTo, category).toPrecision(6)} ${symTo}. Offline capable, free calculator with conversion table, formula, and examples. Fast and accurate.`;
+        }
       }
-      canonicalUrlStr = `https://quickconvertunits.com/${getSEOUrlPath(unitFrom, unitTo)}`;
+      canonicalUrlStr = isNumericPath 
+        ? `https://quickconvertunits.com/convert-${valFrom}-${getSEOUrlPath(unitFrom, unitTo)}`
+        : `https://quickconvertunits.com/${getSEOUrlPath(unitFrom, unitTo)}`;
       ogTitleStr = titleStr;
     }
 
@@ -1252,9 +1299,21 @@ export default function App() {
               <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-4xl font-semibold tracking-tight mb-2 text-neutral-900 dark:text-white">
                 Time Zone Converter
               </h1>
+            ) : location.pathname === "/" ? (
+              <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-4xl font-semibold tracking-tight mb-2 text-neutral-900 dark:text-white">
+                Quick & Accurate Unit Converter
+              </h1>
             ) : (
               <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-4xl font-semibold tracking-tight mb-2 text-neutral-900 dark:text-white">
-                {(activeFromUnit?.name || '').endsWith('s') ? activeFromUnit?.name : `${activeFromUnit?.name}s`} to {(activeToUnit?.name || '').endsWith('s') ? activeToUnit?.name : `${activeToUnit?.name}s`} Converter
+                {valFrom && valFrom !== "1" && valFrom !== "0" && !Number.isNaN(parseFloat(valFrom)) ? (
+                  <>
+                    {valFrom} {(parseFloat(valFrom) === 1 ? activeFromUnit?.name : ((activeFromUnit?.name || '').endsWith('s') ? activeFromUnit?.name : `${activeFromUnit?.name}s`))} to {(activeToUnit?.name || '').endsWith('s') ? activeToUnit?.name : `${activeToUnit?.name}s`}
+                  </>
+                ) : (
+                  <>
+                    {(activeFromUnit?.name || '').endsWith('s') ? activeFromUnit?.name : `${activeFromUnit?.name}s`} to {(activeToUnit?.name || '').endsWith('s') ? activeToUnit?.name : `${activeToUnit?.name}s`} Converter
+                  </>
+                )}
                 <button
                   onClick={toggleFavorite}
                   className={`flex-shrink-0 flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full transition-colors ${
@@ -1735,8 +1794,61 @@ export default function App() {
           </motion.div>
           )}
 
+          {/* SEO Content Article */}
+          {category !== 'time_zone' && activeFromUnit && activeToUnit && valFrom !== "" && (
+            <article className="mt-8 bg-white dark:bg-[#111111] rounded-3xl p-8 md:p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-neutral-100 dark:border-neutral-800">
+              <header className="mb-8 overflow-hidden">
+                <h2 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
+                  Convert {valFrom} {activeFromUnit.name} to {activeToUnit.name}
+                </h2>
+                <p className="text-4xl md:text-5xl mt-6 mb-2 font-mono text-primary-600 dark:text-primary-400 break-words">
+                  {valFrom} {activeFromUnit.symbol} = {valTo} {activeToUnit.symbol}
+                </p>
+              </header>
+
+              <section className="prose prose-neutral dark:prose-invert max-w-none">
+                <h3 className="text-xl font-semibold mb-4 mt-0 text-neutral-900 dark:text-neutral-100">How to calculate {valFrom} {activeFromUnit.name} to {activeToUnit.name}</h3>
+                <p className="text-neutral-600 dark:text-neutral-400">
+                  To convert {activeFromUnit.name} to {activeToUnit.name}, you simply apply the conversion factor.
+                </p>
+                <div className="bg-neutral-50 dark:bg-[#161616] p-4 rounded-xl border border-neutral-100 dark:border-neutral-800 font-mono text-sm md:text-base overflow-x-auto whitespace-nowrap text-neutral-800 dark:text-neutral-200">
+                  {category === "temperature" 
+                    ? `Formula varies by unit`
+                    : `$$ ${valFrom} \\text{ ${activeFromUnit.symbol}} \\times ${parseFloat(convert(1, unitFrom, unitTo, category).toFixed(6))} = ${valTo} \\text{ ${activeToUnit.symbol}} $$`
+                  }
+                </div>
+              </section>
+
+              <section className="mt-10 overflow-x-auto">
+                <h3 className="text-xl font-semibold mb-4 text-neutral-900 dark:text-neutral-100">Common {activeFromUnit.name} to {activeToUnit.name} Conversions</h3>
+                <table className="w-full text-left border-collapse min-w-[300px]">
+                  <thead>
+                    <tr className="border-b border-neutral-200 dark:border-neutral-800">
+                      <th className="py-3 px-4 font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider text-xs">{activeFromUnit.name.toUpperCase()}</th>
+                      <th className="py-3 px-4 font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider text-xs">{activeToUnit.name.toUpperCase()}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
+                    {[1, 5, 10, 50, 100, 250, 500, 1000].map(val => (
+                      <tr key={val} className="hover:bg-neutral-50 dark:hover:bg-[#161616] transition-colors">
+                        <td className="py-3 px-4 font-mono">
+                          <Link to={`/convert-${val}-${unitFrom}-to-${unitTo}`} className="text-primary-600 dark:text-primary-400 hover:underline">
+                            {val} {activeFromUnit.symbol}
+                          </Link>
+                        </td>
+                        <td className="py-3 px-4 font-mono text-neutral-700 dark:text-neutral-300">
+                          {parseFloat(convert(val, unitFrom, unitTo, category).toFixed(6))} {activeToUnit.symbol}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </section>
+            </article>
+          )}
+
           {/* Categories */}
-          <div className="flex overflow-x-auto md:flex-wrap no-scrollbar gap-3 mt-8 mb-8 pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:justify-center items-center">
+          <div className="flex overflow-x-auto md:flex-wrap no-scrollbar gap-3 mt-8 mb-8 pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:justify-center items-center text-center">
             {categories.map((c) => (
               <button
                 key={c.id}
@@ -1752,43 +1864,52 @@ export default function App() {
             ))}
           </div>
 
-          {/* Frequently Asked Questions */}
-          {category !== 'time_zone' && activeFromUnit && activeToUnit && (
-          <div className="mt-8 bg-white dark:bg-[#111111] rounded-3xl p-8 md:p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-neutral-100 dark:border-neutral-800">
-            <h3 className="text-2xl font-semibold tracking-tight mb-6">Frequently Asked Questions</h3>
-            <div className="space-y-6">
-              <div className="prose prose-neutral dark:prose-invert max-w-none">
-                <h4 className="text-lg font-medium text-neutral-800 dark:text-neutral-200 mb-2 mt-0">
-                  {category === "temperature" ? `What is 1 ${activeFromUnit.name} in ${activeToUnit.name}?` : `How many ${activeToUnit.name} are in 1 ${activeFromUnit.name}?`}
-                </h4>
-                <p className="text-neutral-600 dark:text-neutral-400 font-light leading-relaxed mb-0">
-                  {category === "temperature" 
-                    ? `1 degree ${activeFromUnit.name} is equivalent to ${parseFloat(convert(1, unitFrom, unitTo, category).toFixed(6))} degrees ${activeToUnit.name}.`
-                    : `There are ${parseFloat(convert(1, unitFrom, unitTo, category).toFixed(6))} ${activeToUnit.name} in 1 ${activeFromUnit.name}.`
-                  }
-                </p>
+          {/* Featured Result for Numeric Paths */}
+          {valFrom && valFrom !== "1" && valFrom !== "0" && !Number.isNaN(parseFloat(valFrom)) && (
+            <>
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-8 p-8 rounded-[2.5rem] bg-primary-500 text-white shadow-[0_20px_50px_rgba(59,130,246,0.2)] dark:shadow-none text-center relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-white/10 rounded-full blur-[60px]" />
+                <p className="text-primary-100 text-sm font-semibold uppercase tracking-widest mb-2">Featured Result</p>
+                <div className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
+                  {valFrom} {activeFromUnit.symbol} = {valTo} {activeToUnit.symbol}
+                </div>
+                <div className="text-primary-50/80 text-lg font-medium">
+                  {valFrom} {activeFromUnit.name} is equal to exactly {valTo} {activeToUnit.name}
+                </div>
+                {category !== 'temperature' && (
+                  <div className="mt-6 inline-block px-6 py-2 rounded-2xl bg-white/10 backdrop-blur-sm font-mono text-sm">
+                    {valFrom} {activeFromUnit.symbol} × {formatNumber(convert(1, unitFrom, unitTo, category))} = {valTo} {activeToUnit.symbol}
+                  </div>
+                )}
+              </motion.div>
+
+              <div className="mb-12 p-8 rounded-3xl bg-white dark:bg-[#111111] border border-neutral-100 dark:border-neutral-800 shadow-sm">
+                <h2 className="text-2xl font-semibold mb-4 tracking-tight">How to Convert {valFrom} {activeFromUnit.name} to {activeToUnit.name}?</h2>
+                <div className="prose prose-neutral dark:prose-invert max-w-none font-light text-neutral-600 dark:text-neutral-400">
+                  <p>
+                    To convert <strong>{valFrom} {activeFromUnit.name.toLowerCase()}</strong> to <strong>{activeToUnit.name.toLowerCase()}</strong>, we use the following conversion formula:
+                  </p>
+                  <div className="bg-neutral-50 dark:bg-neutral-900/50 p-6 rounded-2xl border border-neutral-100 dark:border-neutral-800 my-6 font-serif italic text-xl text-center">
+                    {category === 'temperature' ? (
+                      activeFromUnit.id === 'celsius' && activeToUnit.id === 'fahrenheit' 
+                        ? `(${valFrom}°C × 9/5) + 32 = ${valTo}°F`
+                        : activeFromUnit.id === 'fahrenheit' && activeToUnit.id === 'celsius'
+                        ? `(${valFrom}°F - 32) × 5/9 = ${valTo}°C`
+                        : `${activeFromUnit.symbol} to ${activeToUnit.symbol} Conversion Result: ${valTo}`
+                    ) : (
+                      `${valFrom} ${activeFromUnit.symbol} × ${formatNumber(convert(1, unitFrom, unitTo, category))} = ${valTo} ${activeToUnit.symbol}`
+                    )}
+                  </div>
+                  <p>
+                    By applying the conversion factor of <strong>{formatNumber(convert(1, unitFrom, unitTo, category))}</strong>, we find that {valFrom} {activeFromUnit.name.toLowerCase()} is exactly {valTo} {activeToUnit.name.toLowerCase()}. This calculation is critical for accuracy in science, engineering, and everyday measurements.
+                  </p>
+                </div>
               </div>
-              <div className="prose prose-neutral dark:prose-invert max-w-none">
-                <h4 className="text-lg font-medium text-neutral-800 dark:text-neutral-200 mb-2 mt-0">
-                  How do I convert {activeFromUnit.name} to {activeToUnit.name}?
-                </h4>
-                <p className="text-neutral-600 dark:text-neutral-400 font-light leading-relaxed mb-0">
-                  {category === "temperature"
-                    ? `To convert ${activeFromUnit.name} to ${activeToUnit.name}, you use a specific temperature formula involving an offset. Our free online calculator handles this complex conversion automatically.`
-                    : `To convert ${activeFromUnit.name} to ${activeToUnit.name}, you multiply the value by ${parseFloat(convert(1, unitFrom, unitTo, category).toFixed(6))}. Our free online calculator handles this mathematical conversion automatically.`
-                  }
-                </p>
-              </div>
-              <div className="prose prose-neutral dark:prose-invert max-w-none">
-                <h4 className="text-lg font-medium text-neutral-800 dark:text-neutral-200 mb-2 mt-0">
-                  What is a {activeFromUnit.name}?
-                </h4>
-                <p className="text-neutral-600 dark:text-neutral-400 font-light leading-relaxed mb-0">
-                  {activeFromUnit.description || `A ${activeFromUnit.name} is a typical unit of ${activeCategory.name.toLowerCase()}.`}
-                </p>
-              </div>
-            </div>
-          </div>
+            </>
           )}
 
           {/* Conversion Chart for Specific Categories */}
@@ -1814,6 +1935,14 @@ export default function App() {
             activeToUnit={activeToUnit as any}
             units={categories.find(c => c.id === category)?.units || []}
           />
+
+          {category !== 'time_zone' && activeFromUnit && activeToUnit && (
+            <QuickLinksSection 
+              fromUnit={activeFromUnit} 
+              toUnit={activeToUnit} 
+              category={category} 
+            />
+          )}
 
           {/* AD: Below Result Ad */}
           <AdSlot

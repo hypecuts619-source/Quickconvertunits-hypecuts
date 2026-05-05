@@ -25,14 +25,14 @@ export const categorySeoContent: Record<string, string> = {
       <li><a href="/feet-to-meters">Feet to Meters</a></li>
     </ul>
     <h2>Frequently Asked Questions</h2>
-    <h3>Is this length converter accurate?</h3>
-    <p>Yes, we use high-precision conversion factors for all distance measurements.</p>
-    <h3>What units are supported?</h3>
-    <p>We support standard units like meters, feet, and inches, as well as specialized units like nautical miles and light years.</p>
+    <h3>How do I convert between imperial and metric length?</h3>
+    <p>You can use this calculator. Simply enter your imperial value (e.g. inches) to instantly see the metric equivalent (e.g. centimeters). The scale is linear, so 10 inches is exactly ten times the value of 1 inch.</p>
+    <h3>Does this length converter work for very small units?</h3>
+    <p>Yes, you can convert micrometers, millimeters, and nanometers accurately, which is essential for scientific and engineering contexts.</p>
     <h3>How many centimeters are in an inch?</h3>
     <p>There are exactly 2.54 centimeters in one inch.</p>
-    <h3>Is a mile longer than a kilometer?</h3>
-    <p>Yes, 1 mile is approximately 1.61 kilometers.</p>
+    <h3>Is a nautical mile the same as a statute mile?</h3>
+    <p>No, a nautical mile is based on the Earth's circumference and equals 1.852 km, while a standard (statute) mile is 1.609 km.</p>
   `,
   temperature: `
     <h2>About Temperature Conversion</h2>
@@ -66,17 +66,14 @@ export const categorySeoContent: Record<string, string> = {
     </ul>
 
     <h2>Frequently Asked Questions</h2>
-    <h3>Is this temperature converter free?</h3>
-    <p>Yes, all conversions are completely free with no registration required.</p>
-
-    <h3>Can I use this offline?</h3>
-    <p>Yes, this converter works offline once the page is loaded.</p>
-
-    <h3>How accurate are the conversions?</h3>
-    <p>Our calculator uses standard conversion formulas and provides results accurate to multiple decimal places.</p>
-
-    <h3>What's the difference between Celsius and Fahrenheit?</h3>
-    <p>Celsius is based on the freezing (0°) and boiling (100°) points of water. Fahrenheit uses different reference points with water freezing at 32° and boiling at 212°.</p>
+    <h3>Why does temperature conversion use addition or subtraction?</h3>
+    <p>Unlike distance or weight, Celsius and Fahrenheit scales do not start at absolute zero. They require an offset operation (adding or subtracting 32) before applying the scaling factor.</p>
+    <h3>What is the formula for Celsius to Fahrenheit?</h3>
+    <p>The standard formula is: Multiply the Celsius temperature by 9/5 (or 1.8) and add 32.</p>
+    <h3>Is -40 degrees the same in both scales?</h3>
+    <p>Yes, -40°C is the exact same temperature as -40°F. This is the only point where the two scales intersect.</p>
+    <h3>What is Kelvin used for?</h3>
+    <p>Kelvin is the primary unit for scientific temperature measurement because it starts at absolute zero, meaning there are no negative values.</p>
   `,
   weight: `
     <h2>About Weight and Mass Conversion</h2>
@@ -105,13 +102,13 @@ export const categorySeoContent: Record<string, string> = {
     </ul>
     <h2>Frequently Asked Questions</h2>
     <h3>What is the difference between mass and weight?</h3>
-    <p>Mass is the amount of matter in an object, while weight is the force of gravity on that object. In daily use, we usually use these terms interchangeably.</p>
-    <h3>How many pounds are in a kilogram?</h3>
-    <p>One kilogram is approximately 2.20462 pounds.</p>
-    <h3>What is 1 stone in kg?</h3>
-    <p>One stone is equivalent to 6.35029 kilograms.</p>
-    <h3>Is a gram bigger than an ounce?</h3>
-    <p>No, an ounce is much bigger. There are about 28.35 grams in one ounce.</p>
+    <p>Mass measures the amount of matter in an object and stays constant, while weight measures the gravitational force. On Earth, we use them interchangeably in standard weight units like kg and lbs.</p>
+    <h3>How many pounds are in 1 kilogram?</h3>
+    <p>One kilogram is exactly 2.20462 pounds. For rough estimates, doubling the kg and adding 10% is a common mental shortcut.</p>
+    <h3>Is a metric ton the same as a US ton?</h3>
+    <p>No. A metric ton is 1,000 kg (approx 2,204 lbs), while a US short ton is 2,000 lbs.</p>
+    <h3>How many grams are in one ounce?</h3>
+    <p>There are about 28.35 grams in one standard ounce (avoirdupois). Not to be confused with troy ounces used for precious metals.</p>
   `,
   area: `
     <h2>Area Conversion for Real Estate and Land</h2>

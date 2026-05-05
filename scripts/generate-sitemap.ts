@@ -57,19 +57,29 @@ const getSEOUrlPath = (fromId, toId) => {
 // All valid conversion combinations
 addUrl("/time-zone-converter", "0.9", "weekly");
 
+const magicNumbers = [1, 5, 10, 20, 25, 50, 100, 150, 180, 200, 250, 500, 1000, 1500, 2000, 3000, 5000];
+
 for (const category of categories) {
   addUrl(`/${category.id.replace(/_/g, '-')}-converter`, "0.9", "weekly");
   
   for (const fromUnit of category.units) {
     for (const toUnit of category.units) {
       if (fromUnit.id !== toUnit.id) {
-        let path = getSEOUrlPath(fromUnit.id, toUnit.id);
+        let pathStr = getSEOUrlPath(fromUnit.id, toUnit.id);
         // bump priority of top 10 keywords
         let priority = "0.7";
-        if (["/kg-to-lbs", "/inches-to-cm", "/cm-to-inches", "/lbs-to-kg", "/feet-to-meters", "/miles-to-km", "/mm-to-inches"].includes(path)) {
+        if (["/kg-to-lbs", "/inches-to-cm", "/cm-to-inches", "/lbs-to-kg", "/feet-to-meters", "/miles-to-km", "/mm-to-inches"].includes(pathStr)) {
           priority = "0.9";
         }
-        addUrl(path, priority, "monthly");
+        addUrl(pathStr, priority, "monthly");
+
+        // Add dynamic conversions for popular SEO queries
+        for (const val of magicNumbers) {
+          // pathStr is e.g. "/lbs-to-kg"
+          // we want "/convert-150-lbs-to-kg"
+          const dynamicPath = `/convert-${val}${pathStr.replace('/', '-')}`;
+          addUrl(dynamicPath, priority === "0.9" ? "0.8" : "0.5", "monthly");
+        }
       }
     }
   }
@@ -78,4 +88,6 @@ for (const category of categories) {
 sitemap += `</urlset>\n`;
 
 fs.writeFileSync(sitemapPath, sitemap, "utf8");
-console.log(`Generated sitemap with length: ${sitemap.length} bytes at ${sitemapPath}`);
+const programmaticPath = path.resolve(process.cwd(), "public/sitemap-programmatic.xml");
+fs.writeFileSync(programmaticPath, sitemap, "utf8");
+console.log(`Generated sitemaps at ${sitemapPath} and ${programmaticPath}`);

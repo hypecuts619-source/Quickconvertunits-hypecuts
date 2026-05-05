@@ -72,14 +72,35 @@ export default defineConfig(({mode}) => {
     build: {
       rollupOptions: {
         output: {
-          manualChunks: {
-            'recharts': ['recharts'],
-            'motion': ['motion', 'framer-motion'],
-            'i18n': ['i18next', 'react-i18next'],
-            'date-fns': ['date-fns'],
-            'router': ['react-router-dom', 'react-router'],
-            'lucide': ['lucide-react'],
-            'react-core': ['react', 'react-dom']
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('react') || id.includes('scheduler') || id.includes('object-assign')) {
+                return 'vendor-react';
+              }
+              if (id.includes('recharts') || id.includes('d3')) {
+                return 'vendor-charts';
+              }
+              if (id.includes('lucide-react')) {
+                return 'vendor-ui';
+              }
+              if (id.includes('i18next')) {
+                return 'vendor-i18n';
+              }
+              if (id.includes('motion') || id.includes('framer-motion')) {
+                return 'vendor-utils';
+              }
+              // Merge small ones to avoid circles
+              return 'vendor-react';
+            }
+            if (id.includes('/lib/seoContent') || id.includes('/lib/customSeoData')) {
+              return 'data-seo';
+            }
+            if (id.includes('/lib/units') || id.includes('/lib/constants')) {
+              return 'data-units';
+            }
+            if (id.includes('/lib/blogPosts')) {
+              return 'data-blog';
+            }
           }
         }
       }

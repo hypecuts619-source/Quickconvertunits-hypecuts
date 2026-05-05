@@ -153,8 +153,92 @@ export const customSeoData: Record<string, CustomSeoContent> = {
       <h2>Frequently Asked Questions</h2>
       <h3>How many cm in an inch?</h3>
       <p>There are exactly 2.54 centimeters in one inch.</p>
-      <h3>How do I convert inches to cm?</h3>
-      <p>Multiply your inch value by 2.54. For example, 5 inches × 2.54 = 12.7 centimeters.</p>
+      <h3>Is an inch always 2.54 cm?</h3>
+      <p>Yes, since 1959, the international inch has been defined as exactly 2.54 centimeters by the International Yard and Pound agreement.</p>
+      <h3>What is 2.5 cm in inches?</h3>
+      <p>2.5 centimeters is slightly less than 1 inch (approximately 0.984 inches).</p>
+      <h3>How do I convert height from feet/inches to cm?</h3>
+      <p>Convert your total height to inches first (feet × 12 + inches) and then multiply the result by 2.54.</p>
+    `
+  },
+  "teaspoon_us-to-fluid_ounce_us": {
+    title: "Teaspoons to Fluid Ounces (tsp to fl oz) - Cooking Converter | QuickConvert",
+    description: "Convert teaspoons to US fluid ounces instantly. 6 teaspoons = 1 US fluid ounce. Free baking calculator with conversion table and formula.",
+    content: `
+      <h2>Teaspoons to Fluid Ounces Reference</h2>
+      <ul>
+        <li>1 tsp = 0.16667 fl oz</li>
+        <li>3 tsp (1 tbsp) = 0.5 fl oz</li>
+        <li>6 tsp (2 tbsp) = 1 fl oz</li>
+        <li>12 tsp (4 tbsp) = 2 fl oz</li>
+        <li>24 tsp (1/2 cup) = 4 fl oz</li>
+      </ul>
+
+      <h2>How to Convert Teaspoons to Fluid Ounces</h2>
+      <p>To convert US teaspoons to US fluid ounces, divide the number of teaspoons by 6:</p>
+      <p className="font-mono bg-neutral-100 dark:bg-neutral-800 p-3 rounded-lg text-center my-4"><strong>fluid ounces = teaspoons ÷ 6</strong></p>
+      
+      <h3>Step-by-Step Example</h3>
+      <p>If you have 12 teaspoons and want to know how many fluid ounces that is:</p>
+      <ol>
+        <li>Start with 12 teaspoons</li>
+        <li>Divide by 6 (12 ÷ 6)</li>
+        <li>Result: 2 fluid ounces</li>
+      </ol>
+
+      <h2>Teaspoons to Fluid Ounces Table</h2>
+      <div className="not-prose overflow-x-auto my-6 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-sm">
+        <table className="w-full text-sm text-center">
+          <thead className="bg-neutral-50 dark:bg-[#1a1a1a] border-b border-neutral-200 dark:border-neutral-800 text-neutral-500 font-medium">
+            <tr>
+              <th className="px-4 py-3">Teaspoons (tsp)</th>
+              <th className="px-4 py-3">Fluid Ounces (fl oz)</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/50">
+            <tr><td className="px-4 py-2 bg-white dark:bg-[#111111]">1 tsp</td><td className="px-4 py-2 text-neutral-600 dark:text-neutral-300 bg-white/50 dark:bg-neutral-900/50">0.167 fl oz</td></tr>
+            <tr><td className="px-4 py-2 bg-white dark:bg-[#111111]">3 tsp</td><td className="px-4 py-2 text-neutral-600 dark:text-neutral-300 bg-white/50 dark:bg-neutral-900/50">0.5 fl oz</td></tr>
+            <tr><td className="px-4 py-2 bg-white dark:bg-[#111111]">6 tsp</td><td className="px-4 py-2 text-neutral-600 dark:text-neutral-300 bg-white/50 dark:bg-neutral-900/50">1.0 fl oz</td></tr>
+            <tr><td className="px-4 py-2 bg-white dark:bg-[#111111]">12 tsp</td><td className="px-4 py-2 text-neutral-600 dark:text-neutral-300 bg-white/50 dark:bg-neutral-900/50">2.0 fl oz</td></tr>
+            <tr><td className="px-4 py-2 bg-white dark:bg-[#111111]">24 tsp</td><td className="px-4 py-2 text-neutral-600 dark:text-neutral-300 bg-white/50 dark:bg-neutral-900/50">4.0 fl oz</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Frequently Asked Questions</h2>
+      <h3>How many teaspoons are in a fluid ounce?</h3>
+      <p>There are exactly 6 US teaspoons in 1 US fluid ounce.</p>
+      <h3>Is a teaspoon half a tablespoon?</h3>
+      <p>No, there are 3 teaspoons in 1 tablespoon. Therefore, a tablespoon is 3 times the size of a teaspoon.</p>
+      <h3>How many mL is 1 fluid ounce?</h3>
+      <p>One US fluid ounce is approximately 29.57 milliliters.</p>
+      <h3>Can I use a regular spoon for measuring?</h3>
+      <p>Standard kitchen spoons vary in size significantly. For baking and cooking accuracy, it is always recommended to use calibrated measuring spoons.</p>
+    `
+  },
+  "fluid_ounce_us-to-teaspoon_us": {
+    title: "Fluid Ounces to Teaspoons (fl oz to tsp) - Accuracy Calculator | QuickConvert",
+    description: "Convert US fluid ounces to teaspoons. 1 fl oz = 6 tsp. Accurate cooking measurement tool for chefs and home cooks. Fast and reliable conversion.",
+    content: `
+      <h2>Fluid Ounces to Teaspoons Reference</h2>
+      <ul>
+        <li>1 fl oz = 6 tsp</li>
+        <li>2 fl oz = 12 tsp</li>
+        <li>4 fl oz = 24 tsp</li>
+        <li>8 fl oz (1 cup) = 48 tsp</li>
+      </ul>
+
+      <h2>How to Convert Fluid Ounces to Teaspoons</h2>
+      <p>To convert US fluid ounces to teaspoons, multiply the ounce value by 6:</p>
+      <p className="font-mono bg-neutral-100 dark:bg-neutral-800 p-3 rounded-lg text-center my-4"><strong>teaspoons = fluid ounces × 6</strong></p>
+
+      <h2>Frequently Asked Questions</h2>
+      <h3>How many teaspoons in an ounce of liquid?</h3>
+      <p>In the US customary system, there are 6 teaspoons in 1 fluid ounce.</p>
+      <h3>How many tablespoons in a fluid ounce?</h3>
+      <p>There are 2 tablespoons in 1 US fluid ounce.</p>
+      <h3>Is a fluid ounce of water the same as a weight ounce?</h3>
+      <p>Only approximately. At standard temperature, 1 fluid ounce of water weighs about 1.04 dry ounces. This is "a pint's a pound the world around" rule of thumb, but it isn't exact for all liquids.</p>
     `
   },
   "miles-to-km": {
