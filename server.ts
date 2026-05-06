@@ -179,7 +179,7 @@ const popularUnits: Record<string, { name: string; symbol: string; factor?: numb
 let cachedTemplate = "";
 
 // Simple ISR-style cache for generated SEO fragments
-const seoCache = new Map<string, { title: string; desc: string; static: string; schema: string }>();
+const seoCache = new Map<string, { title: string; desc: string; static: string; schema: string; canonical: string }>();
 const ONE_YEAR_S = 31536000;
 
 function formatValue(val: number): string {
@@ -229,8 +229,8 @@ function applySEO(urlPath: string, template: string): string {
     t = t.replace(/<meta[^>]*name="description"[^>]*\/>/, `<meta data-react-helmet="true" name="description" content="${cached.desc}" />`);
     t = t.replace(/<meta[^>]*property="og:title"[^>]*\/>/, `<meta data-react-helmet="true" property="og:title" content="${cached.title}" />`);
     t = t.replace(/<meta[^>]*property="og:description"[^>]*\/>/, `<meta data-react-helmet="true" property="og:description" content="${cached.desc}" />`);
-    t = t.replace(/<link[^>]*rel="canonical"[^>]*\/>/, `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${urlPath}" />`);
-    t = t.replace(/<meta[^>]*property="og:url"[^>]*\/>/, `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${urlPath}" />`);
+    t = t.replace(/<link[^>]*rel="canonical"[^>]*\/>/, `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${cached.canonical}" />`);
+    t = t.replace(/<meta[^>]*property="og:url"[^>]*\/>/, `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${cached.canonical}" />`);
     t = t.replace(/<div style="display:none;" aria-hidden="true">[\s\S]*?<\/div>/, cached.static);
     t = t.replace(/<\/head>/, `${cached.schema}</head>`);
     return t;
@@ -297,12 +297,6 @@ function applySEO(urlPath: string, template: string): string {
         `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${canonicalPath}" />`
       );
       
-      const val1 = calculateConversion(1, fromId, toId);
-      const val5 = calculateConversion(5, fromId, toId);
-      const val10 = calculateConversion(10, fromId, toId);
-      const val50 = calculateConversion(50, fromId, toId);
-      const val100 = calculateConversion(100, fromId, toId);
-      
       let formulaText = `To calculate, you multiply the ${fromUnit.name} value by the conversion factor.`;
       if (fromUnit.base === 'temperature') {
         if (fromId === 'celsius' && toId === 'fahrenheit') formulaText = `The formula to convert Celsius to Fahrenheit is: <strong>(°C × 9/5) + 32 = °F</strong>.`;
@@ -314,7 +308,7 @@ function applySEO(urlPath: string, template: string): string {
         else formulaText = `Temperature conversions rely on specific formulas rather than a simple multiplier.`;
       } else if (fromUnit.factor && toUnit.factor) {
         let conversionRatio = fromUnit.factor / toUnit.factor;
-        formulaText = `The conversion factor is approximately <strong>${formatValue(conversionRatio)}</strong>. Therefore, 1 ${fromUnit.name} is equal to ${val1} ${toUnit.name}.`;
+        formulaText = `The conversion factor is approximately <strong>${formatValue(conversionRatio)}</strong>. Therefore, 1 ${fromUnit.name} is equal to ${calculateConversion(1, fromId, toId)} ${toUnit.name}.`;
       }
       
       const staticContent = `
@@ -332,7 +326,7 @@ function applySEO(urlPath: string, template: string): string {
           </section>
           <section>
             <h2>Quick Conversion Reference (Table)</h2>
-            <p>Below is a quick reference table showing common values for ${fromUnit.name} and their equivalent in ${toUnit.name}.</p>
+            <p>Below is a quick reference table showing common and related values for ${fromUnit.name} and their equivalent in ${toUnit.name}.</p>
             <table>
               <thead>
                 <tr>
@@ -341,13 +335,11 @@ function applySEO(urlPath: string, template: string): string {
                 </tr>
               </thead>
               <tbody>
-                <tr><td>1 ${fromUnit.name}</td><td>${val1 !== 'N/A' ? val1 : '?'} ${toUnit.name}</td></tr>
-                <tr><td>5 ${fromUnit.name}</td><td>${val5 !== 'N/A' ? val5 : '?'} ${toUnit.name}</td></tr>
-                <tr><td>10 ${fromUnit.name}</td><td>${val10 !== 'N/A' ? val10 : '?'} ${toUnit.name}</td></tr>
-                <tr><td>50 ${fromUnit.name}</td><td>${val50 !== 'N/A' ? val50 : '?'} ${toUnit.name}</td></tr>
-                <tr><td>100 ${fromUnit.name}</td><td>${val100 !== 'N/A' ? val100 : '?'} ${toUnit.name}</td></tr>
-                <tr><td>500 ${fromUnit.name}</td><td>${calculateConversion(500, fromId, toId)} ${toUnit.name}</td></tr>
-                <tr><td>1000 ${fromUnit.name}</td><td>${calculateConversion(1000, fromId, toId)} ${toUnit.name}</td></tr>
+                ${Array.from(new Set([1, 5, 10, 50, 100, Math.max(1, Math.floor(val - 1)), val, Math.ceil(val + 1), Math.ceil(val + 5), Math.ceil(val + 10), Math.ceil(val * 2)]))
+                  .filter(n => n > 0 && n <= 10000).sort((a,b)=>a-b)
+                  .map(n => `<tr><td><a href="https://quickconvertunits.com/convert-${n}-${canonicalPathBase}">${n} ${fromUnit.name}</a></td><td>${calculateConversion(n, fromId, toId) !== 'N/A' ? calculateConversion(n, fromId, toId) : '?'} ${toUnit.name}</td></tr>`)
+                  .join("\n")}
+                <tr><td><a href="https://quickconvertunits.com/${canonicalPathBase}">Full ${fromUnit.name} to ${toUnit.name} Series</a></td><td>Varied</td></tr>
               </tbody>
             </table>
           </section>
@@ -408,10 +400,10 @@ function applySEO(urlPath: string, template: string): string {
             "mainEntity": [
               {
                 "@type": "Question",
-                "name": `How do I convert ${fromUnit.name} to ${toUnit.name}?`,
+                "name": val !== 1 ? `How do you convert ${valText} ${fromUnit.symbol} to ${toUnit.symbol}?` : `How do I convert ${fromUnit.name} to ${toUnit.name}?`,
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": `Simply enter the value of ${fromUnit.name} into our online converter. The tool will instantly calculate and display the corresponding value in ${toUnit.name} based on the most accurate conversion factor.`
+                  "text": val !== 1 ? `To convert ${valText} ${fromUnit.name} to ${toUnit.name}, apply the conversion. ${formulaText.replace(/<strong>/g, '').replace(/<\/strong>/g, '')} Therefore, ${valText} ${fromUnit.symbol} = ${resVal} ${toUnit.symbol}.` : `Simply enter the value of ${fromUnit.name} into our online converter. The tool will instantly calculate and display the corresponding value in ${toUnit.name} based on the most accurate conversion factor.`
                 }
               },
               {
@@ -423,7 +415,23 @@ function applySEO(urlPath: string, template: string): string {
                 }
               }
             ]
-          }
+          },
+          ...(val !== 1 && resVal !== "N/A" ? [{
+            "@type": "MathSolver",
+            "name": `Conversion from ${valText} ${fromUnit.symbol} to ${toUnit.symbol}`,
+            "learningResourceType": "Math Solver",
+            "educationalAlignment": {
+              "@type": "AlignmentObject",
+              "alignmentType": "educationalSubject",
+              "targetName": "Math"
+            },
+            "potentialAction": {
+              "@type": "SolveMathAction",
+              "target": `https://quickconvertunits.com/convert-${valText}-${canonicalPathBase}`,
+              "eduQuestionType": "Conversion",
+              "mathExpression": `${valText} ${fromUnit.name} = x ${toUnit.name}`
+            }
+          }] : [])
         ]
       };
       
@@ -437,7 +445,8 @@ function applySEO(urlPath: string, template: string): string {
         title: title,
         desc: description,
         static: staticContent,
-        schema: `<script type="application/ld+json">${JSON.stringify(schema)}</script>`
+        schema: `<script type="application/ld+json">${JSON.stringify(schema)}</script>`,
+        canonical: canonicalPath
       });
     }
   } else if (urlPath === "bmi-calculator" || urlPath === "time-zone-converter") {
@@ -675,7 +684,8 @@ function applySEO(urlPath: string, template: string): string {
       title: title,
       desc: description,
       static: staticContent,
-      schema: "" 
+      schema: "",
+      canonical: urlPath
     });
   }
   return template;

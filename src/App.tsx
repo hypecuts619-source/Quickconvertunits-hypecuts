@@ -44,8 +44,21 @@ const PopularConversions = lazy(() => import("./components/PopularConversions").
 const TimeZoneConverter = lazy(() => import("./components/TimeZoneConverter").then(module => ({ default: module.TimeZoneConverter })));
 const BMICalculator = lazy(() => import("./components/BMICalculator").then(module => ({ default: module.BMICalculator })));
 
-const QuickLinksSection = ({ fromUnit, toUnit, category }: { fromUnit: any; toUnit: any; category: string }) => {
-  const nums = [1, 5, 10, 25, 50, 100, 150, 200, 250, 500, 1000];
+const QuickLinksSection = ({ fromUnit, toUnit, category, baseVal }: { fromUnit: any; toUnit: any; category: string; baseVal: string }) => {
+  const currentVal = parseFloat(baseVal) || 1;
+  const numsStr = new Set([1, 5, 10, 20, 25, 50, 100, 150, 180, 200, 250, 500, 1000, 1500, 2000, 3000, 5000]);
+  
+  if (currentVal > 0) {
+    if (currentVal > 1) numsStr.add(Math.floor(currentVal - 1));
+    numsStr.add(currentVal);
+    numsStr.add(Math.ceil(currentVal + 1));
+    numsStr.add(Math.ceil(currentVal + 5));
+    numsStr.add(Math.ceil(currentVal + 10));
+    numsStr.add(Math.ceil(currentVal * 2));
+    numsStr.add(Math.ceil(currentVal * 10));
+  }
+
+  const nums = Array.from(numsStr).filter(n => n > 0 && n <= 10000).sort((a, b) => a - b).slice(0, 30);
   const uPath = getSEOUrlPath(fromUnit.id, toUnit.id);
   
   return (
@@ -1870,7 +1883,7 @@ export default function App() {
                     {[1, 5, 10, 50, 100, 250, 500, 1000].map(val => (
                       <tr key={val} className="hover:bg-neutral-50 dark:hover:bg-[#161616] transition-colors">
                         <td className="py-3 px-4 font-mono">
-                          <Link to={`/convert-${val}-${unitFrom}-to-${unitTo}`} className="text-primary-600 dark:text-primary-400 hover:underline">
+                          <Link to={`/convert-${val}-${getSEOUrlPath(unitFrom, unitTo)}`} className="text-primary-600 dark:text-primary-400 hover:underline">
                             {val} {activeFromUnit.symbol}
                           </Link>
                         </td>
@@ -1978,6 +1991,7 @@ export default function App() {
               fromUnit={activeFromUnit} 
               toUnit={activeToUnit} 
               category={category} 
+              baseVal={valFrom}
             />
           )}
 
