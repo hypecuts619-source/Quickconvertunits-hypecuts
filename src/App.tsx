@@ -961,7 +961,7 @@ export default function App() {
       });
     }
 
-    if (customFAQs.length > 0) {
+    if (customFAQs.length > 0 && !(isSpecificConverter && category !== 'time_zone')) {
       schema.push({
         "@context": "https://schema.org",
         "@type": "FAQPage",
@@ -973,45 +973,6 @@ export default function App() {
             text: faq.answer
           }
         }))
-      });
-    } else if (isSpecificConverter && activeFromUnit && activeToUnit && category !== 'time_zone') {
-      const conversionFactor = convert(1, unitFrom, unitTo, category);
-      // ... (rest of the system generated FAQs if needed, but let's keep it simple and clean)
-      // I will keep the generated ones as fallback
-      const formatNum = (num: number) => {
-        if (Number.isNaN(num)) return "0";
-        const str = Number.isInteger(num) ? num.toString() : parseFloat(num.toFixed(6)).toString();
-        const parts = str.split(".");
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        return parts.join(".");
-      };
-      
-      const fUnitName = t(`units.${activeFromUnit.id}`, activeFromUnit.name);
-      const tUnitName = t(`units.${activeToUnit.id}`, activeToUnit.name);
-
-      schema.push({
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: [
-          {
-            "@type": "Question",
-            name: t("seoFaq1Q", "How many {{toUnit}} are in 1 {{fromUnit}}?", { toUnit: tUnitName, fromUnit: fUnitName }),
-            acceptedAnswer: {
-              "@type": "Answer",
-              text: t("seoFaq1A", "1 {{fromUnit}} equals exactly {{result}} {{toUnit}}.", { result: formatNum(conversionFactor), toUnit: tUnitName, fromUnit: fUnitName })
-            }
-          },
-          {
-            "@type": "Question",
-            name: t("seoFaq2Q", "Is 1 {{fromUnit}} more than 1 {{toUnit}}?", { fromUnit: fUnitName, toUnit: tUnitName }),
-            acceptedAnswer: {
-              "@type": "Answer",
-              text: conversionFactor > 1 
-                ? `Yes, 1 ${fUnitName} is ${formatNum(conversionFactor)} times more than 1 ${tUnitName}.` 
-                : `No, 1 ${fUnitName} is less than 1 ${tUnitName}.`
-            }
-          }
-        ]
       });
     }
 
