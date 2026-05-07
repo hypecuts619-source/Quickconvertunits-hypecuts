@@ -207,9 +207,10 @@ function capitalize(str: string) {
 /**
  * Basic Cloudflare Pages Middleware
  */
-export async function onRequest({ request, next }: { request: Request, next: () => Promise<Response> }) {
-  const response = await next();
-  const url = new URL(request.url);
+export default {
+  async fetch(request: Request, env: any, ctx: any): Promise<Response> {
+    const response = await env.ASSETS.fetch(request);
+    const url = new URL(request.url);
   const pathname = url.pathname.replace(/^\//, "");
   
   const contentType = response.headers.get("Content-Type") || "";
@@ -675,4 +676,5 @@ export async function onRequest({ request, next }: { request: Request, next: () 
     statusText: response.statusText,
     headers: newHeaders
   });
+}
 }

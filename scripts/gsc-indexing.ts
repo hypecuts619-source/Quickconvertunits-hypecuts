@@ -40,7 +40,7 @@ async function run() {
   });
 
   const authClient = await auth.getClient();
-  const indexing = google.indexing({ version: "v3", auth: authClient });
+  const indexing = google.indexing({ version: "v3", auth: authClient as any });
 
   let successCount = 0;
   let errorCount = 0;

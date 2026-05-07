@@ -3,7 +3,6 @@ import {createRoot} from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { registerSW } from 'virtual:pwa-register';
-import { Analytics } from '@vercel/analytics/react';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import './index.css';
 import './lib/i18n';
@@ -39,7 +38,6 @@ createRoot(document.getElementById('root')!).render(
             </Routes>
           </Suspense>
         </BrowserRouter>
-        <Analytics />
       </ErrorBoundary>
     </HelmetProvider>
   </StrictMode>,
