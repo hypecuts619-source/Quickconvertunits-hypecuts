@@ -160,7 +160,7 @@ interface HistoryItem {
   timestamp: string;
 }
 
-const themes = ["blue", "rose", "emerald", "violet", "amber"];
+const themes = ["blue", "rose", "emerald", "violet", "amber", "cyan", "fuchsia"];
 
 const AdSlot = ({
   widthClass,
@@ -1186,7 +1186,11 @@ export default function App() {
                                     ? "#8b5cf6"
                                     : t === "amber"
                                       ? "#f59e0b"
-                                      : "#3b82f6",
+                                      : t === "cyan"
+                                        ? "#06b6d4"
+                                        : t === "fuchsia"
+                                          ? "#d946ef"
+                                          : "#3b82f6",
                         }}
                       />
                     ))}

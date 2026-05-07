@@ -53,6 +53,8 @@ export default function ConversionChart({
       case "emerald": return "#10b981";
       case "violet": return "#8b5cf6";
       case "amber": return "#f59e0b";
+      case "cyan": return "#0891b2";
+      case "fuchsia": return "#c026d3";
       default: return "#3b82f6";
     }
   };
