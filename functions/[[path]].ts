@@ -1,15 +1,4 @@
-import express from "express";
-import compression from "compression";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from 'url';
-import { getCanonicalUnitId, getSEOUrlPath } from "./src/lib/units.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Vercel path fallback
-let currentDir = process.cwd();
+import { getCanonicalUnitId, getSEOUrlPath } from '../src/lib/units';
 
 // We define a small map of the most common units to serve rich SEO tags quickly.
 // If a unit is not in this map, we fallback to formatting the URL string.
@@ -113,6 +102,12 @@ const popularUnits: Record<string, { name: string; symbol: string; factor?: numb
   brl: { name: "Real", symbol: "R$", factor: 0.2, base: "currency" },
   mxn: { name: "Peso", symbol: "$", factor: 0.057, base: "currency" },
   sek: { name: "Krona", symbol: "kr", factor: 0.093, base: "currency" },
+  cad: { name: "Canadian Dollar", symbol: "C$", factor: 0.74, base: "currency" },
+  cny: { name: "Chinese Yuan", symbol: "¥", factor: 0.14, base: "currency" },
+  hkd: { name: "Hong Kong Dollar", symbol: "HK$", factor: 0.13, base: "currency" },
+  jpy: { name: "Japanese Yen", symbol: "¥", factor: 0.0067, base: "currency" },
+  aud: { name: "Australian Dollar", symbol: "A$", factor: 0.65, base: "currency" },
+  chf: { name: "Swiss Franc", symbol: "CHF", factor: 1.13, base: "currency" },
   // Power
   watt: { name: "Watt", symbol: "W", factor: 1, base: "power" },
   watts: { name: "Watt", symbol: "W", factor: 1, base: "power" },
@@ -176,14 +171,7 @@ const popularUnits: Record<string, { name: string; symbol: string; factor?: numb
   ghz: { name: "Gigahertz", symbol: "GHz", factor: 1000000000, base: "frequency" },
 };
 
-let cachedTemplate = "";
-
-// Simple ISR-style cache for generated SEO fragments
-const seoCache = new Map<string, { title: string; desc: string; static: string; schema: string; canonical: string }>();
-const ONE_YEAR_S = 31536000;
-
 function formatValue(val: number): string {
-  // Try to keep it readable, avoid scientific notation if possible
   if (val >= 10000 || val < 0.0001) {
     return val.toExponential(4);
   }
@@ -216,27 +204,32 @@ function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1).replace(/_/g, " ").replace(/-/g, " ");
 }
 
-function applySEO(urlPath: string, template: string): string {
-  // ensure leading slash is removed
-  urlPath = urlPath.replace(/^\//, "");
-  const cacheKey = urlPath || 'home';
-
-  // Check ISR Cache
-  if (seoCache.has(cacheKey)) {
-    const cached = seoCache.get(cacheKey)!;
-    let t = template;
-    t = t.replace(/<title[^>]*>.*?<\/title>/, `<title data-react-helmet="true">${cached.title}</title>`);
-    t = t.replace(/<meta[^>]*name="description"[^>]*\/>/, `<meta data-react-helmet="true" name="description" content="${cached.desc}" />`);
-    t = t.replace(/<meta[^>]*property="og:title"[^>]*\/>/, `<meta data-react-helmet="true" property="og:title" content="${cached.title}" />`);
-    t = t.replace(/<meta[^>]*property="og:description"[^>]*\/>/, `<meta data-react-helmet="true" property="og:description" content="${cached.desc}" />`);
-    t = t.replace(/<link[^>]*rel="canonical"[^>]*\/>/, `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${cached.canonical}" />`);
-    t = t.replace(/<meta[^>]*property="og:url"[^>]*\/>/, `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${cached.canonical}" />`);
-    t = t.replace(/<div style="display:none;" aria-hidden="true">[\s\S]*?<\/div>/, cached.static);
-    t = t.replace(/<\/head>/, `${cached.schema}</head>`);
-    return t;
+/**
+ * Basic Cloudflare Pages Middleware
+ */
+export async function onRequest({ request, next }: { request: Request, next: () => Promise<Response> }) {
+  const response = await next();
+  const url = new URL(request.url);
+  const pathname = url.pathname.replace(/^\//, "");
+  
+  const contentType = response.headers.get("Content-Type") || "";
+  if (!contentType.includes("text/html")) {
+    if (pathname.includes("-to-")) {
+      const newHeaders = new Headers(response.headers);
+      newHeaders.set("Cache-Control", `public, max-age=31536000, immutable`);
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: newHeaders
+      });
+    }
+    return response;
   }
   
-  if (urlPath && urlPath.includes("-to-")) {
+  let template = await response.text();
+  let urlPath = pathname;
+
+  if (urlPath && urlPath.includes("-to-") && !urlPath.includes("blog")) {
     const parts = urlPath.split("-to-");
     if (parts.length === 2 && parts[0] && parts[1]) {
       let val = 1;
@@ -338,7 +331,7 @@ function applySEO(urlPath: string, template: string): string {
                 ${Array.from(new Set([1, 5, 10, 50, 100, Math.max(1, Math.floor(val - 1)), val, Math.ceil(val + 1), Math.ceil(val + 5), Math.ceil(val + 10), Math.ceil(val * 2)]))
                   .filter(n => n > 0 && n <= 10000).sort((a,b)=>a-b)
                   .map(n => `<tr><td><a href="https://quickconvertunits.com/convert-${n}-${canonicalPathBase}">${n} ${fromUnit.name}</a></td><td>${calculateConversion(n, fromId, toId) !== 'N/A' ? calculateConversion(n, fromId, toId) : '?'} ${toUnit.name}</td></tr>`)
-                  .join("\n")}
+                  .join("\\n")}
                 <tr><td><a href="https://quickconvertunits.com/${canonicalPathBase}">Full ${fromUnit.name} to ${toUnit.name} Series</a></td><td>Varied</td></tr>
               </tbody>
             </table>
@@ -348,7 +341,7 @@ function applySEO(urlPath: string, template: string): string {
             <h3>How do I convert ${fromUnit.name} to ${toUnit.name}?</h3>
             <p>Enter the number of ${fromUnit.symbol} you wish to convert in the top input box. The corresponding ${toUnit.symbol} value will instantly populate in the bottom input box.</p>
             <h3>What is ${fromUnit.name}?</h3>
-            <p>The ${fromUnit.name} is a unit of measurement. It is commonly used both historically and modernly in various contexts.</p>
+            <p>The ${fromUnit.name} (${fromUnit.symbol}) is a unit of measurement. It is commonly used both historically and modernly in various contexts.</p>
             <h3>What is ${toUnit.name}?</h3>
             <p>The ${toUnit.name} (${toUnit.symbol}) is another unit of measurement to express similar quantities. Our calculator ensures quick transformation between them.</p>
             <h3>Is this ${fromUnit.name} to ${toUnit.name} converter free?</h3>
@@ -439,15 +432,6 @@ function applySEO(urlPath: string, template: string): string {
         /<\/head>/,
         `<script type="application/ld+json">${JSON.stringify(schema)}</script></head>`
       );
-
-      // Save to ISR Cache
-      seoCache.set(cacheKey, {
-        title: title,
-        desc: description,
-        static: staticContent,
-        schema: `<script type="application/ld+json">${JSON.stringify(schema)}</script>`,
-        canonical: canonicalPath
-      });
     }
   } else if (urlPath === "bmi-calculator" || urlPath === "time-zone-converter") {
     let title = "";
@@ -460,13 +444,12 @@ function applySEO(urlPath: string, template: string): string {
       description = "Instantly convert between time zones to schedule global meetings easily. Supports UTC, EST, PST, standard and daylight time conversions.";
     }
     
-    let t = template;
-    t = t.replace(/<title[^>]*>.*?<\/title>/, `<title data-react-helmet="true">${title}</title>`);
-    t = t.replace(/<meta[^>]*name="description"[^>]*\/>/, `<meta data-react-helmet="true" name="description" content="${description}" />`);
-    t = t.replace(/<meta[^>]*property="og:title"[^>]*\/>/, `<meta data-react-helmet="true" property="og:title" content="${title}" />`);
-    t = t.replace(/<meta[^>]*property="og:description"[^>]*\/>/, `<meta data-react-helmet="true" property="og:description" content="${description}" />`);
-    t = t.replace(/<link[^>]*rel="canonical"[^>]*\/>/, `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${urlPath}" />`);
-    t = t.replace(/<meta[^>]*property="og:url"[^>]*\/>/, `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${urlPath}" />`);
+    template = template.replace(/<title[^>]*>.*?<\/title>/, `<title data-react-helmet="true">${title}</title>`);
+    template = template.replace(/<meta[^>]*name="description"[^>]*\/>/, `<meta data-react-helmet="true" name="description" content="${description}" />`);
+    template = template.replace(/<meta[^>]*property="og:title"[^>]*\/>/, `<meta data-react-helmet="true" property="og:title" content="${title}" />`);
+    template = template.replace(/<meta[^>]*property="og:description"[^>]*\/>/, `<meta data-react-helmet="true" property="og:description" content="${description}" />`);
+    template = template.replace(/<link[^>]*rel="canonical"[^>]*\/>/, `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${urlPath}" />`);
+    template = template.replace(/<meta[^>]*property="og:url"[^>]*\/>/, `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${urlPath}" />`);
     
     const staticContent = `
       <div style="display:none;" aria-hidden="true">
@@ -476,9 +459,8 @@ function applySEO(urlPath: string, template: string): string {
         </div>
       </div>
     `;
-    t = t.replace(/<div style="display:none;" aria-hidden="true">[\s\S]*?<\/div>/, staticContent);
-    return t;
-  } else if (urlPath && urlPath.endsWith("-converter")) {
+    template = template.replace(/<div style="display:none;" aria-hidden="true">[\\s\\S]*?<\/div>/, staticContent);
+  } else if (urlPath && urlPath.endsWith("-converter") && !urlPath.includes("blog")) {
     const catNameRaw = urlPath.replace("-converter", "");
     const title = `Fast ${capitalize(catNameRaw)} Converter - Instant Conversions`;
     
@@ -675,182 +657,22 @@ function applySEO(urlPath: string, template: string): string {
     `;
 
     template = template.replace(
-      /<div style="display:none;" aria-hidden="true">[\s\S]*?<\/div>/,
+      /<div style="display:none;" aria-hidden="true">[\\s\\S]*?<\/div>/,
       staticContent
     );
-
-    // Save to ISR Cache
-    seoCache.set(cacheKey, {
-      title: title,
-      desc: description,
-      static: staticContent,
-      schema: "",
-      canonical: urlPath
-    });
   }
-  return template;
-}
 
-const app = express();
-app.use(compression());
-const PORT = 3000;
-const isProd = process.env.NODE_ENV === "production" || !!process.env.VERCEL || !!process.env.VERCEL_ENV;
+  const newHeaders = new Headers(response.headers);
+  if (urlPath && urlPath.includes("-to-")) {
+    newHeaders.set("Cache-Control", `public, max-age=31536000, immutable`);
+  } else {
+    // Basic caching for index and other non-programmatic pages via edge
+    newHeaders.set("Cache-Control", `public, max-age=3600`);
+  }
 
-let distStaticPath = path.resolve(process.cwd(), "dist");
-if (!fs.existsSync(distStaticPath)) {
-  distStaticPath = path.resolve(currentDir, "..", "dist");
-}
-
-app.get("/api/health", (req, res) => {
-  res.json({ status: "ok" });
-});
-
-// Explicit routes for crawlers to avoid any ambiguity
-app.get("/robots.txt", (req, res) => {
-  const p = path.resolve(isProd ? path.join(distStaticPath, "robots.txt") : "public/robots.txt");
-  if (fs.existsSync(p)) return res.sendFile(p);
-  res.status(200).send("User-agent: *\nAllow: /");
-});
-
-app.get("/ads.txt", (req, res) => {
-  const p = path.resolve(isProd ? path.join(distStaticPath, "ads.txt") : "public/ads.txt");
-  if (fs.existsSync(p)) return res.sendFile(p);
-  res.status(404).send("ads.txt not found");
-});
-
-app.get("/sitemap.xml", (req, res) => {
-  const p = path.resolve(isProd ? path.join(distStaticPath, "sitemap.xml") : "public/sitemap.xml");
-  if (fs.existsSync(p)) return res.sendFile(p);
-  res.status(404).send("sitemap.xml not found");
-});
-
-if (isProd) {
-  // Production routes (Synchronous)
-  
-  app.use(express.static(distStaticPath, { index: false }));
-  
-  // Aggressive Edge Caching for programmatic routes
-  app.use((req, res, next) => {
-    if (req.path.includes("-to-")) {
-      res.setHeader('Cache-Control', `public, s-maxage=${ONE_YEAR_S}, stale-while-revalidate=59`);
-    } else {
-      res.setHeader('Cache-Control', 'public, max-age=3600');
-    }
-    next();
-  });
-  
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  app.get("*", (req: any, res: any) => {
-    // Determine the original URL. If Vercel rewrote it to /api/server, use the original host and path headers if available
-    let requestedUrlInfo = req.originalUrl || req.url;
-    if (req.headers["x-now-route-matches"]) {
-      try {
-        const matches = new URLSearchParams(req.headers["x-now-route-matches"] as string);
-        if (matches.has("1")) requestedUrlInfo = "/" + matches.get("1");
-      } catch (e) {}
-    } else if (req.headers["x-vercel-forwarded-for"]) {
-      // Vercel sometimes passes the original path inside the host
-    }
-    // simple hack: if req.path is /api/server and we have a query parameter or just use req.originalUrl 
-    if (requestedUrlInfo === "/api/server" && req.headers["x-invoke-path"]) {
-       requestedUrlInfo = req.headers["x-invoke-path"] as string;
-    } else if (requestedUrlInfo.startsWith("/api/server")) {
-       const proto = req.headers["x-forwarded-proto"] || "https";
-       const host = req.headers["host"] || "localhost";
-       try {
-          const urlObj = new URL(req.url, `${proto}://${host}`);
-          requestedUrlInfo = urlObj.pathname + urlObj.search;
-       } catch (e) {}
-    }
-
-    if (!cachedTemplate) {
-      let templatePath = path.resolve(__dirname, "dist", "index.html");
-      if (!fs.existsSync(templatePath)) {
-        templatePath = path.resolve(process.cwd(), "dist", "index.html");
-      }
-      if (!fs.existsSync(templatePath)) {
-        templatePath = path.resolve(__dirname, "..", "dist", "index.html");
-      }
-      if (!fs.existsSync(templatePath)) {
-        templatePath = path.resolve(currentDir, "dist", "index.html");
-      }
-
-      try {
-        if (!fs.existsSync(templatePath)) {
-          throw new Error("File not found at " + templatePath);
-        }
-        cachedTemplate = fs.readFileSync(templatePath, "utf-8");
-      } catch (e: any) {
-        // If it's a static file request that reached here, 404 instead of 500
-        if (requestedUrlInfo.includes(".") && !requestedUrlInfo.endsWith(".html")) {
-          return res.status(404).send("File not found: " + requestedUrlInfo);
-        }
-
-        let debugInfo = "";
-        try { debugInfo += "CWD: " + process.cwd(); } catch(e){}
-        try { debugInfo += " | __dirname: " + __dirname; } catch(e){}
-        try { debugInfo += " | CWD files: " + fs.readdirSync(process.cwd()).join(", "); } catch(e){}
-        try { 
-          const distP = path.resolve(process.cwd(), "dist");
-          if (fs.existsSync(distP)) {
-            debugInfo += " | dist files: " + fs.readdirSync(distP).join(", ");
-          } else {
-            debugInfo += " | dist folder missing at " + distP;
-          }
-        } catch(e){}
-        return res.status(500).send("index.html not found. Path: " + templatePath + " | " + debugInfo + " | Error: " + e.message);
-      }
-    }
-
-    try {
-      let template = cachedTemplate;
-      try {
-        template = applySEO(requestedUrlInfo.split("?")[0], cachedTemplate);
-      } catch (seoErr: any) {
-        console.error("SEO Error generating template:", seoErr.message, seoErr.stack);
-        // gracefully fallback to untransformed template
-      }
-      res.status(200).set({ "Content-Type": "text/html" }).send(template);
-    } catch (e: any) {
-      console.error("Server 500 error:", e.message, e.stack);
-      return res.status(500).send("Server Error: " + e.message + " stack: " + e.stack);
-    }
+  return new Response(template, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: newHeaders
   });
 }
-
-async function startServer() {
-  if (!isProd) {
-    console.log("Starting Vite development server...");
-    const { createServer: createViteServer } = await import("vite");
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "custom",
-    });
-    app.use(vite.middlewares);
-
-    app.get("*", async (req, res) => {
-      let template = "";
-      try {
-        template = fs.readFileSync(path.resolve(currentDir, "index.html"), "utf-8");
-        template = await vite.transformIndexHtml(req.originalUrl, template);
-      } catch (e: any) {
-        console.error("Vite Transform Error:", e.message, e.stack);
-        return res.status(500).send("index.html not found, or SSR transform failed: " + e.message);
-      }
-
-      template = applySEO(req.path, template);
-      res.status(200).set({ "Content-Type": "text/html" }).send(template);
-    });
-  }
-
-  // Only start listening if we are not running on Vercel
-  if (!process.env.VERCEL) {
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
-  }
-}
-
-startServer();
-
-export default app;

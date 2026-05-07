@@ -4,11 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx server.ts",
+    "dev": "vite",
     "prebuild": "npx tsx scripts/generate-sitemap.ts",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "node server.ts",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
     "submit-hubs": "npx tsx scripts/gsc-indexing.ts"
