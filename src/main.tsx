@@ -14,6 +14,7 @@ const AboutUs = lazy(() => import('./AboutUs.tsx'));
 const Contact = lazy(() => import('./Contact.tsx'));
 const Blog = lazy(() => import('./Blog.tsx'));
 const BlogPost = lazy(() => import('./BlogPost.tsx'));
+const Directory = lazy(() => import('./Directory.tsx'));
 
 // Automatically register the service worker
 if ('serviceWorker' in navigator) {
@@ -35,6 +36,9 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/contact" element={<Contact />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/conversions" element={<Directory />} />
+              <Route path="/conversions/:category" element={<Directory />} />
+              <Route path="/conversions/:category/:pair" element={<Directory />} />
             </Routes>
           </Suspense>
         </BrowserRouter>

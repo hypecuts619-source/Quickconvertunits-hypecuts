@@ -30,9 +30,12 @@ import {
   Star,
   Table,
   Download,
+  Code,
 } from "lucide-react";
 import { UnitSelector } from "./components/UnitSelector";
 import { Breadcrumbs } from "./components/Breadcrumbs";
+import { DynamicContext } from "./components/DynamicContext";
+import { EmbedWidget } from "./components/EmbedWidget";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -815,6 +818,7 @@ export default function App() {
   const isHomepage = location.pathname === "/" && !location.search.includes("val=");
   const isCategoryPage = location.pathname.endsWith("-converter") && !location.pathname.includes("-to-") && location.pathname !== "/time-zone-converter";
   const isSpecificConverter = location.pathname !== "/" && !isCategoryPage;
+  const isEmbed = new URLSearchParams(location.search).get("embed") === "true";
 
   let titleStr = "";
   let metaDescStr = "";
@@ -1058,55 +1062,197 @@ export default function App() {
       </AnimatePresence>
 
       {/* Background gradients */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-500/5 dark:bg-primary-500/10 blur-[120px]" />
-        <div className="absolute top-[40%] right-[-10%] w-[40%] h-[60%] rounded-full bg-primary-500/5 dark:bg-primary-500/10 blur-[140px]" />
-      </div>
+      {!isEmbed && (
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-500/5 dark:bg-primary-500/10 blur-[120px]" />
+          <div className="absolute top-[40%] right-[-10%] w-[40%] h-[60%] rounded-full bg-primary-500/5 dark:bg-primary-500/10 blur-[140px]" />
+        </div>
+      )}
 
       {/* Header */}
-      <header className="sticky top-0 z-20 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md border-b border-neutral-200/80 dark:border-neutral-800/80">
-        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between gap-2 sm:gap-4">
-          <a 
-            href="/"
-            className="flex items-center gap-1.5 sm:gap-2 font-bold text-lg sm:text-xl tracking-tight text-primary-600 dark:text-primary-500 hover:opacity-80 transition-opacity focus:outline-none min-w-0 shrink"
-          >
-            <img
-              src="/favicon.svg"
-              alt="QuickConvert Logo"
-              className="w-5 h-5 sm:w-6 sm:h-6 shrink-0"
-            />
-            <span className="truncate">{t("appName", "QuickConvert")}</span>
-          </a>
-
-          <div className="flex items-center gap-1 sm:gap-2 md:gap-4 flex-1 justify-end shrink-0">
-            {/* Desktop Search */}
-            <div className="relative hidden md:block max-w-sm w-full">
-              <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
-                <input
-                  id="desktop-search-input"
-                  aria-label={t("searchPlaceholder", "Search top conversions")}
-                  type="text"
-                  placeholder={t("searchPlaceholder", "Search for units (⌘K)")}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => setIsSearchFocused(true)}
-                  onBlur={() =>
-                    setTimeout(() => setIsSearchFocused(false), 200)
-                  }
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && suggestions.length > 0) {
-                      selectSuggestion(suggestions[0]);
-                    }
-                  }}
-                  className="w-full pl-9 pr-14 py-2 rounded-full bg-neutral-100 dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary-500/50 dark:focus:ring-primary-400/50 text-base md:text-sm transition-shadow"
+      {!isEmbed && (
+        <>
+          <header className="sticky top-0 z-20 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md border-b border-neutral-200/80 dark:border-neutral-800/80">
+            <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between gap-2 sm:gap-4">
+              <a 
+                href="/"
+                className="flex items-center gap-1.5 sm:gap-2 font-bold text-lg sm:text-xl tracking-tight text-primary-600 dark:text-primary-500 hover:opacity-80 transition-opacity focus:outline-none min-w-0 shrink"
+              >
+                <img
+                  src="/favicon.svg"
+                  alt="QuickConvert Logo"
+                  className="w-5 h-5 sm:w-6 sm:h-6 shrink-0"
                 />
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none">
-                  <span className="text-[10px] font-medium text-neutral-400 px-1.5 py-0.5 rounded-md border border-neutral-200 dark:border-neutral-700 bg-white/50 dark:bg-neutral-900/50">⌘K</span>
+                <span className="truncate">{t("appName", "QuickConvert")}</span>
+              </a>
+
+              <div className="flex items-center gap-1 sm:gap-2 md:gap-4 flex-1 justify-end shrink-0">
+                {/* Desktop Search */}
+                <div className="relative hidden md:block max-w-sm w-full">
+                  <div className="relative">
+                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+                    <input
+                      id="desktop-search-input"
+                      aria-label={t("searchPlaceholder", "Search top conversions")}
+                      type="text"
+                      placeholder={t("searchPlaceholder", "Search for units (⌘K)")}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onFocus={() => setIsSearchFocused(true)}
+                      onBlur={() =>
+                        setTimeout(() => setIsSearchFocused(false), 200)
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && suggestions.length > 0) {
+                          selectSuggestion(suggestions[0]);
+                        }
+                      }}
+                      className="w-full pl-9 pr-14 py-2 rounded-full bg-neutral-100 dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary-500/50 dark:focus:ring-primary-400/50 text-base md:text-sm transition-shadow"
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none">
+                      <span className="text-[10px] font-medium text-neutral-400 px-1.5 py-0.5 rounded-md border border-neutral-200 dark:border-neutral-700 bg-white/50 dark:bg-neutral-900/50">⌘K</span>
+                    </div>
+                  </div>
+                  {isSearchFocused && (suggestions.length > 0 || (!searchQuery && favorites.length > 0) || (searchQuery && suggestions.length === 0)) && (
+                    <div className="absolute top-11 left-0 right-0 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-100 dark:border-neutral-700 overflow-hidden z-50">
+                      {!searchQuery && favorites.length > 0 && (
+                        <div className="px-4 py-2 text-xs font-semibold text-neutral-500 bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700">
+                          Saved Conversions
+                        </div>
+                      )}
+                      {!searchQuery && favorites.map((fav, i) => {
+                        const cat = categories.find(c => c.id === fav.cat);
+                        const fUnit = cat?.units.find(u => u.id === fav.fu);
+                        const tUnit = cat?.units.find(u => u.id === fav.tu);
+                        if (!fUnit || !tUnit) return null;
+                        return (
+                          <button
+                            key={`fav-${i}`}
+                            className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors flex items-center justify-between group"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              selectSuggestion({
+                                categoryId: fav.cat,
+                                fromId: fav.fu,
+                                toId: fav.tu,
+                              });
+                            }}
+                          >
+                            <span>{fUnit.name} to {tUnit.name}</span>
+                            <Star className="w-3 h-3 text-amber-500 fill-current opacity-50 group-hover:opacity-100 transition-opacity" />
+                          </button>
+                        );
+                      })}
+                      {searchQuery && suggestions.map((sug, i) => (
+                        <button
+                          key={i}
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            selectSuggestion(sug);
+                          }}
+                        >
+                          {sug.text}
+                        </button>
+                      ))}
+                      {searchQuery && suggestions.length === 0 && (
+                        <div className="px-4 py-3 text-center text-sm text-neutral-500">
+                          No matches found for "{searchQuery}"
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
+
+                <div className="relative">
+                  <button
+                    aria-label="Toggle theme menu"
+                    onClick={() => setShowThemeMenu(!showThemeMenu)}
+                    onBlur={() => setTimeout(() => setShowThemeMenu(false), 200)}
+                    className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-neutral-500 dark:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                  >
+                    <Palette className="w-5 h-5" />
+                  </button>
+                  <AnimatePresence>
+                    {showThemeMenu && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 5, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 5, scale: 0.95 }}
+                        className="absolute right-0 top-12 bg-white dark:bg-[#1a1a1a] rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border border-neutral-100 dark:border-neutral-800 overflow-hidden z-50 flex p-1.5 gap-1"
+                      >
+                        {themes.map((t) => (
+                          <button
+                            aria-label={`Select ${t} theme`}
+                            key={t}
+                            onClick={() => setTheme(t)}
+                            className={`w-8 h-8 rounded-full border-2 transition-all ${theme === t ? "border-primary-500 scale-110" : "border-transparent hover:scale-105"}`}
+                            style={{
+                              backgroundColor:
+                                t === "blue"
+                                  ? "#3b82f6"
+                                  : t === "rose"
+                                    ? "#f43f5e"
+                                    : t === "emerald"
+                                      ? "#10b981"
+                                      : t === "violet"
+                                        ? "#8b5cf6"
+                                        : t === "amber"
+                                          ? "#f59e0b"
+                                          : t === "cyan"
+                                            ? "#06b6d4"
+                                            : t === "fuchsia"
+                                              ? "#d946ef"
+                                              : "#3b82f6",
+                            }}
+                          />
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <button
+                  aria-label="Toggle dark mode"
+                  onClick={() => setDarkMode(!darkMode)}
+                  className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-neutral-500 dark:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                >
+                  {darkMode ? (
+                    <Sun className="w-5 h-5" />
+                  ) : (
+                    <Moon className="w-5 h-5" />
+                  )}
+                </button>
+                <div className="hidden sm:block border-l border-neutral-200 dark:border-neutral-700 h-6 mx-2"></div>
+                <LanguageSelector />
               </div>
+            </div>
+          </header>
+
+          {/* Mobile Search */}
+          <div className="md:hidden px-4 py-3 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 relative z-[100]">
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+              <input
+                id="mobile-search-input"
+                aria-label={t("searchPlaceholder", "Search categories")}
+                type="text"
+                placeholder={t("searchPlaceholder", "Search conversions...")}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setIsSearchFocused(true)}
+                onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && suggestions.length > 0) {
+                    selectSuggestion(suggestions[0]);
+                  }
+                }}
+                className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-base md:text-sm"
+              />
+            </div>
+            <AnimatePresence>
               {isSearchFocused && (suggestions.length > 0 || (!searchQuery && favorites.length > 0) || (searchQuery && suggestions.length === 0)) && (
-                <div className="absolute top-11 left-0 right-0 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-100 dark:border-neutral-700 overflow-hidden z-50">
+                <div className="absolute top-14 left-0 right-0 bg-white dark:bg-neutral-800 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.25)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)] border border-neutral-100 dark:border-neutral-800 overflow-hidden z-[110] mx-4">
                   {!searchQuery && favorites.length > 0 && (
                     <div className="px-4 py-2 text-xs font-semibold text-neutral-500 bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700">
                       Saved Conversions
@@ -1119,8 +1265,8 @@ export default function App() {
                     if (!fUnit || !tUnit) return null;
                     return (
                       <button
-                        key={`fav-${i}`}
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors flex items-center justify-between group"
+                        key={`mobile-fav-${i}`}
+                        className="w-full text-left px-4 py-3 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors flex items-center justify-between group border-b border-neutral-100 dark:border-neutral-800 last:border-0"
                         onMouseDown={(e) => {
                           e.preventDefault();
                           selectSuggestion({
@@ -1138,7 +1284,7 @@ export default function App() {
                   {searchQuery && suggestions.map((sug, i) => (
                     <button
                       key={i}
-                      className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors"
+                      className="w-full text-left px-4 py-3 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors border-b border-neutral-100 dark:border-neutral-800 last:border-0"
                       onMouseDown={(e) => {
                         e.preventDefault();
                         selectSuggestion(sug);
@@ -1148,201 +1294,79 @@ export default function App() {
                     </button>
                   ))}
                   {searchQuery && suggestions.length === 0 && (
-                    <div className="px-4 py-3 text-center text-sm text-neutral-500">
+                    <div className="px-4 py-4 text-center text-sm text-neutral-500">
                       No matches found for "{searchQuery}"
                     </div>
                   )}
                 </div>
               )}
-            </div>
-
-            <div className="relative">
-              <button
-                aria-label="Toggle theme menu"
-                onClick={() => setShowThemeMenu(!showThemeMenu)}
-                onBlur={() => setTimeout(() => setShowThemeMenu(false), 200)}
-                className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-neutral-500 dark:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500/50"
-              >
-                <Palette className="w-5 h-5" />
-              </button>
-              <AnimatePresence>
-                {showThemeMenu && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 5, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 5, scale: 0.95 }}
-                    className="absolute right-0 top-12 bg-white dark:bg-[#1a1a1a] rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border border-neutral-100 dark:border-neutral-800 overflow-hidden z-50 flex p-1.5 gap-1"
-                  >
-                    {themes.map((t) => (
-                      <button
-                        aria-label={`Select ${t} theme`}
-                        key={t}
-                        onClick={() => setTheme(t)}
-                        className={`w-8 h-8 rounded-full border-2 transition-all ${theme === t ? "border-primary-500 scale-110" : "border-transparent hover:scale-105"}`}
-                        style={{
-                          backgroundColor:
-                            t === "blue"
-                              ? "#3b82f6"
-                              : t === "rose"
-                                ? "#f43f5e"
-                                : t === "emerald"
-                                  ? "#10b981"
-                                  : t === "violet"
-                                    ? "#8b5cf6"
-                                    : t === "amber"
-                                      ? "#f59e0b"
-                                      : t === "cyan"
-                                        ? "#06b6d4"
-                                        : t === "fuchsia"
-                                          ? "#d946ef"
-                                          : "#3b82f6",
-                        }}
-                      />
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            <button
-              aria-label="Toggle dark mode"
-              onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-neutral-500 dark:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500/50"
-            >
-              {darkMode ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
-            </button>
-            <div className="hidden sm:block border-l border-neutral-200 dark:border-neutral-700 h-6 mx-2"></div>
-            <LanguageSelector />
+            </AnimatePresence>
           </div>
-        </div>
-      </header>
-
-      {/* Mobile Search */}
-      <div className="md:hidden px-4 py-3 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 relative z-[100]">
-        <div className="relative">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
-          <input
-            id="mobile-search-input"
-            aria-label={t("searchPlaceholder", "Search categories")}
-            type="text"
-            placeholder={t("searchPlaceholder", "Search conversions...")}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={() => setIsSearchFocused(true)}
-            onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && suggestions.length > 0) {
-                selectSuggestion(suggestions[0]);
-              }
-            }}
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-base md:text-sm"
-          />
-        </div>
-        <AnimatePresence>
-          {isSearchFocused && (suggestions.length > 0 || (!searchQuery && favorites.length > 0) || (searchQuery && suggestions.length === 0)) && (
-            <div className="absolute top-14 left-0 right-0 bg-white dark:bg-neutral-800 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.25)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)] border border-neutral-100 dark:border-neutral-800 overflow-hidden z-[110] mx-4">
-              {!searchQuery && favorites.length > 0 && (
-                <div className="px-4 py-2 text-xs font-semibold text-neutral-500 bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700">
-                  Saved Conversions
-                </div>
-              )}
-              {!searchQuery && favorites.map((fav, i) => {
-                const cat = categories.find(c => c.id === fav.cat);
-                const fUnit = cat?.units.find(u => u.id === fav.fu);
-                const tUnit = cat?.units.find(u => u.id === fav.tu);
-                if (!fUnit || !tUnit) return null;
-                return (
-                  <button
-                    key={`mobile-fav-${i}`}
-                    className="w-full text-left px-4 py-3 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors flex items-center justify-between group border-b border-neutral-100 dark:border-neutral-800 last:border-0"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      selectSuggestion({
-                        categoryId: fav.cat,
-                        fromId: fav.fu,
-                        toId: fav.tu,
-                      });
-                    }}
-                  >
-                    <span>{fUnit.name} to {tUnit.name}</span>
-                    <Star className="w-3 h-3 text-amber-500 fill-current opacity-50 group-hover:opacity-100 transition-opacity" />
-                  </button>
-                );
-              })}
-              {searchQuery && suggestions.map((sug, i) => (
-                <button
-                  key={i}
-                  className="w-full text-left px-4 py-3 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors border-b border-neutral-100 dark:border-neutral-800 last:border-0"
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    selectSuggestion(sug);
-                  }}
-                >
-                  {sug.text}
-                </button>
-              ))}
-              {searchQuery && suggestions.length === 0 && (
-                <div className="px-4 py-4 text-center text-sm text-neutral-500">
-                  No matches found for "{searchQuery}"
-                </div>
-              )}
-            </div>
-          )}
-        </AnimatePresence>
-      </div>
+        </>
+      )}
 
       {/* Main Layout containing Ad zones */}
       <div className="max-w-7xl mx-auto px-4 py-6 md:py-12 flex flex-col lg:flex-row gap-8 pb-24 md:pb-12 relative z-10">
         {/* Left Column (Main App + Content) */}
         <div className="flex-1 max-w-3xl mx-auto w-full">
-          <Breadcrumbs 
-            category={{id: category, name: activeCategory.name}} 
-            unitFrom={{name: activeFromUnit?.name || ''}} 
-            unitTo={{name: activeToUnit?.name || ''}} 
-            isSpecificConverter={isSpecificConverter} 
-          />
-          <div className="text-center mb-8">
-            {category === 'time_zone' ? (
-              <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-4xl font-semibold tracking-tight mb-2 text-neutral-900 dark:text-white">
-                Time Zone Converter
-              </h1>
-            ) : category === 'bmi' ? (
-              <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-4xl font-semibold tracking-tight mb-2 text-neutral-900 dark:text-white">
-                BMI Calculator
-              </h1>
-            ) : location.pathname === "/" ? (
-              <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-4xl font-semibold tracking-tight mb-2 text-neutral-900 dark:text-white">
-                Quick & Accurate Unit Converter
-              </h1>
-            ) : (
-              <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-4xl font-semibold tracking-tight mb-2 text-neutral-900 dark:text-white">
-                {valFrom && valFrom !== "1" && valFrom !== "0" && !Number.isNaN(parseFloat(valFrom)) ? (
-                  <>
-                    {valFrom} {(parseFloat(valFrom) === 1 ? activeFromUnit?.name : ((activeFromUnit?.name || '').endsWith('s') ? activeFromUnit?.name : `${activeFromUnit?.name}s`))} to {(activeToUnit?.name || '').endsWith('s') ? activeToUnit?.name : `${activeToUnit?.name}s`}
-                  </>
-                ) : (
-                  <>
-                    {(activeFromUnit?.name || '').endsWith('s') ? activeFromUnit?.name : `${activeFromUnit?.name}s`} to {(activeToUnit?.name || '').endsWith('s') ? activeToUnit?.name : `${activeToUnit?.name}s`} Converter
-                  </>
-                )}
-                <button
-                  onClick={toggleFavorite}
-                  className={`flex-shrink-0 flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full transition-colors ${
-                    isFavorited
-                      ? "bg-amber-100 text-amber-500 dark:bg-amber-500/20 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-500/30"
-                      : "bg-neutral-100 text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600 dark:bg-[#1a1a1a] dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-neutral-300"
-                  }`}
-                  title={isFavorited ? "Saved to Favorites" : "Save this conversion"}
-                >
-                  <Star className={`w-4 h-4 md:w-5 md:h-5 ${isFavorited ? "fill-current" : ""}`} />
-                </button>
-              </h1>
-            )}
-          </div>
+          {!isEmbed && (
+            <Breadcrumbs 
+              category={{id: category, name: activeCategory.name}} 
+              unitFrom={{name: activeFromUnit?.name || ''}} 
+              unitTo={{name: activeToUnit?.name || ''}} 
+              isSpecificConverter={isSpecificConverter} 
+            />
+          )}
+          {!isEmbed && (
+            <div className="text-center mb-8">
+              {category === 'time_zone' ? (
+                <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-4xl font-semibold tracking-tight mb-2 text-neutral-900 dark:text-white">
+                  Time Zone Converter
+                </h1>
+              ) : category === 'bmi' ? (
+                <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-4xl font-semibold tracking-tight mb-2 text-neutral-900 dark:text-white">
+                  BMI Calculator
+                </h1>
+              ) : location.pathname === "/" ? (
+                <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-4xl font-semibold tracking-tight mb-2 text-neutral-900 dark:text-white">
+                  Quick & Accurate Unit Converter
+                </h1>
+              ) : (
+                <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-4xl font-semibold tracking-tight mb-2 text-neutral-900 dark:text-white">
+                  {valFrom && valFrom !== "1" && valFrom !== "0" && !Number.isNaN(parseFloat(valFrom)) ? (
+                    <>
+                      {valFrom} {(parseFloat(valFrom) === 1 ? activeFromUnit?.name : ((activeFromUnit?.name || '').endsWith('s') ? activeFromUnit?.name : `${activeFromUnit?.name}s`))} to {(activeToUnit?.name || '').endsWith('s') ? activeToUnit?.name : `${activeToUnit?.name}s`}
+                    </>
+                  ) : (
+                    <>
+                      {(activeFromUnit?.name || '').endsWith('s') ? activeFromUnit?.name : `${activeFromUnit?.name}s`} to {(activeToUnit?.name || '').endsWith('s') ? activeToUnit?.name : `${activeToUnit?.name}s`} Converter
+                    </>
+                  )}
+                  <button
+                    onClick={toggleFavorite}
+                    className={`flex-shrink-0 flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full transition-colors ${
+                      isFavorited
+                        ? "bg-amber-100 text-amber-500 dark:bg-amber-500/20 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-500/30"
+                        : "bg-neutral-100 text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600 dark:bg-[#1a1a1a] dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-neutral-300"
+                    }`}
+                    title={isFavorited ? "Saved to Favorites" : "Save this conversion"}
+                  >
+                    <Star className={`w-4 h-4 md:w-5 md:h-5 ${isFavorited ? "fill-current" : ""}`} />
+                  </button>
+                  <button
+                    onClick={() => {
+                      const el = document.getElementById('embed-section');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="flex-shrink-0 flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full bg-neutral-100 text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600 dark:bg-[#1a1a1a] dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-neutral-300 transition-colors"
+                    title="Embed this calculator"
+                  >
+                    <Code className="w-4 h-4 md:w-5 md:h-5" />
+                  </button>
+                </h1>
+              )}
+            </div>
+          )}
 
           {/* Converter Card */}
           {category === 'time_zone' ? (
@@ -1352,10 +1376,19 @@ export default function App() {
           ) : (
           <motion.div
             layout
-            className="bg-white dark:bg-[#111111] p-6 md:p-10 rounded-[2.5rem] shadow-[0_8px_40px_rgba(0,0,0,0.04)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 relative z-10 overflow-hidden mb-8"
+            className={`bg-white dark:bg-[#111111] p-6 md:p-10 rounded-[2.5rem] shadow-[0_8px_40px_rgba(0,0,0,0.04)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 relative z-10 overflow-hidden mb-8 ${isEmbed ? 'p-4 md:p-6' : ''}`}
           >
             {/* Subtle light effect for dark mode inside card */}
             <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-primary-500/5 rounded-full blur-[80px] pointer-events-none hidden dark:block" />
+
+            {isEmbed && (
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2 font-bold text-lg text-primary-600 dark:text-primary-500">
+                  <img src="/favicon.svg" alt="" className="w-5 h-5" />
+                  <span>{activeFromUnit?.name} to {activeToUnit?.name}</span>
+                </div>
+              </div>
+            )}
 
             <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-center relative">
               {/* FROM */}
@@ -1808,11 +1841,23 @@ export default function App() {
                 </motion.div>
               )}
             </AnimatePresence>
+            {isEmbed && (
+              <div className="mt-8 pt-4 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-center">
+                <a 
+                  href="https://quickconvertunits.com/" 
+                  target="_blank" 
+                  rel="noopener"
+                  className="text-xs text-neutral-400 hover:text-primary-500 transition-colors flex items-center gap-1"
+                >
+                  Powered by QuickConvert
+                </a>
+              </div>
+            )}
           </motion.div>
           )}
 
           {/* SEO Content Article */}
-          {!isHomepage && category !== 'time_zone' && activeFromUnit && activeToUnit && valFrom !== "" && (
+          {!isEmbed && !isHomepage && category !== 'time_zone' && activeFromUnit && activeToUnit && valFrom !== "" && (
             <article className="mt-8 bg-white dark:bg-[#111111] rounded-3xl p-8 md:p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-neutral-100 dark:border-neutral-800">
               <header className="mb-8 overflow-hidden">
                 <h2 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
@@ -1869,24 +1914,37 @@ export default function App() {
           )}
 
           {/* Categories */}
-          <div className="flex overflow-x-auto md:flex-wrap no-scrollbar gap-3 mt-8 mb-8 pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:justify-center items-center text-center">
-            {categories.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => handleCategoryChange(c.id)}
-                className={`whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-primary-500/50 flex-shrink-0 ${
-                  category === c.id
-                    ? "bg-primary-500 text-white shadow-md transform scale-105 border border-primary-600 dark:border-primary-400"
-                    : "bg-white dark:bg-[#1a1a1a] text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-[#222] border border-neutral-200/80 dark:border-neutral-800/80 hover:text-neutral-900 dark:hover:text-white"
-                }`}
-              >
-                {t(`categories.${c.id}`, c.name)}
-              </button>
-            ))}
-          </div>
+          {!isEmbed && (
+            <div className="flex overflow-x-auto md:flex-wrap no-scrollbar gap-3 mt-8 mb-8 pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:justify-center items-center text-center">
+              {categories.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => handleCategoryChange(c.id)}
+                  className={`whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-primary-500/50 flex-shrink-0 ${
+                    category === c.id
+                      ? "bg-primary-500 text-white shadow-md transform scale-105 border border-primary-600 dark:border-primary-400"
+                      : "bg-white dark:bg-[#1a1a1a] text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-[#222] border border-neutral-200/80 dark:border-neutral-800/80 hover:text-neutral-900 dark:hover:text-white"
+                  }`}
+                >
+                  {t(`categories.${c.id}`, c.name)}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Embed Widget Option */}
+          {!isEmbed && (
+            <div id="embed-section">
+              <EmbedWidget
+                category={category}
+                fromUnitId={unitFrom}
+                toUnitId={unitTo}
+              />
+            </div>
+          )}
 
           {/* Featured Result for Numeric Paths */}
-          {valFrom && valFrom !== "1" && valFrom !== "0" && !Number.isNaN(parseFloat(valFrom)) && (
+          {!isEmbed && valFrom && valFrom !== "1" && valFrom !== "0" && !Number.isNaN(parseFloat(valFrom)) && (
             <>
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
@@ -1929,11 +1987,19 @@ export default function App() {
                   </p>
                 </div>
               </div>
+              
+              <DynamicContext
+                valFrom={valFrom}
+                valTo={valTo}
+                unitFrom={activeFromUnit}
+                unitTo={activeToUnit}
+                category={category}
+              />
             </>
           )}
 
           {/* Conversion Chart for Specific Categories */}
-          {!isHomepage && (
+          {!isEmbed && !isHomepage && (
             <Suspense fallback={<div className="mt-8 h-[350px] flex items-center justify-center bg-white dark:bg-neutral-800 rounded-3xl border border-neutral-100 dark:border-neutral-700">Loading chart...</div>}>
               <ConversionChart
                 categoryId={category}
@@ -1944,7 +2010,7 @@ export default function App() {
             </Suspense>
           )}
           
-          {!isHomepage && (
+          {!isEmbed && !isHomepage && (
             <HowToConvertSection
               category={category}
               activeFromUnit={activeFromUnit as any}
@@ -1952,7 +2018,7 @@ export default function App() {
             />
           )}
           
-          {!isHomepage && (
+          {!isEmbed && !isHomepage && (
             <RelatedToolsSection
               categoryName={categories.find(c => c.id === category)?.name || category}
               category={category}
@@ -1972,16 +2038,19 @@ export default function App() {
           )}
 
           {/* AD: Below Result Ad */}
-          <AdSlot
-            className="mt-8"
-            widthClass="w-full max-w-[728px]"
-            heightClass="h-[100px]"
-            text="Below Result Ad"
-            mobileText="Below Result Ad"
-          />
+          {!isEmbed && (
+            <AdSlot
+              className="mt-8"
+              widthClass="w-full max-w-[728px]"
+              heightClass="h-[100px]"
+              text="Below Result Ad"
+              mobileText="Below Result Ad"
+            />
+          )}
 
           {/* Trust Signals / User Reviews */}
-          <div className="mt-16 mb-12 px-4 md:px-0">
+          {!isEmbed && (
+            <div className="mt-16 mb-12 px-4 md:px-0">
             <div className="flex flex-col items-center text-center mb-8">
               <h3 className="text-3xl font-semibold tracking-tight mb-3">Trusted by Professionals</h3>
               <p className="text-neutral-500 dark:text-neutral-400 text-lg">Join thousands of users relying on our fast, accurate conversions everyday.</p>
@@ -2044,11 +2113,13 @@ export default function App() {
               }
             `}</style>
           </div>
+        )}
 
           {/* SEO Content Sections with Popular & History */}
-          <section className="mt-16 text-neutral-800 dark:text-neutral-200">
-            {/* Popular & History Panels */}
-            <div className="grid md:grid-cols-2 gap-6 mb-12">
+          {!isEmbed && (
+            <section className="mt-16 text-neutral-800 dark:text-neutral-200">
+              {/* Popular & History Panels */}
+              <div className="grid md:grid-cols-2 gap-6 mb-12">
               {/* Favorites & Popular */}
               <div className="bg-white dark:bg-[#111111] rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none p-6">
                 <div className="flex items-center gap-2 mb-6">
@@ -2450,126 +2521,138 @@ export default function App() {
                 </div>
               </div>
             )}
-
           </section>
+        )}
 
           {/* SEO Optional Content area placeholder */}
-          <div className="mt-16 pt-8 border-t border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 text-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-center md:text-left">
-            <div className="flex-1 space-y-3">
-              <div>
-                <p className="mb-1 font-medium text-neutral-900 dark:text-neutral-200">
-                  &copy; {new Date().getFullYear()} QuickConvert. {t("footerText", "Built for fast, accurate conversions.")}
+          {!isEmbed && (
+            <div className="mt-16 pt-8 border-t border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 text-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-center md:text-left">
+              <div className="flex-1 space-y-3">
+                <div>
+                  <p className="mb-1 font-medium text-neutral-900 dark:text-neutral-200">
+                    &copy; {new Date().getFullYear()} QuickConvert. {t("footerText", "Built for fast, accurate conversions.")}
+                  </p>
+                  <p className="opacity-80 font-medium">🛡️ Strictly Local: Your conversion data never leaves your device.</p>
+                </div>
+                <p className="text-xs text-neutral-500 dark:text-neutral-500 leading-relaxed max-w-3xl">
+                  <strong>Disclaimer:</strong> While we strive to provide accurate information, QuickConvert makes no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability or availability of the conversion calculators. Any reliance you place on such information is therefore strictly at your own risk.
                 </p>
-                <p className="opacity-80 font-medium">🛡️ Strictly Local: Your conversion data never leaves your device.</p>
               </div>
-              <p className="text-xs text-neutral-500 dark:text-neutral-500 leading-relaxed max-w-3xl">
-                <strong>Disclaimer:</strong> While we strive to provide accurate information, QuickConvert makes no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability or availability of the conversion calculators. Any reliance you place on such information is therefore strictly at your own risk.
-              </p>
+              <div className="flex flex-wrap items-center justify-center md:justify-end gap-x-4 gap-y-2 shrink-0">
+                <Link
+                  to="/conversions"
+                  className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                >
+                  Conversions Directory
+                </Link>
+                <Link
+                  to="/about"
+                  className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                >
+                  About Us
+                </Link>
+                <Link
+                  to="/blog"
+                  className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                >
+                  Blog
+                </Link>
+                <Link
+                  to="/contact"
+                  className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                >
+                  Contact
+                </Link>
+                <Link
+                  to="/terms"
+                  className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                >
+                  Terms
+                </Link>
+                <Link
+                  to="/privacy-policy"
+                  className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                >
+                  Privacy
+                </Link>
+              </div>
             </div>
-            <div className="flex flex-wrap items-center justify-center md:justify-end gap-x-4 gap-y-2 shrink-0">
-              <Link
-                to="/about"
-                className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-              >
-                About Us
-              </Link>
-              <Link
-                to="/blog"
-                className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-              >
-                Blog
-              </Link>
-              <Link
-                to="/contact"
-                className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-              >
-                Contact
-              </Link>
-              <Link
-                to="/terms"
-                className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-              >
-                Terms
-              </Link>
-              <Link
-                to="/privacy-policy"
-                className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-              >
-                Privacy
-              </Link>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Right Column (Sidebar Ads Desktop) */}
-        <aside className="hidden lg:block w-[300px] shrink-0">
-          <div className="sticky top-24 space-y-6">
-            {/* Quick Reference Table */}
-            <div className="bg-white dark:bg-[#111111] border border-neutral-100 dark:border-neutral-800 rounded-2xl p-5 shadow-sm overflow-hidden">
-              <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 mb-4 tracking-tight flex items-center gap-2">
-                <Star className="w-4 h-4 text-amber-500" />
-                {t("popular", "Popular Conversions")}
-              </h3>
-              <div className="flex flex-col gap-1">
-                {POPULAR_CONVERSIONS.slice(0, 12).map((conv, i) => (
-                  <a
-                    key={i}
-                    href={conv.cat === 'time_zone' ? '/time-zone-converter' : `/?category=${conv.cat}&from=${conv.from}&to=${conv.to}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleCategoryChange(conv.cat);
-                      setTimeout(() => {
-                        setUnitFrom(conv.from);
-                        setUnitTo(conv.to);
-                        setValFrom("1");
-                      }, 10);
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-neutral-50 dark:bg-neutral-800/20 dark:hover:bg-neutral-800/50 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 group transition-colors"
-                  >
-                    <span>
-                      {conv.cat === 'time_zone' ? (
-                        t(`units.time_zone_converter`, 'Time Zone Converter')
-                      ) : conv.label.includes(' to ') ? (
-                        <>{t(`units.${conv.from}`, conv.label.split(' to ')[0])} {t("to", "to")} {t(`units.${conv.to}`, conv.label.split(' to ')[1])}</>
-                      ) : (
-                        t(`units.${conv.cat}`, conv.label)
-                      )}
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                  </a>
-                ))}
+        {!isEmbed && (
+          <aside className="hidden lg:block w-[300px] shrink-0">
+            <div className="sticky top-24 space-y-6">
+              {/* Quick Reference Table */}
+              <div className="bg-white dark:bg-[#111111] border border-neutral-100 dark:border-neutral-800 rounded-2xl p-5 shadow-sm overflow-hidden">
+                <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 mb-4 tracking-tight flex items-center gap-2">
+                  <Star className="w-4 h-4 text-amber-500" />
+                  {t("popular", "Popular Conversions")}
+                </h3>
+                <div className="flex flex-col gap-1">
+                  {POPULAR_CONVERSIONS.slice(0, 12).map((conv, i) => (
+                    <a
+                      key={i}
+                      href={conv.cat === 'time_zone' ? '/time-zone-converter' : `/?category=${conv.cat}&from=${conv.from}&to=${conv.to}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleCategoryChange(conv.cat);
+                        setTimeout(() => {
+                          setUnitFrom(conv.from);
+                          setUnitTo(conv.to);
+                          setValFrom("1");
+                        }, 10);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-neutral-50 dark:bg-neutral-800/20 dark:hover:bg-neutral-800/50 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 group transition-colors"
+                    >
+                      <span>
+                        {conv.cat === 'time_zone' ? (
+                          t(`units.time_zone_converter`, 'Time Zone Converter')
+                        ) : conv.label.includes(' to ') ? (
+                          <>{t(`units.${conv.from}`, conv.label.split(' to ')[0])} {t("to", "to")} {t(`units.${conv.to}`, conv.label.split(' to ')[1])}</>
+                        ) : (
+                          t(`units.${conv.cat}`, conv.label)
+                        )}
+                      </span>
+                      <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    </a>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* AD: Right Sidebar Sticky 1 */}
-            <AdSlot
-              widthClass="w-[300px]"
-              heightClass="h-[600px]"
-              text="Sticky Sidebar Ad 1 (300x600)"
-            />
-            {/* AD: Right Sidebar Sticky 2 */}
-            <AdSlot
-              widthClass="w-[300px]"
-              heightClass="h-[300px]"
-              text="Sticky Sidebar Ad 2 (300x250)"
-            />
-          </div>
-        </aside>
+              {/* AD: Right Sidebar Sticky 1 */}
+              <AdSlot
+                widthClass="w-[300px]"
+                heightClass="h-[600px]"
+                text="Sticky Sidebar Ad 1 (300x600)"
+              />
+              {/* AD: Right Sidebar Sticky 2 */}
+              <AdSlot
+                widthClass="w-[300px]"
+                heightClass="h-[300px]"
+                text="Sticky Sidebar Ad 2 (300x250)"
+              />
+            </div>
+          </aside>
+        )}
       </div>
 
       {/* AD: Mobile Sticky Bottom Ad */}
-      <div className="fixed bottom-0 left-0 right-0 z-[40] bg-white dark:bg-[#111111] border-t border-neutral-200 dark:border-neutral-800 p-2 md:hidden flex justify-center pb-[env(safe-area-inset-bottom)]">
-        <AdSlot
-          widthClass="w-[320px]"
-          heightClass="h-[50px]"
-          text="Sticky Bottom Ad (320x50)"
-          mobileText="Sticky Bottom Ad (320x50)"
-        />
-      </div>
+      {!isEmbed && (
+        <div className="fixed bottom-0 left-0 right-0 z-[40] bg-white dark:bg-[#111111] border-t border-neutral-200 dark:border-neutral-800 p-2 md:hidden flex justify-center pb-[env(safe-area-inset-bottom)]">
+          <AdSlot
+            widthClass="w-[320px]"
+            heightClass="h-[50px]"
+            text="Sticky Bottom Ad (320x50)"
+            mobileText="Sticky Bottom Ad (320x50)"
+          />
+        </div>
+      )}
 
-      <CookieConsent />
-      <PwaPrompt />
+      {!isEmbed && <CookieConsent />}
+      {!isEmbed && <PwaPrompt />}
       
       {/* Error Toast */}
       <div id="error-toast" className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 bg-red-500 text-white rounded-full font-medium text-sm shadow-xl opacity-0 translate-y-4 pointer-events-none transition-all duration-300">
