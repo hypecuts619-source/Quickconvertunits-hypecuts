@@ -32,8 +32,10 @@ export function PopularConversions({ onSelect }: { onSelect: (cat: string, from:
               <span className="font-medium text-sm text-neutral-800 dark:text-neutral-200 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                 {conv.cat === 'time_zone' ? (
                   t(`units.time_zone_converter`, 'Time Zone Converter')
-                ) : (
+                ) : conv.label.includes(' to ') ? (
                   <>{t(`units.${conv.from}`, conv.label.split(' to ')[0])} {t("to", "to")} {t(`units.${conv.to}`, conv.label.split(' to ')[1])}</>
+                ) : (
+                  t(`units.${conv.cat}`, conv.label)
                 )}
               </span>
               <ArrowRight className="w-4 h-4 text-neutral-300 dark:text-neutral-600 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all" />

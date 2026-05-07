@@ -1,5 +1,6 @@
 export const POPULAR_CONVERSIONS = [
   { from: 'time_zone', to: 'time_zone', label: 'Time Zone Converter', cat: 'time_zone' },
+  { from: 'usd', to: 'eur', label: 'Currency Converter', cat: 'currency' },
   { from: 'kilogram', to: 'pound', label: 'KG to LBS', cat: 'weight' },
   { from: 'pound', to: 'kilogram', label: 'LBS to KG', cat: 'weight' },
   { from: 'meter', to: 'foot', label: 'Meters to Feet', cat: 'length' },

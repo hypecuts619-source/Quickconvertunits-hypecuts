@@ -262,7 +262,20 @@ export const categories: UnitCategory[] = [
     id: 'bmi',
     name: 'BMI Calculator',
     baseUnit: 'bmi',
-    units: [] // Special case for UI
+     units: [] // Special case for UI
+  },
+  {
+    id: 'typography',
+    name: 'Typography',
+    baseUnit: 'pixel',
+    units: [
+      { id: 'pixel', name: 'Pixel', symbol: 'px', factor: 1, description: 'A base design unit for web interfaces.' },
+      { id: 'point', name: 'Point', symbol: 'pt', factor: 1.3333333333, description: 'Traditional typographic measurement (72 pt = 1 inch).' },
+      { id: 'em', name: 'Em', symbol: 'em', factor: 16, description: 'Relative unit for font sizing. Usually 1em = 16px.' },
+      { id: 'rem', name: 'Rem', symbol: 'rem', factor: 16, description: 'Root em, widely used in modern CSS.' },
+      { id: 'inch', name: 'Inch', symbol: 'in', factor: 96, description: 'Standard CSS inch (1in = 96px).' },
+      { id: 'centimeter', name: 'Centimeter', symbol: 'cm', factor: 37.795275591, description: 'Standard CSS centimeter (1cm = 96px / 2.54).' }
+    ]
   }
 ];
 
@@ -500,7 +513,14 @@ export function getSuggestions(query: string) {
 
 export function formatNumber(num: number): string {
   if (Number.isNaN(num)) return "0";
-  const str = Number.isInteger(num) ? num.toString() : parseFloat(num.toFixed(6)).toString();
+  if (num === 0) return "0";
+  
+  const absNum = Math.abs(num);
+  if (absNum < 1e-6 || absNum >= 1e12) {
+    return num.toExponential(6).replace(/\.?0+e/, 'e');
+  }
+
+  const str = Number.isInteger(num) ? num.toString() : parseFloat(num.toFixed(8)).toString();
   const parts = str.split(".");
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   return parts.join(".");

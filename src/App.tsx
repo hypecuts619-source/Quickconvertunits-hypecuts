@@ -276,10 +276,10 @@ function PwaPrompt() {
       e.preventDefault();
       // Stash the event so it can be triggered later.
       setDeferredPrompt(e);
-      // Wait 30 seconds before showing the prompt
+      // Wait 15 seconds before showing the prompt
       setTimeout(() => {
         setIsPromptReady(true);
-      }, 30000);
+      }, 15000);
     });
 
     window.addEventListener('appinstalled', () => {
@@ -306,30 +306,25 @@ function PwaPrompt() {
   if (!isPromptReady) return null;
 
   return (
-    <div className="fixed bottom-20 left-4 right-4 md:left-auto md:right-4 md:bottom-4 md:w-80 p-4 bg-white dark:bg-[#111111] border border-neutral-200 dark:border-neutral-800 z-[60] rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] text-center md:text-left flex flex-col items-center md:items-start transition-all">
-      <div className="flex items-center gap-3 mb-3 shrink-0">
-         <div className="w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center shrink-0">
-           <Download className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-         </div>
-         <div>
-           <h4 className="font-semibold text-neutral-900 dark:text-white text-sm">{t("installApp", "Install QuickConvert")}</h4>
-           <p className="text-xs text-neutral-500 dark:text-neutral-400">Use offline anywhere</p>
-         </div>
+    <div className="fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-3 px-2 py-2 pr-4 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.15)] transition-all whitespace-nowrap animate-in slide-in-from-bottom-5 fade-in duration-500">
+      <button onClick={() => setIsPromptReady(false)} className="p-2 text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300 transition-colors" aria-label="Dismiss">
+        <X className="w-4 h-4" />
+      </button>
+      <div className="flex items-center gap-2 cursor-pointer" onClick={handleInstallClick}>
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/40">
+          <Download className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+        </div>
+        <div className="flex flex-col pr-2">
+          <span className="text-sm font-semibold tracking-tight leading-tight">{t("installApp", "Install QuickConvert")}</span>
+          <span className="text-[10px] text-neutral-500 leading-tight">Use offline anytime, anywhere</span>
+        </div>
       </div>
-      <div className="flex w-full gap-2">
-        <button
-          onClick={() => setIsPromptReady(false)}
-          className="flex-1 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 rounded-lg text-sm font-medium hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
-        >
-          Later
-        </button>
-        <button
-          onClick={handleInstallClick}
-          className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
-        >
-          Install App
-        </button>
-      </div>
+      <button
+        onClick={handleInstallClick}
+        className="px-4 py-1.5 bg-primary-600 text-white text-sm font-medium rounded-full hover:bg-primary-700 transition-colors shadow-sm"
+      >
+        Install
+      </button>
     </div>
   );
 }
@@ -565,11 +560,16 @@ export default function App() {
     if (!isNaN(num)) {
       const res = convert(num, unitFrom, unitTo, category);
       // Format nicely to avoid floating point issues like 0.30000000000000004
-      setValTo(
-        Number.isInteger(res)
-          ? res.toString()
-          : parseFloat(res.toFixed(6)).toString(),
-      );
+      if (Math.abs(res) < 1e-6 || Math.abs(res) >= 1e12) {
+        if (res === 0) setValTo("0");
+        else setValTo(res.toExponential(6).replace(/\.?0+e/, 'e'));
+      } else {
+        setValTo(
+          Number.isInteger(res)
+            ? res.toString()
+            : parseFloat(res.toFixed(8)).toString(),
+        );
+      }
     } else {
       setValTo("");
     }
@@ -626,11 +626,16 @@ export default function App() {
     const num = parseFloat(v);
     if (!isNaN(num)) {
       const res = convert(num, unitTo, unitFrom, category);
-      setValFrom(
-        Number.isInteger(res)
-          ? res.toString()
-          : parseFloat(res.toFixed(6)).toString(),
-      );
+      if (Math.abs(res) < 1e-6 || Math.abs(res) >= 1e12) {
+        if (res === 0) setValFrom("0");
+        else setValFrom(res.toExponential(6).replace(/\.?0+e/, 'e'));
+      } else {
+        setValFrom(
+          Number.isInteger(res)
+            ? res.toString()
+            : parseFloat(res.toFixed(8)).toString(),
+        );
+      }
     } else {
       setValFrom("");
     }
@@ -1807,7 +1812,7 @@ export default function App() {
           )}
 
           {/* SEO Content Article */}
-          {category !== 'time_zone' && activeFromUnit && activeToUnit && valFrom !== "" && (
+          {!isHomepage && category !== 'time_zone' && activeFromUnit && activeToUnit && valFrom !== "" && (
             <article className="mt-8 bg-white dark:bg-[#111111] rounded-3xl p-8 md:p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-neutral-100 dark:border-neutral-800">
               <header className="mb-8 overflow-hidden">
                 <h2 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
@@ -1928,30 +1933,36 @@ export default function App() {
           )}
 
           {/* Conversion Chart for Specific Categories */}
-          <Suspense fallback={<div className="mt-8 h-[350px] flex items-center justify-center bg-white dark:bg-neutral-800 rounded-3xl border border-neutral-100 dark:border-neutral-700">Loading chart...</div>}>
-            <ConversionChart
-              categoryId={category}
-              valFrom={valFrom}
-              unitFrom={unitFrom}
-              theme={theme}
+          {!isHomepage && (
+            <Suspense fallback={<div className="mt-8 h-[350px] flex items-center justify-center bg-white dark:bg-neutral-800 rounded-3xl border border-neutral-100 dark:border-neutral-700">Loading chart...</div>}>
+              <ConversionChart
+                categoryId={category}
+                valFrom={valFrom}
+                unitFrom={unitFrom}
+                theme={theme}
+              />
+            </Suspense>
+          )}
+          
+          {!isHomepage && (
+            <HowToConvertSection
+              category={category}
+              activeFromUnit={activeFromUnit as any}
+              activeToUnit={activeToUnit as any}
             />
-          </Suspense>
+          )}
           
-          <HowToConvertSection
-            category={category}
-            activeFromUnit={activeFromUnit as any}
-            activeToUnit={activeToUnit as any}
-          />
-          
-          <RelatedToolsSection
-            categoryName={categories.find(c => c.id === category)?.name || category}
-            category={category}
-            activeFromUnit={activeFromUnit as any}
-            activeToUnit={activeToUnit as any}
-            units={categories.find(c => c.id === category)?.units || []}
-          />
+          {!isHomepage && (
+            <RelatedToolsSection
+              categoryName={categories.find(c => c.id === category)?.name || category}
+              category={category}
+              activeFromUnit={activeFromUnit as any}
+              activeToUnit={activeToUnit as any}
+              units={categories.find(c => c.id === category)?.units || []}
+            />
+          )}
 
-          {category !== 'time_zone' && activeFromUnit && activeToUnit && (
+          {!isHomepage && category !== 'time_zone' && activeFromUnit && activeToUnit && (
             <QuickLinksSection 
               fromUnit={activeFromUnit} 
               toUnit={activeToUnit} 
@@ -2519,8 +2530,10 @@ export default function App() {
                     <span>
                       {conv.cat === 'time_zone' ? (
                         t(`units.time_zone_converter`, 'Time Zone Converter')
-                      ) : (
+                      ) : conv.label.includes(' to ') ? (
                         <>{t(`units.${conv.from}`, conv.label.split(' to ')[0])} {t("to", "to")} {t(`units.${conv.to}`, conv.label.split(' to ')[1])}</>
+                      ) : (
+                        t(`units.${conv.cat}`, conv.label)
                       )}
                     </span>
                     <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />

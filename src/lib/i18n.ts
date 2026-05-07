@@ -43,7 +43,9 @@ const resources = {
         energy: "Energy",
         power: "Power",
         pressure: "Pressure",
-        currency: "Currency"
+        currency: "Currency",
+        typography: "Tipografía",
+        typography: "Typography"
       },
       footerText: "Built for fast, accurate conversions.",
       searchPlaceholder: "Search for units (⌘K)",
@@ -94,7 +96,9 @@ const resources = {
         energy: "Energie",
         power: "Leistung",
         pressure: "Druck",
-        currency: "Währung"
+        currency: "Währung",
+        typography: "Tipografía",
+        typography: "Typografie"
       },
       footerText: "Gebaut für schnelle, präzise Umrechnungen.",
       searchPlaceholder: "Nach Einheiten suchen (⌘K)",
@@ -145,7 +149,9 @@ const resources = {
         energy: "Énergie",
         power: "Puissance",
         pressure: "Pression",
-        currency: "Devise"
+        currency: "Devise",
+        typography: "Tipografía",
+        typography: "Typographie"
       },
       footerText: "Conçu pour des conversions rapides et précises.",
       searchPlaceholder: "Rechercher des unités (⌘K)",
@@ -196,7 +202,9 @@ const resources = {
         energy: "ऊर्जा",
         power: "शक्ति",
         pressure: "दबाव",
-        currency: "मुद्रा"
+        currency: "मुद्रा",
+        typography: "Tipografía",
+        typography: "टाइपोग्राफी"
       },
       footerText: "तेज़, सटीक रूपांतरण के लिए बनाया गया।",
       searchPlaceholder: "इकाइयाँ खोजें (⌘K)",
@@ -247,7 +255,9 @@ const resources = {
         energy: "能量",
         power: "功率",
         pressure: "压力",
-        currency: "货币"
+        currency: "货币",
+        typography: "Tipografía",
+        typography: "排版"
       },
       footerText: "为快速准确的对换而建。",
       searchPlaceholder: "搜索单位 (⌘K)",
@@ -298,7 +308,9 @@ const resources = {
         energy: "الطاقة",
         power: "القوة",
         pressure: "الضغط",
-        currency: "العملة"
+        currency: "العملة",
+        typography: "Tipografía",
+        typography: "الطباعة"
       },
       footerText: "صمم لتحويلات سريعة ودقيقة.",
       searchPlaceholder: "البحث عن وحدات (⌘K)",
@@ -349,7 +361,8 @@ const resources = {
         energy: "Energía",
         power: "Potencia",
         pressure: "Presión",
-        currency: "Moneda"
+        currency: "Moneda",
+        typography: "Tipografía"
       },
       footerText: "Construido para conversiones rápidas y precisas.",
       searchPlaceholder: "Buscar unidades (⌘K)",
@@ -400,7 +413,9 @@ const resources = {
         energy: "Energia",
         power: "Potência",
         pressure: "Pressão",
-        currency: "Moeda"
+        currency: "Moeda",
+        typography: "Tipografia",
+        typography: "Tipografía"
       },
       footerText: "Construído para conversões rápidas e precisas.",
       searchPlaceholder: "Pesquisar unidades (⌘K)",
@@ -451,7 +466,9 @@ const resources = {
         energy: "Энергия",
         power: "Мощность",
         pressure: "Давление",
-        currency: "Валюта"
+        currency: "Валюта",
+        typography: "Типографика",
+        typography: "Tipografía"
       },
       footerText: "Создано для быстрых и точных конвертаций.",
       searchPlaceholder: "Поиск величин (⌘K)",
@@ -502,7 +519,9 @@ const resources = {
         energy: "エネルギー",
         power: "電力",
         pressure: "圧力",
-        currency: "通貨"
+        currency: "通貨",
+        typography: "タイポグラフィ",
+        typography: "Tipografía"
       },
       footerText: "高速かつ正確な変換のために構築されました。",
       searchPlaceholder: "単位を検索 (⌘K)",
@@ -553,7 +572,9 @@ const resources = {
         energy: "Energia",
         power: "Potenza",
         pressure: "Pressione",
-        currency: "Valuta"
+        currency: "Valuta",
+        typography: "Tipografia",
+        typography: "Tipografía"
       },
       footerText: "Costruito per conversioni veloci e precise.",
       searchPlaceholder: "Cerca unità (⌘K)",
