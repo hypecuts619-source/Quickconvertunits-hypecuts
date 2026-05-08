@@ -970,11 +970,34 @@ export default function App() {
       });
     }
 
-    if (customFAQs.length > 0 && !(isSpecificConverter && category !== 'time_zone')) {
+    const showSpecificFAQ = isSpecificConverter && category !== 'time_zone' && activeFromUnit && activeToUnit;
+    let finalFAQs = [...customFAQs];
+    
+    if (showSpecificFAQ) {
+      const resVal1 = convert(1, unitFrom, unitTo, category);
+      const valTextStr = valFrom && valFrom !== "1" ? valFrom : "1";
+      const numVal = parseFloat(valTextStr) || 1;
+      const resValCurrent = convert(numVal, unitFrom, unitTo, category);
+      
+      const formulaText = `To calculate, you multiply the ${activeFromUnit.name} value by the conversion factor.`;
+
+      finalFAQs = [
+        {
+          question: numVal !== 1 ? `How do you convert ${valTextStr} ${activeFromUnit.symbol} to ${activeToUnit.symbol}?` : `How do I convert ${activeFromUnit.name} to ${activeToUnit.name}?`,
+          answer: numVal !== 1 ? `To convert ${valTextStr} ${activeFromUnit.name} to ${activeToUnit.name}, apply the conversion. ${formulaText} Therefore, ${valTextStr} ${activeFromUnit.symbol} = ${resValCurrent} ${activeToUnit.symbol}.` : `Simply enter the value of ${activeFromUnit.name} into our online converter. The tool will instantly calculate and display the corresponding value in ${activeToUnit.name} based on the most accurate conversion factor.`
+        },
+        {
+          question: `Is this ${activeFromUnit.name} to ${activeToUnit.name} converter free?`,
+          answer: `Yes, our conversion tool is 100% free for all users and works instantly on both mobile and desktop devices.`
+        }
+      ];
+    }
+
+    if (finalFAQs.length > 0) {
       schema.push({
         "@context": "https://schema.org",
         "@type": "FAQPage",
-        mainEntity: customFAQs.map(faq => ({
+        mainEntity: finalFAQs.map(faq => ({
           "@type": "Question",
           name: faq.question,
           acceptedAnswer: {
@@ -2556,6 +2579,12 @@ export default function App() {
                   className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                 >
                   Blog
+                </Link>
+                <Link
+                  to="/api-docs"
+                  className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors border-emerald-200 dark:border-emerald-800 border bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded text-emerald-700 dark:text-emerald-400 font-medium"
+                >
+                  Free API
                 </Link>
                 <Link
                   to="/contact"

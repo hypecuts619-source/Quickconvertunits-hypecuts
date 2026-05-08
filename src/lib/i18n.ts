@@ -576,11 +576,25 @@ const resources = {
   }
 };
 
+const getInitialLanguage = () => {
+  if (typeof window === 'undefined') return 'en';
+  
+  const pathParts = window.location.pathname.split('/');
+  const possibleLang = pathParts[1];
+  const supportedLangs = ['en', 'es', 'fr', 'de', 'hi', 'zh', 'ar', 'pt', 'ru', 'ja', 'it'];
+  
+  if (supportedLangs.includes(possibleLang)) {
+    return possibleLang;
+  }
+  
+  return localStorage.getItem('i18nextLng') || "en";
+};
+
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: localStorage.getItem('i18nextLng') || "en", // default language
+    lng: getInitialLanguage(),
     fallbackLng: "en",
     interpolation: {
       escapeValue: false

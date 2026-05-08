@@ -209,66 +209,168 @@ function capitalize(str: string) {
  */
 export default {
   async fetch(request: Request, env: any, ctx: any): Promise<Response> {
-    const response = await env.ASSETS.fetch(request);
     const url = new URL(request.url);
-  const pathname = url.pathname.replace(/^\//, "");
-  
-  const contentType = response.headers.get("Content-Type") || "";
-  if (!contentType.includes("text/html")) {
-    if (pathname.includes("-to-")) {
-      const newHeaders = new Headers(response.headers);
-      newHeaders.set("Cache-Control", `public, max-age=31536000, immutable`);
-      return new Response(response.body, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: newHeaders
+    const pathname = url.pathname.replace(/^\//, "");
+
+    if (pathname === "sitemap.xml") {
+      const urls: string[] = [];
+      const bases = ["weight", "length", "temperature", "volume", "area", "time", "speed", "power"];
+      bases.forEach(base => {
+        const units = Object.entries(popularUnits).filter(([_, u]) => u.base === base);
+        for (let i = 0; i < units.length; i++) {
+          for (let j = 0; j < units.length; j++) {
+            if (i !== j) {
+              const fromId = units[i][0];
+              const toId = units[j][0];
+              const canonicalFromId = getCanonicalUnitId(fromId);
+              const canonicalToId = getCanonicalUnitId(toId);
+              const canonicalPath = getSEOUrlPath(canonicalFromId, canonicalToId);
+              urls.push(`https://quickconvertunits.com/${canonicalPath}`);
+            }
+          }
+        }
+      });
+      // Deduplicate
+      const uniqueUrls = Array.from(new Set(urls)).slice(0, 10000); 
+
+      const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://quickconvertunits.com/</loc><changefreq>daily</changefreq></url>
+  ${uniqueUrls.map(u => `<url><loc>${u}</loc><changefreq>weekly</changefreq></url>`).join('\n')}
+</urlset>`;
+      return new Response(sitemap, {
+        headers: {
+          "Content-Type": "application/xml",
+          "Cache-Control": "public, max-age=86400"
+        }
       });
     }
-    return response;
-  }
-  
-  let template = await response.text();
-  let urlPath = pathname;
 
-  if (urlPath && urlPath.includes("-to-") && !urlPath.includes("blog")) {
-    const parts = urlPath.split("-to-");
-    if (parts.length === 2 && parts[0] && parts[1]) {
-      let val = 1;
-      let fromId = parts[0];
-      const toId = parts[1];
+    // Free REST API for developers (high quality backlink strategy)
+    if (pathname.startsWith("api/v1/convert")) {
+      const value = parseFloat(url.searchParams.get("value") || "1");
+      const from = url.searchParams.get("from");
+      const to = url.searchParams.get("to");
 
-      if (fromId.startsWith("convert-")) {
-        const valMatch = fromId.match(/^convert-([\d.]+)-(.*)$/);
-        if (valMatch) {
-          val = parseFloat(valMatch[1]);
-          fromId = valMatch[2];
+      if (!from || !to || isNaN(value)) {
+        return new Response(JSON.stringify({ error: "Missing or invalid parameters. Example: /api/v1/convert?value=1&from=kg&to=lbs" }), {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*"
+          }
+        });
+      }
+
+      const resVal = calculateConversion(value, from, to);
+      if (resVal === "N/A") {
+        return new Response(JSON.stringify({ error: "Unsupported conversion between units." }), {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*"
+          }
+        });
+      }
+
+      return new Response(JSON.stringify({
+        value: value,
+        from: from,
+        to: to,
+        result: resVal,
+        timestamp: new Date().toISOString(),
+        attribution: "Powered by QuickConvert API - https://quickconvertunits.com"
+      }), {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "public, max-age=3600"
         }
-      }
-      
-      const fromUnit = popularUnits[fromId] || { name: capitalize(fromId), symbol: capitalize(fromId) };
-      const toUnit = popularUnits[toId] || { name: capitalize(toId), symbol: capitalize(toId) };
-      
-      const valText = val === 1 ? "1" : val.toString();
-      const resVal = calculateConversion(val, fromId, toId);
-      
-      const canonicalFromId = getCanonicalUnitId(fromId);
-      const canonicalToId = getCanonicalUnitId(toId);
-      const canonicalPathBase = getSEOUrlPath(canonicalFromId, canonicalToId);
-      const canonicalPath = val === 1 ? canonicalPathBase : `convert-${val}-${canonicalPathBase}`;
-      
-      let title = `Fast ${valText} ${fromUnit.name} to ${toUnit.name} Converter - Instant ${fromUnit.symbol} to ${toUnit.symbol}`;
-      if (val !== 1 && resVal !== "N/A") {
-        title = `${valText} ${fromUnit.name} to ${toUnit.name} - Convert ${valText} ${fromUnit.symbol} to ${toUnit.symbol}`;
-      }
-      
-      const description = val === 1 
-        ? `Convert 1 ${fromUnit.name.toLowerCase()} to ${toUnit.name.toLowerCase()} instantly. Free online conversion calculator. Enter value, select units—get precise results fast.`
-        : `What is ${valText} ${fromUnit.name} in ${toUnit.name}? ${valText} ${fromUnit.symbol} = ${resVal} ${toUnit.symbol}. Detailed conversion steps and formula included.`;
+      });
+    }
 
-      template = template.replace(
-        /<title[^>]*>.*?<\/title>/,
-        `<title data-react-helmet="true">${title}</title>`
-      );
+    const response = await env.ASSETS.fetch(request);
+    
+    const contentType = response.headers.get("Content-Type") || "";
+    if (!contentType.includes("text/html")) {
+      if (pathname.includes("-to-")) {
+        const newHeaders = new Headers(response.headers);
+        newHeaders.set("Cache-Control", `public, max-age=31536000, immutable`);
+        return new Response(response.body, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: newHeaders
+        });
+      }
+      return response;
+    }
+    
+    let template = await response.text();
+    
+    // Path-based i18n
+    const langMatch = pathname.match(/^(es|fr|de|hi|zh|ja|ru|pt|it|ar)\/(.*)$/);
+    let lang = "en";
+    let urlPath = pathname;
+    if (langMatch) {
+      lang = langMatch[1];
+      urlPath = langMatch[2];
+    }
+    
+    const hreflangTags = ['en', 'es', 'fr', 'de', 'hi', 'zh', 'ja', 'ru', 'pt', 'it', 'ar']
+      .map(l => `<link rel="alternate" hreflang="${l}" href="https://quickconvertunits.com/${l === 'en' ? '' : l + '/'}${urlPath}" />`)
+      .join('\n    ');
+    
+    template = template.replace(/<head>/i, `<head>\n    ${hreflangTags}`);
+    template = template.replace(/<html lang="en">/i, `<html lang="${lang}">`);
+
+    if (urlPath && urlPath.includes("-to-") && !urlPath.includes("blog")) {
+      const parts = urlPath.split("-to-");
+      if (parts.length === 2 && parts[0] && parts[1]) {
+        let val = 1;
+        let fromId = parts[0];
+        const toId = parts[1];
+
+        if (fromId.startsWith("convert-")) {
+          const valMatch = fromId.match(/^convert-([\d.]+)-(.*)$/);
+          if (valMatch) {
+            val = parseFloat(valMatch[1]);
+            fromId = valMatch[2];
+          }
+        }
+        
+        const fromUnit = popularUnits[fromId] || { name: capitalize(fromId), symbol: capitalize(fromId) };
+        const toUnit = popularUnits[toId] || { name: capitalize(toId), symbol: capitalize(toId) };
+        
+        const valText = val === 1 ? "1" : val.toString();
+        const resVal = calculateConversion(val, fromId, toId);
+        
+        const canonicalFromId = getCanonicalUnitId(fromId);
+        const canonicalToId = getCanonicalUnitId(toId);
+        const canonicalPathBase = getSEOUrlPath(canonicalFromId, canonicalToId);
+        const canonicalPath = val === 1 ? canonicalPathBase : `convert-${val}-${canonicalPathBase}`;
+        const finalCanonicalPath = lang === 'en' ? canonicalPath : `${lang}/${canonicalPath}`;
+        
+        let intentAction = "Converter";
+        if (fromUnit.base === "weight") intentAction = "Weight Calculator";
+        else if (fromUnit.base === "volume") intentAction = "Baking Converter";
+        else if (fromUnit.base === "length") intentAction = "Length Converter";
+        else if (fromUnit.base === "temperature") intentAction = "Temperature Calculator";
+        else if (fromUnit.base === "time") intentAction = "Time Calculator";
+        else if (fromUnit.base === "digital") intentAction = "Data Converter";
+        
+        let title = `${fromUnit.name} to ${toUnit.name} (${fromUnit.symbol} to ${toUnit.symbol}) ${intentAction}`;
+        if (val !== 1 && resVal !== "N/A") {
+          title = `${valText} ${fromUnit.name} to ${toUnit.name} (${fromUnit.symbol} to ${toUnit.symbol}) ${intentAction}`;
+        }
+        
+        const description = val === 1 
+          ? `Convert 1 ${fromUnit.name.toLowerCase()} to ${toUnit.name.toLowerCase()} instantly. Free online ${intentAction.toLowerCase()}. Enter value, select units—get precise results fast.`
+          : `What is ${valText} ${fromUnit.name} in ${toUnit.name}? ${valText} ${fromUnit.symbol} = ${resVal} ${toUnit.symbol}. Detailed conversion steps and formula included.`;
+
+        template = template.replace(
+          /<title[^>]*>.*?<\/title>/,
+          `<title data-react-helmet="true">${title}</title>`
+        );
       template = template.replace(
         /<meta[^>]*name="description"[^>]*\/>/,
         `<meta data-react-helmet="true" name="description" content="${description}" />`
@@ -283,12 +385,12 @@ export default {
       );
       template = template.replace(
         /<link[^>]*rel="canonical"[^>]*\/>/,
-        `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${canonicalPath}" />`
+        `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${finalCanonicalPath}" />`
       );
 
       template = template.replace(
         /<meta[^>]*property="og:url"[^>]*\/>/,
-        `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${canonicalPath}" />`
+        `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${finalCanonicalPath}" />`
       );
       
       let formulaText = `To calculate, you multiply the ${fromUnit.name} value by the conversion factor.`;
@@ -613,13 +715,15 @@ export default {
       /<meta[^>]*property="og:description"[^>]*\/>/,
       `<meta data-react-helmet="true" property="og:description" content="${description}" />`
     );
+    const finalCanonicalPath = lang === 'en' ? urlPath : `${lang}/${urlPath}`;
+    
     template = template.replace(
       /<link[^>]*rel="canonical"[^>]*\/>/,
-      `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${urlPath}" />`
+      `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${finalCanonicalPath}" />`
     );
     template = template.replace(
       /<meta[^>]*property="og:url"[^>]*\/>/,
-      `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${urlPath}" />`
+      `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${finalCanonicalPath}" />`
     );
     
     const staticContent = `

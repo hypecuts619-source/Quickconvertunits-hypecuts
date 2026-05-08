@@ -15,6 +15,7 @@ const Contact = lazy(() => import('./Contact.tsx'));
 const Blog = lazy(() => import('./Blog.tsx'));
 const BlogPost = lazy(() => import('./BlogPost.tsx'));
 const Directory = lazy(() => import('./Directory.tsx'));
+const ApiDocs = lazy(() => import('./ApiDocs.tsx'));
 
 // Automatically register the service worker
 if ('serviceWorker' in navigator) {
@@ -28,17 +29,35 @@ createRoot(document.getElementById('root')!).render(
         <BrowserRouter>
           <Suspense fallback={<div style={{height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>Loading...</div>}>
             <Routes>
+              {/* Routes without language prefix */}
               <Route path="/" element={<App />} />
-              <Route path="/:conversion" element={<App />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="/about" element={<AboutUs />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/api-docs" element={<ApiDocs />} />
               <Route path="/conversions" element={<Directory />} />
               <Route path="/conversions/:category" element={<Directory />} />
               <Route path="/conversions/:category/:pair" element={<Directory />} />
+              <Route path="/:conversion" element={<App />} />
+
+              {/* Routes with language prefix */}
+              <Route path="/:lang">
+                <Route index element={<App />} />
+                <Route path="privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="terms" element={<TermsOfService />} />
+                <Route path="about" element={<AboutUs />} />
+                <Route path="contact" element={<Contact />} />
+                <Route path="blog" element={<Blog />} />
+                <Route path="blog/:slug" element={<BlogPost />} />
+                <Route path="api-docs" element={<ApiDocs />} />
+                <Route path="conversions" element={<Directory />} />
+                <Route path="conversions/:category" element={<Directory />} />
+                <Route path="conversions/:category/:pair" element={<Directory />} />
+                <Route path=":conversion" element={<App />} />
+              </Route>
             </Routes>
           </Suspense>
         </BrowserRouter>

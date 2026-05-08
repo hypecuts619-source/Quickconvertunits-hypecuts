@@ -6,7 +6,39 @@ export function LanguageSelector() {
   const { i18n } = useTranslation();
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    i18n.changeLanguage(e.target.value);
+    const newLang = e.target.value;
+    i18n.changeLanguage(newLang);
+    
+    // Redirect to the new language path
+    const pathParts = window.location.pathname.split('/');
+    const currentFirstPart = pathParts[1];
+    const supportedLangs = ['en', 'es', 'fr', 'de', 'hi', 'zh', 'ar', 'pt', 'ru', 'ja', 'it'];
+    
+    let newPath = window.location.pathname;
+    
+    if (supportedLangs.includes(currentFirstPart)) {
+      // It has a language prefix
+      if (newLang === 'en') {
+        // Remove prefix
+        pathParts.splice(1, 1);
+        newPath = pathParts.join('/') || '/';
+      } else {
+        // Replace prefix
+        pathParts[1] = newLang;
+        newPath = pathParts.join('/');
+      }
+    } else {
+      // It doesn't have a language prefix
+      if (newLang !== 'en') {
+        newPath = `/${newLang}${window.location.pathname}`;
+      }
+    }
+    
+    // Maintain query params
+    const newUrl = newPath + window.location.search;
+    if (newUrl !== window.location.pathname + window.location.search) {
+      window.location.href = newUrl;
+    }
   };
 
   return (

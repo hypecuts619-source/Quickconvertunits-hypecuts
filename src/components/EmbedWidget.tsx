@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Code, Check, Copy } from 'lucide-react';
+import { getSEOUrlPath } from '../lib/units';
 
 interface Props {
   category: string;
@@ -12,6 +13,7 @@ export function EmbedWidget({ category, fromUnitId, toUnitId }: Props) {
   const [copied, setCopied] = useState(false);
 
   const embedUrl = `https://quickconvertunits.com/?category=${category}&from=${fromUnitId}&to=${toUnitId}&embed=true`;
+  const specificPath = getSEOUrlPath(fromUnitId, toUnitId);
 
   const embedCode = `<iframe 
   src="${embedUrl}" 
@@ -21,7 +23,7 @@ export function EmbedWidget({ category, fromUnitId, toUnitId }: Props) {
   title="${category} Converter"
 ></iframe>
 <p style="text-align:center; font-size:12px; margin-top:8px;">
-  Powered by <a href="https://quickconvertunits.com/" target="_blank" rel="noopener">QuickConvertUnits.com</a>
+  Powered by <a href="https://quickconvertunits.com/${specificPath}" target="_blank" rel="noopener">QuickConvertUnits.com</a>
 </p>`;
 
   const copyToClipboard = () => {
