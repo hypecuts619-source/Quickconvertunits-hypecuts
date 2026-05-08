@@ -276,6 +276,32 @@ export const categories: UnitCategory[] = [
       { id: 'inch', name: 'Inch', symbol: 'in', factor: 96, description: 'Standard CSS inch (1in = 96px).' },
       { id: 'centimeter', name: 'Centimeter', symbol: 'cm', factor: 37.795275591, description: 'Standard CSS centimeter (1cm = 96px / 2.54).' }
     ]
+  },
+  {
+    id: 'data_rate',
+    name: 'Data Transfer Rate',
+    baseUnit: 'bps',
+    units: [
+      { id: 'bps', name: 'Bit per second', symbol: 'bps', factor: 1, description: 'The fundamental unit of data transfer rate.' },
+      { id: 'kbps', name: 'Kilobit per second', symbol: 'Kbps', factor: 1000, description: 'One thousand bits per second, used to measure audio bitrate and slow connections.' },
+      { id: 'mbps', name: 'Megabit per second', symbol: 'Mbps', factor: 1000000, description: 'One million bits per second, the standard metric for consumer internet connection speeds.' },
+      { id: 'gbps', name: 'Gigabit per second', symbol: 'Gbps', factor: 1000000000, description: 'One billion bits per second, used to measure high-speed enterprise networks and fiber optics.' },
+      { id: 'Bps', name: 'Byte per second', symbol: 'B/s', factor: 8, description: 'Eight bits per second.' },
+      { id: 'KBps', name: 'Kilobyte per second', symbol: 'KB/s', factor: 8000, description: 'Eight thousand bits per second, often used by download managers to display transfer rates.' },
+      { id: 'MBps', name: 'Megabyte per second', symbol: 'MB/s', factor: 8000000, description: 'Eight million bits per second, commonly used to describe file transfer speeds on local networks and SSDs.' },
+      { id: 'GBps', name: 'Gigabyte per second', symbol: 'GB/s', factor: 8000000000, description: 'Eight billion bits per second, measured in very high-speed internal bus transfers or massive data centers.' }
+    ]
+  },
+  {
+    id: 'torque',
+    name: 'Torque',
+    baseUnit: 'newton_meter',
+    units: [
+      { id: 'newton_meter', name: 'Newton-meter', symbol: 'N·m', factor: 1, description: 'The SI unit for torque, representing a force of one newton applied perpendicularly to a moment arm one meter long.' },
+      { id: 'pound_foot', name: 'Pound-foot', symbol: 'lb·ft', factor: 1.3558179483, description: 'An imperial unit of torque, famously used to quantify and market the rotational force of automotive engines.' },
+      { id: 'pound_inch', name: 'Pound-inch', symbol: 'lb·in', factor: 0.112984829, description: 'An imperial unit of torque used to measure smaller forces, such as the tightening specification of small bolts.' },
+      { id: 'kilogram_meter', name: 'Kilogram-meter', symbol: 'kg·m', factor: 9.80665, description: 'A metric (though non-SI) unit of torque equivalent to the force of one kilogram in Earth\'s gravity at a distance of one meter.' }
+    ]
   }
 ];
 

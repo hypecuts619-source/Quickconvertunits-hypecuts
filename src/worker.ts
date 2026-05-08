@@ -169,6 +169,18 @@ const popularUnits: Record<string, { name: string; symbol: string; factor?: numb
   mhz: { name: "Megahertz", symbol: "MHz", factor: 1000000, base: "frequency" },
   gigahertz: { name: "Gigahertz", symbol: "GHz", factor: 1000000000, base: "frequency" },
   ghz: { name: "Gigahertz", symbol: "GHz", factor: 1000000000, base: "frequency" },
+  // Data Transfer Rate
+  bps: { name: "Bit per second", symbol: "bps", factor: 1, base: "data_rate" },
+  kbps: { name: "Kilobit per second", symbol: "Kbps", factor: 1000, base: "data_rate" },
+  mbps: { name: "Megabit per second", symbol: "Mbps", factor: 1000000, base: "data_rate" },
+  gbps: { name: "Gigabit per second", symbol: "Gbps", factor: 1000000000, base: "data_rate" },
+  MBps: { name: "Megabyte per second", symbol: "MB/s", factor: 8000000, base: "data_rate" },
+  GBps: { name: "Gigabyte per second", symbol: "GB/s", factor: 8000000000, base: "data_rate" },
+  // Torque
+  newton_meter: { name: "Newton-meter", symbol: "N·m", factor: 1, base: "torque" },
+  pound_foot: { name: "Pound-foot", symbol: "lb·ft", factor: 1.3558, base: "torque" },
+  pound_inch: { name: "Pound-inch", symbol: "lb·in", factor: 0.113, base: "torque" },
+  kilogram_meter: { name: "Kilogram-meter", symbol: "kg·m", factor: 9.807, base: "torque" },
 };
 
 function formatValue(val: number): string {
@@ -214,7 +226,7 @@ export default {
 
     if (pathname === "sitemap.xml") {
       const urls: string[] = [];
-      const bases = ["weight", "length", "temperature", "volume", "area", "time", "speed", "power"];
+      const bases = ["weight", "length", "temperature", "volume", "area", "time", "speed", "power", "digital", "pressure", "frequency", "angle", "data_rate", "torque"];
       bases.forEach(base => {
         const units = Object.entries(popularUnits).filter(([_, u]) => u.base === base);
         for (let i = 0; i < units.length; i++) {

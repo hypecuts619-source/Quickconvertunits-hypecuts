@@ -2506,6 +2506,20 @@ export default function App() {
                   <Link to="/radians-to-degrees" className="text-primary-600 dark:text-primary-400 hover:underline">Radians to Degrees</Link>
                 </div>
 
+                <h3 className="text-xl font-medium mt-8 mb-2">Torque</h3>
+                <p className="font-light text-neutral-600 dark:text-neutral-400">Convert torquing forces between Newton-meters, pound-feet, and pound-inches for mechanical engineering and automotive applications.</p>
+                <div className="flex flex-wrap gap-2 text-sm mt-3">
+                  <Link to="/newton_meter-to-pound_foot" className="text-primary-600 dark:text-primary-400 hover:underline">Newton-meter to Pound-foot</Link> | 
+                  <Link to="/pound_foot-to-newton_meter" className="text-primary-600 dark:text-primary-400 hover:underline">Pound-foot to Newton-meter</Link>
+                </div>
+
+                <h3 className="text-xl font-medium mt-8 mb-2">Data Transfer Rate</h3>
+                <p className="font-light text-neutral-600 dark:text-neutral-400">Calculate speeds for downloading, streaming, and network infrastructure. Seamlessly convert Mbps to MB/s and Gbps to GB/s to understand true bandwidth capabilities.</p>
+                <div className="flex flex-wrap gap-2 text-sm mt-3">
+                  <Link to="/mbps-to-MBps" className="text-primary-600 dark:text-primary-400 hover:underline">Mbps to MB/s</Link> | 
+                  <Link to="/gbps-to-GBps" className="text-primary-600 dark:text-primary-400 hover:underline">Gbps to GB/s</Link>
+                </div>
+
                 <h3 className="text-xl font-medium mt-8 mb-2">Currency</h3>
                 <p className="font-light text-neutral-600 dark:text-neutral-400">Translate value between major world fiat currencies like USD, EUR, and GBP. Uses realistic exchange rate estimations for budgeting trips and international purchases.</p>
                 <div className="flex flex-wrap gap-2 text-sm mt-3">
