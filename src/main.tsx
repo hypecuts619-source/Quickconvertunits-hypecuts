@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { registerSW } from 'virtual:pwa-register';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { ScrollToTop } from './components/ScrollToTop';
 import './index.css';
 import './lib/i18n';
 
@@ -27,6 +28,7 @@ createRoot(document.getElementById('root')!).render(
     <HelmetProvider>
       <ErrorBoundary fallback={<div className="min-h-screen flex items-center justify-center p-10"><div className="text-center bg-red-50 text-red-600 p-8 rounded-2xl max-w-xl"><h1>App Crashed</h1><p>The application encountered an error while rendering.</p></div></div>}>
         <BrowserRouter>
+          <ScrollToTop />
           <Suspense fallback={<div style={{height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>Loading...</div>}>
             <Routes>
               {/* Routes without language prefix */}

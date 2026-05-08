@@ -65,6 +65,13 @@ export const categorySeoContent: Record<string, string> = {
       <li><a href="/celsius-to-kelvin">Celsius to Kelvin</a></li>
     </ul>
 
+    <h2>Did You Know? Temperature facts</h2>
+    <ul>
+      <li>-40° is the exact point where the Celsius and Fahrenheit scales intersect (-40°C = -40°F).</li>
+      <li>At absolute zero (0 K), all molecular motion comes to a complete halt. This is equivalent to -273.15°C or -459.67°F.</li>
+      <li>The hottest temperature ever recorded on Earth was 56.7°C (134°F) in Death Valley, California, USA.</li>
+    </ul>
+
     <h2>Frequently Asked Questions</h2>
     <h3>Why does temperature conversion use addition or subtraction?</h3>
     <p>Unlike distance or weight, Celsius and Fahrenheit scales do not start at absolute zero. They require an offset operation (adding or subtracting 32) before applying the scaling factor.</p>
@@ -99,6 +106,12 @@ export const categorySeoContent: Record<string, string> = {
       <li><a href="/kg-to-lbs">Kg to Lbs</a></li>
       <li><a href="/lbs-to-kg">Lbs to Kg</a></li>
       <li><a href="/grams-to-ounces">Grams to Ounces</a></li>
+    </ul>
+    <h2>Did You Know? Weight Facts</h2>
+    <ul>
+      <li>Your weight on Earth is due to gravity. If you stood on Mars, you would weigh about 38% of your current weight!</li>
+      <li>The word 'pound' comes from the Roman 'libra pondo', meaning 'a pound by weight'. That's why the abbreviation is 'lb'.</li>
+      <li>A traditional baker's dozen (13) was created because medieval bakers were fined if their loaves were under standard weight. Adding an extra loaf prevented punishment!</li>
     </ul>
     <h2>Frequently Asked Questions</h2>
     <h3>What is the difference between mass and weight?</h3>
@@ -201,6 +214,25 @@ export const categorySeoContent: Record<string, string> = {
   currency: `
     <h2>Real-Time Currency Exchange</h2>
     <p>Convert world currencies including US Dollars, Euros, British Pounds, and Japanese Yen. We use up-to-date exchange rates so your financial conversions are always accurate. Whether you're traveling, trading, or managing international business, get instantaneous currency conversions.</p>
+
+    <h3>How Exchange Rates Work</h3>
+    <p>An exchange rate represents the value of one currency in terms of another. The <strong>mid-market rate</strong> (or interbank rate) is the midpoint between the buy and sell prices of two currencies in the global market. This is the truest, fairest exchange rate. However, consumer banks and exchange bureaus typically add a markup or margin to this rate when converting your money, effectively charging you a hidden fee. Our converter uses the mid-market rate as an accurate baseline.</p>
+
+    <h2>Frequently Asked Questions</h2>
+    <h3>What is the mid-market exchange rate?</h3>
+    <p>The mid-market rate is the halfway point between the demand (buy) and supply (sell) rates of a currency on the global markets. It is the most accurate reflection of a currency's true value.</p>
+    
+    <h3>Why do exchange rates differ from my bank?</h3>
+    <p>Consumer banks and currency exchange kiosks typically apply a hidden markup over the mid-market rate to make a profit. The rates shown here represent the true baseline without those bank markups.</p>
+    
+    <h3>How often do your exchange rates update?</h3>
+    <p>Our exchange rates are updated periodically throughout the day to ensure you get a highly accurate estimation for historical and current conversions.</p>
+    
+    <h3>Is this currency converter free to use?</h3>
+    <p>Yes, all conversions on QuickConvert are 100% free with no hidden fees or account registrations required.</p>
+    
+    <h3>Can I use this currency converter offline?</h3>
+    <p>Yes, our Progressive Web App (PWA) architecture caches the latest fetched exchange rates. You can still perform currency conversions using the most recently stored rates even if you lose your internet connection.</p>
   `,
   power: `
     <h2>Power Conversion Calculator</h2>

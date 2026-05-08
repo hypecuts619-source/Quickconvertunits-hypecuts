@@ -216,6 +216,11 @@ function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1).replace(/_/g, " ").replace(/-/g, " ");
 }
 
+// Simple in-memory rate limiting for the API (resets on worker restart, but serves as a basic hardcoded limit)
+const ipRequests = new Map<string, { count: number; timestamp: number }>();
+const MAX_REQUESTS = 1000;
+const TIME_WINDOW = 3600 * 1000; // 1 hour
+
 /**
  * Basic Cloudflare Pages Middleware
  */
@@ -260,6 +265,32 @@ export default {
 
     // Free REST API for developers (high quality backlink strategy)
     if (pathname.startsWith("api/v1/convert")) {
+      const ip = request.headers.get("cf-connecting-ip") || request.headers.get("x-forwarded-for") || "unknown";
+      const now = Date.now();
+      
+      let record = ipRequests.get(ip);
+      if (!record || (now - record.timestamp > TIME_WINDOW)) {
+        record = { count: 0, timestamp: now };
+      }
+      
+      record.count += 1;
+      ipRequests.set(ip, record);
+
+      if (record.count > MAX_REQUESTS) {
+        const retryAfter = Math.ceil((TIME_WINDOW - (now - record.timestamp)) / 1000).toString();
+        return new Response(JSON.stringify({ 
+          error: "Rate limit exceeded. Maximum 1000 requests per hour per IP allowed for fair use.",
+          retry_after_seconds: retryAfter
+        }), {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Retry-After": retryAfter
+          }
+        });
+      }
+
       const value = parseFloat(url.searchParams.get("value") || "1");
       const from = url.searchParams.get("from");
       const to = url.searchParams.get("to");

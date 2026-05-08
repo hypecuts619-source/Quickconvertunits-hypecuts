@@ -9,11 +9,6 @@ export const trackConversionEvent = (category: string, fromUnit: string, toUnit:
         conversion_value: value,
       });
     }
-    
-    // Hotjar event tracking for conversion success
-    if ((window as any).hj) {
-      (window as any).hj("event", `conversion_completed_${category}`);
-    }
   }
 };
 
@@ -24,11 +19,6 @@ export const trackFunnelStep = (stepName: string) => {
       (window as any).gtag("event", "funnel_step", {
         step_name: stepName
       });
-    }
-
-    // Hotjar state change for heatmaps and funnel tracking
-    if ((window as any).hj) {
-      (window as any).hj("stateChange", stepName);
     }
   }
 };

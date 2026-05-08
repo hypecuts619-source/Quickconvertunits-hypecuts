@@ -5,6 +5,79 @@ export interface CustomSeoContent {
 }
 
 export const customSeoData: Record<string, CustomSeoContent> = {
+  "lbs-to-kg": {
+    title: "Pounds to Kilograms (lbs to kg) - Free Converter | QuickConvert",
+    description: "Convert lbs to kg instantly. 1 pound = 0.453592 kilograms. Free calculator with formula, and examples. Fast and accurate.",
+    content: `
+      <h2>Frequently Asked Questions</h2>
+      <h3>What is the simple rule to convert pounds to kg?</h3>
+      <p>Divide the pounds by 2.2046 to get the exact kilograms. For a quick mental estimate, divide the pounds in half and then subtract 10%.</p>
+      <h3>Is a kilo exactly 2 pounds?</h3>
+      <p>No, a kilo is approximately 2.2 pounds. While equating them to exactly 2 pounds works for very rough estimates, it introduces a 10% error which scales up significantly for heavier items.</p>
+      <h3>Why do gyms use both lbs and kg?</h3>
+      <p>Many weightlifting federations use kilograms as the standard for competition. However, in the US and UK, many commercial gyms stock pound plates due to historic preferences, so athletes often must convert daily.</p>
+      <h3>What does 150 lbs look like in kg?</h3>
+      <p>150 pounds is equal to exactly 68.0389 kilograms.</p>
+      <h3>Why is the abbreviation for pounds "lbs"?</h3>
+      <p>The abbreviation "lbs" comes from the Latin word "libra pondo" which translates to "a pound by weight".</p>
+    `
+  },
+  "grams-to-ounces": {
+    title: "Grams to Ounces (g to oz) - Free Weight Converter | QuickConvert",
+    description: "Convert grams to ounces quickly. 1 gram = 0.035274 ounces. Perfect for cooking and baking conversions. Fast, intuitive, and accurate.",
+    content: `
+      <h2>Frequently Asked Questions</h2>
+      <h3>How many grams are in one ounce?</h3>
+      <p>There are exactly 28.3495 grams in a single standard dry ounce.</p>
+      <h3>Is a fluid ounce the same as a dry ounce in grams?</h3>
+      <p>No. A dry ounce measures weight (approx 28.35 grams). A fluid ounce measures volume. For water, 1 fluid ounce weighs about 29.57 grams, but in America, it's customary to assume 1 fl oz of water equals 1 oz by weight for rough kitchen math.</p>
+      <h3>Why do baking recipes use grams instead of ounces?</h3>
+      <p>Grams are smaller units than ounces, providing much finer precision without resorting to difficult decimals or fractions like 1/16th of an ounce. This accuracy is vital in baking chemistry.</p>
+      <h3>How many ounces in 100 grams?</h3>
+      <p>100 grams is equal to approximately 3.5274 ounces.</p>
+      <h3>What is a Troy ounce?</h3>
+      <p>A Troy ounce is heavier than a standard (Avoirdupois) ounce. It equals 31.103 grams and is used exclusively for weighing precious metals like gold and silver.</p>
+    `
+  },
+  "meters-to-feet": {
+    title: "Meters to Feet (m to ft) - Distance Converter | QuickConvert",
+    description: "Convert meters to feet easily. 1 meter = 3.28084 feet. Simple calculator with formula and common use cases.",
+    content: `
+      <h2>Common Use Cases for Meters to Feet</h2>
+      <ul>
+        <li><strong>Aviation:</strong> Flight altitudes are generally measured in feet, while runway lengths might be in meters.</li>
+        <li><strong>Real Estate:</strong> Many international property listings are in square meters or dimensions in meters, which US buyers need to translate into feet.</li>
+        <li><strong>Track and Field:</strong> Sprints are in meters (e.g., 100m, 400m), while field events in the US might still reference feet for high school and local levels.</li>
+        <li><strong>Swimming Pools:</strong> Olympic pools are 50 meters, translating to roughly 164 feet long.</li>
+      </ul>
+      <h2>Frequently Asked Questions</h2>
+      <h3>How many feet are in exactly one meter?</h3>
+      <p>There are roughly 3.28084 feet in a single meter.</p>
+      <h3>Is a meter longer than a yard?</h3>
+      <p>Yes, a meter is slightly longer. A meter is roughly 39.37 inches, while a yard is exactly 36 inches.</p>
+      <h3>How can I mentally convert meters to feet easily?</h3>
+      <p>A great mental trick is to multiply the meters by 3, and then add 10% to the result. For example, 10 meters × 3 = 30 + 3 (which is 10%) = 33 feet (actual is 32.8 ft).</p>
+      <h3>How tall is 2 meters in feet?</h3>
+      <p>2 meters is roughly 6.56 feet, or about 6 feet and 6.7 inches.</p>
+      <h3>Why are metric distances used globally instead of feet?</h3>
+      <p>The metric system scales by factors of 10, making it drastically easier for scientific calculations and conversions compared to the imperial system where 12 inches equals a foot, and 5280 feet equals a mile.</p>
+    `
+  },
+  "eur-to-usd": {
+    title: "EUR to USD - Convert Euros to US Dollars | QuickConvert",
+    description: "Convert EUR to USD directly with our live mid-market exchange rate calculator. Essential for travel to Europe, trading, or standard financial conversions.",
+    content: `
+      <h2>Frequently Asked Questions</h2>
+      <h3>What is the EUR to USD exchange rate?</h3>
+      <p>The exchange rate tells you how many US Dollars you can buy with 1 Euro. Because the Euro is generally stronger, 1 Euro typically equals more than 1 US Dollar, usually hovering around $1.05 to $1.15 in recent years.</p>
+      <h3>Is it better to exchange USD to EUR in the US or Europe?</h3>
+      <p>Generally, exchanging money at a local ATM in Europe will provide you with the most favorable mid-market rate compared to exchanging physical cash at a bank in the US.</p>
+      <h3>Why does the EUR/USD pair fluctuate?</h3>
+      <p>The exchange rate is free-floating and fluctuates based on supply and demand, the economic performance of the Eurozone versus the United States, inflation, and interest rate policies from their respective central banks.</p>
+      <h3>Are there hidden fees when converting Euros to Dollars?</h3>
+      <p>While our calculator uses the pure mid-market rate, currency brokers and banks will typically charge a spread (markup) on top of this rate, meaning the actual money you receive will be slightly less than this pure conversion.</p>
+    `
+  },
   "kg-to-lbs": {
     title: "Kilograms to Pounds (kg to lbs) - Free Converter | QuickConvert",
     description: "Convert kg to lbs instantly. 1 kilogram = 2.20462 pounds. Free calculator with conversion table, formula, and examples. Accurate and fast.",

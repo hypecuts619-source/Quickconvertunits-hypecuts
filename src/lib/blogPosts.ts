@@ -12,6 +12,163 @@ export interface BlogPost {
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: 'converting-grandma-european-cake-recipe-to-us-cups',
+    title: 'Converting Grandma\'s European Cake Recipe to US Cups',
+    excerpt: 'European baking recipes rely on precise weight measurements, while US recipes favor volume. Learn how to convert grams of flour, sugar, and butter into standard US cups for perfect baking.',
+    date: 'May 08, 2026',
+    readTime: '5 min read',
+    faqSchema: {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do you convert grams to cups in baking?",
+          "acceptedAnswer": { "@type": "Answer", "text": "It depends on the ingredient. 1 cup of all-purpose flour is about 120 grams, while 1 cup of granulated sugar is about 200 grams." }
+        },
+        {
+          "@type": "Question",
+          "name": "Why do European recipes use weight instead of volume?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Weight provides much higher consistency and accuracy than volume, especially for compressible dry ingredients like flour and brown sugar." }
+        }
+      ]
+    },
+    content: `
+      <p class="lead text-xl text-neutral-600 dark:text-neutral-300 mb-8">
+        Have you ever found an incredible heirloom recipe from Europe, only to find the ingredients listed entirely in grams rather than cups and spoons? Since cooking relies on precise chemistry, incorrect conversions can cause your cake to collapse. 
+      </p>
+
+      <h2>The Difference: Volume vs. Weight</h2>
+      <p>
+        In the US, we measure primarily by <strong>volume</strong> (how much space an ingredient takes up), using cups, tablespoons, and teaspoons. In Europe and most of the world, baking relies on <strong>weight</strong> or mass (how heavy an ingredient is), measured in grams and kilograms.
+      </p>
+      <p>
+        The complication? A cup of fluffy flour weighs significantly less than a cup of dense sugar. Therefore, there is no single "grams to cups" conversion factor; it changes per ingredient.
+      </p>
+
+      <h2>Common Ingredient Conversions</h2>
+      <p>Here are the standard weight-to-volume conversions for common baking ingredients:</p>
+      <ul>
+        <li><strong>All-purpose flour:</strong> 1 US cup = 120 grams. <br /><em>To convert a European recipe tracking 240g of flour, you need 2 precise cups.</em></li>
+        <li><strong>Granulated sugar:</strong> 1 US cup = 200 grams.</li>
+        <li><strong>Brown sugar (packed):</strong> 1 US cup = 213 grams.</li>
+        <li><strong>Butter:</strong> 1 US cup (2 sticks) = 227 grams.</li>
+        <li><strong>Cocoa powder:</strong> 1 US cup = 100 grams.</li>
+      </ul>
+
+      <h2>Tools for Perfection</h2>
+      <p>If you bake consistently, investing in a digital kitchen scale is life-changing. But if you must convert, use our <a href="/grams-to-ounces" class="text-primary-600 dark:text-primary-400 hover:underline">Grams to Ounces</a> converter to get a familiar imperial weight measure of your ingredients.</p>
+    `
+  },
+  {
+    slug: 'server-storage-terabytes-vs-tebibytes-explained',
+    title: 'How to calculate server storage: Terabytes vs Tebibytes explained',
+    excerpt: 'Ever wonder why your 1 Terabyte hard drive only shows up as 931 Gigabytes on Windows? Discover the crucial difference between base-10 decimal limits and base-2 binary units.',
+    date: 'May 06, 2026',
+    readTime: '6 min read',
+    faqSchema: {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the difference between Terabyte and Tebibyte?",
+          "acceptedAnswer": { "@type": "Answer", "text": "A Terabyte (TB) uses the decimal metric system (1,000,000,000,000 bytes). A Tebibyte (TiB) uses the binary system (1,099,511,627,776 bytes)." }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is my 1TB drive showing less space on Windows?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Storage manufacturers sell drives in decimal Terabytes (TB), but Windows reads and displays storage in binary Tebibytes (TiB), reporting the equivalent of 931 GiB." }
+        }
+      ]
+    },
+    content: `
+      <p class="lead text-xl text-neutral-600 dark:text-neutral-300 mb-8">
+        If you work in IT, manage a cloud server architecture, or simply wonder why the hard drive you just purchased seems to be missing several gigabytes of space, the answer lies in the metric prefixes. Let's break down Terabytes versus Tebibytes.
+      </p>
+
+      <h2>The Marketing Discrepancy</h2>
+      <p>
+        Hard drive and SSD manufacturers advertise storage using the standard SI metric prefixes. In this system, exactly like kilometers and kilograms, a standard "kilo" means 1,000.
+        <br /><br />
+        Therefore, to a hardware manufacturer:
+        <ul>
+          <li>1 Kilobyte (KB) = 1,000 bytes</li>
+          <li>1 Megabyte (MB) = 1,000,000 bytes</li>
+          <li>1 Gigabyte (GB) = 1,000,000,000 bytes</li>
+          <li>1 Terabyte (TB) = 1,000,000,000,000 bytes</li>
+        </ul>
+      </p>
+
+      <h2>The Computer Operating System Reality</h2>
+      <p>
+        However, computers inherently operate in a binary (base-2) system. Instead of powers of 10, they use powers of 2. In 1998, to solve this very confusion, the International Electrotechnical Commission established standard prefixes for binary multiples.
+      </p>
+      <ul>
+        <li>1 Kibibyte (KiB) = 1,024 bytes</li>
+        <li>1 Mebibyte (MiB) = 1,048,576 bytes</li>
+        <li>1 Gibibyte (GiB) = 1,073,741,824 bytes</li>
+        <li>1 Tebibyte (TiB) = 1,099,511,627,776 bytes</li>
+      </ul>
+
+      <h2>The "Missing" Storage Explained</h2>
+      <p>
+        If you buy a 1 TB external hard drive (1 trillion bytes), Windows reads that number and divides it by 1,024 repeatedly to get the Tebibyte scale. 1,000,000,000,000 / 1024 / 1024 / 1024 = <strong>931.32</strong>. 
+      </p>
+      <p>
+        So when Windows tells you that your 1 TB drive has "931 GB" free, what it actually means is "931 GiB" free. The storage isn't missing; it's simply a language barrier between the marketing box and the operating system!
+      </p>
+      <p>
+        Use our <a href="/mb-to-gb" class="text-primary-600 dark:text-primary-400 hover:underline">Data Converters</a> to instantly translate between standard prefixes and binary capacity.
+      </p>
+    `
+  },
+  {
+    slug: 'driving-in-the-uk-miles-to-kilometers-speed-limits',
+    title: 'Driving in the UK: Miles to Kilometers speed limits',
+    excerpt: 'Planning a road trip through Europe? The UK speed limit signs differ drastically from the continent. Discover the essential conversion guides to keep you legally safe.',
+    date: 'May 04, 2026',
+    readTime: '4 min read',
+    faqSchema: {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Are speed limits in the UK in miles or kilometers?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The UK officially uses miles per hour (mph) for all road speed limits and distance signs." }
+        },
+        {
+          "@type": "Question",
+          "name": "How fast is 70 mph in km/h?",
+          "acceptedAnswer": { "@type": "Answer", "text": "70 miles per hour is approximately 113 kilometers per hour." }
+        }
+      ]
+    },
+    content: `
+      <p class="lead text-xl text-neutral-600 dark:text-neutral-300 mb-8">
+        If you are traveling abroad and renting a car, understanding standard speed limits is essential to avoiding hefty traffic fines. The United Kingdom stands out from the rest of Europe for one very distinct reason: their road network still relies on miles per hour (mph).
+      </p>
+
+      <h2>The UK Speed Regulations</h2>
+      <p>
+        Unlike neighboring countries such as France, Ireland, or Spain—which all use Kilometers per Hour (km/h)—the UK mandates mph for speed limits and miles for distance signs.
+      </p>
+      <p>Here are the standard national speed limits you will encounter in the UK, translated for metric drivers:</p>
+      <ul>
+        <li><strong>Built-up areas (cities/towns):</strong> 30 mph <em>(approx <a href="/mph-to-kph" class="text-primary-600 dark:text-primary-400 hover:underline">48 km/h</a>)</em></li>
+        <li><strong>Single carriageways (country roads):</strong> 60 mph <em>(approx <a href="/mph-to-kph" class="text-primary-600 dark:text-primary-400 hover:underline">96 km/h</a>)</em></li>
+        <li><strong>Dual carriageways and motorways:</strong> 70 mph <em>(approx <a href="/mph-to-kph" class="text-primary-600 dark:text-primary-400 hover:underline">113 km/h</a>)</em></li>
+      </ul>
+
+      <h2>A Note on European Travel</h2>
+      <p>
+        If you plan to take the Eurotunnel and drive your UK rental car into France, be acutely aware of your dashboard! French highways have a 130 km/h limit in dry weather (approx 80 mph). Most modern digital dashboards allow you to push a button and swap your display to km/h—do this the moment you exit the train to make the mental transition easier.
+      </p>
+      <p>Ensure you bookmark our <a href="/mph-to-kph" class="text-primary-600 dark:text-primary-400 hover:underline">Speed Converters page</a> if you are traveling globally!</p>
+    `
+  },
+  {
     slug: 'how-many-ounces-in-a-gallon-ultimate-guide',
     title: 'How many Ounces in a Gallon? The ultimate guide',
     excerpt: 'Ever wondered how many ounces are in a gallon? Whether you are brewing beer, measuring water intake, or cooking, here is the definitive breakdown answering your question.',

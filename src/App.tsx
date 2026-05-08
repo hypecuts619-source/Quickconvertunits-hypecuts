@@ -47,6 +47,116 @@ const PopularConversions = lazy(() => import("./components/PopularConversions").
 const TimeZoneConverter = lazy(() => import("./components/TimeZoneConverter").then(module => ({ default: module.TimeZoneConverter })));
 const BMICalculator = lazy(() => import("./components/BMICalculator").then(module => ({ default: module.BMICalculator })));
 
+const SpecificConversionSEO = ({ fromUnit, toUnit, category }: { fromUnit: any; toUnit: any; category: string }) => {
+  let nums = [1, 2, 3, 4, 5, 10, 25, 50, 100, 200, 250, 500, 1000];
+  if (category === 'currency') nums = [1, 5, 10, 20, 50, 100, 250, 500, 1000, 5000, 10000];
+
+  let formulaStr = "";
+  if (category !== 'temperature' && category !== 'time_zone' && category !== 'bmi') {
+    formulaStr = `1 ${fromUnit.symbol} = ${convert(1, fromUnit.id, toUnit.id, category)} ${toUnit.symbol}`;
+  }
+
+  return (
+    <div className="mt-8 mb-12">
+      {formulaStr && (
+        <div className="bg-primary-50 dark:bg-primary-900/10 rounded-2xl p-6 border border-primary-100 dark:border-primary-900/30 mb-8 w-full block">
+          <h3 className="text-lg font-bold text-primary-900 dark:text-primary-100 mb-2">Conversion Formula</h3>
+          <p className="font-mono text-lg md:text-xl text-primary-800 dark:text-primary-200 font-bold bg-white dark:bg-neutral-900 p-3 rounded-xl border border-primary-200 dark:border-primary-800/50 inline-block overflow-x-auto max-w-full">
+            {formulaStr}
+          </p>
+          <p className="text-primary-700 dark:text-primary-300 mt-3 text-sm flex items-start gap-2">
+            <span className="shrink-0 w-5 h-5 rounded-full bg-primary-200 dark:bg-primary-800 flex items-center justify-center text-xs font-bold mt-0.5">i</span>
+            <span>Multiply the value in {fromUnit.name} by the conversion factor to get the result in {toUnit.name}.</span>
+          </p>
+        </div>
+      )}
+
+      <h3 className="text-xl font-semibold tracking-tight mb-4">{fromUnit.name} to {toUnit.name} Reference Table</h3>
+      <div className="overflow-x-auto rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#111111] shadow-sm">
+        <table className="w-full text-left min-w-[300px]">
+          <thead className="bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800">
+            <tr>
+              <th className="py-3 px-4 text-sm font-semibold text-neutral-600 dark:text-neutral-400">{fromUnit.name} ({fromUnit.symbol})</th>
+              <th className="py-3 px-4 text-sm font-semibold text-neutral-600 dark:text-neutral-400">{toUnit.name} ({toUnit.symbol})</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800 text-sm">
+            {nums.map(n => {
+              const res = convert(n, fromUnit.id, toUnit.id, category);
+              const resStr = Number.isInteger(res) ? res.toString() : parseFloat(res.toFixed(6)).toString();
+              return (
+                <tr key={n} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-900/50 transition-colors">
+                  <td className="py-2.5 px-4 font-medium">{n}</td>
+                  <td className="py-2.5 px-4 font-mono text-neutral-600 dark:text-neutral-300">{resStr}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+const CurrencyPairsTable = () => {
+  const majorPairs = [
+    { from: 'usd', to: 'eur' },
+    { from: 'usd', to: 'gbp' },
+    { from: 'usd', to: 'jpy' },
+    { from: 'usd', to: 'cad' },
+    { from: 'usd', to: 'aud' },
+    { from: 'usd', to: 'inr' },
+    { from: 'eur', to: 'gbp' },
+    { from: 'eur', to: 'chf' },
+  ];
+
+  return (
+    <div className="mt-8 mb-12">
+      <h3 className="text-xl font-semibold tracking-tight mb-4 flex items-center gap-2">
+        <TrendingUp className="w-5 h-5 text-emerald-500" />
+        Live Major Exchange Rates
+      </h3>
+      <div className="overflow-x-auto rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#111111] shadow-sm">
+        <table className="w-full text-left min-w-[400px]">
+          <thead className="bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800">
+            <tr>
+              <th className="py-3 px-4 text-sm font-semibold text-neutral-600 dark:text-neutral-400">Currency Pair</th>
+              <th className="py-3 px-4 text-sm font-semibold text-neutral-600 dark:text-neutral-400">Current Rate</th>
+              <th className="py-3 px-4 text-sm font-semibold text-neutral-600 dark:text-neutral-400 text-right">Convert</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800 text-sm">
+            {majorPairs.map((pair, idx) => {
+              const res = convert(1, pair.from, pair.to, 'currency');
+              // Find full symbol
+              const units = categories.find(c => c.id === 'currency')?.units;
+              const unitFrom = units?.find(u => u.id === pair.from);
+              const unitTo = units?.find(u => u.id === pair.to);
+              
+              return (
+                <tr key={idx} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-900/50 transition-colors">
+                  <td className="py-2.5 px-4 font-medium flex items-center gap-1.5">
+                    <span className="font-semibold">{unitFrom?.symbol}</span> 
+                    <span className="text-neutral-400">to</span>
+                    <span className="font-semibold">{unitTo?.symbol}</span>
+                    <span className="text-neutral-500 text-xs ml-2 uppercase">({pair.from}/{pair.to})</span>
+                  </td>
+                  <td className="py-2.5 px-4 font-mono text-neutral-600 dark:text-neutral-300">
+                    {res.toFixed(4)}
+                  </td>
+                  <td className="py-2.5 px-4 text-right">
+                    <Link to={`/${getSEOUrlPath(pair.from, pair.to)}`} className="text-primary-600 dark:text-primary-400 hover:underline font-medium text-xs">View Rate <ArrowRight className="w-3 h-3 inline pb-0.5" /></Link>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
 const QuickLinksSection = ({ fromUnit, toUnit, category, baseVal }: { fromUnit: any; toUnit: any; category: string; baseVal: string }) => {
   const currentVal = parseFloat(baseVal) || 1;
   const numsStr = new Set([1, 5, 10, 20, 25, 50, 100, 150, 180, 200, 250, 500, 1000, 1500, 2000, 3000, 5000]);
@@ -698,6 +808,29 @@ export default function App() {
     setValTo("");
   };
 
+  const isUSUser = () => {
+    try {
+      return navigator.language.includes('US') || Intl.DateTimeFormat().resolvedOptions().timeZone.includes('America/');
+    } catch (e) {
+      return false;
+    }
+  };
+
+  const getDefaultUnits = (catId: string) => {
+    const cat = categories.find((c) => c.id === catId);
+    if (!cat) return { from: "", to: "" };
+    if (cat.id === 'time_zone') return { from: 'time_zone', to: 'time_zone' };
+    
+    if (isUSUser()) {
+      if (cat.id === 'length') return { from: 'foot', to: 'meter' };
+      if (cat.id === 'weight') return { from: 'pound', to: 'kilogram' };
+      if (cat.id === 'temperature') return { from: 'fahrenheit', to: 'celsius' };
+      if (cat.id === 'volume') return { from: 'us_gallon', to: 'liter' };
+      if (cat.id === 'cooking') return { from: 'us_cup', to: 'milliliter' };
+    }
+    return { from: cat.units[0]?.id || "", to: cat.units[1]?.id || cat.units[0]?.id || "" };
+  };
+
   const handleCategoryChange = (catId: string) => {
     const cat = categories.find((c) => c.id === catId);
     if (cat) {
@@ -707,13 +840,9 @@ export default function App() {
         navigate(`/${cat.id.replace(/_/g, '-')}-converter`);
       }
       setCategory(cat.id);
-      if (cat.id === 'time_zone') {
-        setUnitFrom('time_zone');
-        setUnitTo('time_zone');
-      } else {
-        setUnitFrom(cat.units[0]?.id || "");
-        setUnitTo(cat.units[1]?.id || cat.units[0]?.id || "");
-      }
+      const defaults = getDefaultUnits(cat.id);
+      setUnitFrom(defaults.from);
+      setUnitTo(defaults.to);
     }
   };
 
@@ -1036,8 +1165,9 @@ export default function App() {
            navigate(targetPath);
          }
       } else if (isCategoryPage) {
-         const defaultFrom = activeCategory.units[0]?.id;
-         const defaultTo = activeCategory.units[1]?.id || defaultFrom;
+         const defaults = getDefaultUnits(category);
+         const defaultFrom = defaults.from;
+         const defaultTo = defaults.to;
          if ((unitFrom !== defaultFrom || unitTo !== defaultTo) && currentFullPath !== targetPath) {
            navigate(targetPath, { replace: true });
          }
@@ -2060,6 +2190,18 @@ export default function App() {
             />
           )}
 
+          {!isHomepage && isSpecificConverter && category !== 'time_zone' && activeFromUnit && activeToUnit && (
+            <SpecificConversionSEO
+              fromUnit={activeFromUnit}
+              toUnit={activeToUnit}
+              category={category}
+            />
+          )}
+
+          {!isHomepage && isCategoryPage && category === 'currency' && (
+            <CurrencyPairsTable />
+          )}
+
           {/* AD: Below Result Ad */}
           {!isEmbed && (
             <AdSlot
@@ -2563,19 +2705,35 @@ export default function App() {
 
           {/* SEO Optional Content area placeholder */}
           {!isEmbed && (
-            <div className="mt-16 pt-8 border-t border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 text-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-center md:text-left">
-              <div className="flex-1 space-y-3">
+            <div className="mt-16 pt-8 border-t border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 text-sm flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8 text-center lg:text-left">
+              <div className="flex-1 max-w-2xl space-y-3">
                 <div>
                   <p className="mb-1 font-medium text-neutral-900 dark:text-neutral-200">
                     &copy; {new Date().getFullYear()} QuickConvert. {t("footerText", "Built for fast, accurate conversions.")}
                   </p>
-                  <p className="opacity-80 font-medium">🛡️ Strictly Local: Your conversion data never leaves your device.</p>
+                  <p className="opacity-80 font-medium whitespace-normal">🛡️ Strictly Local: Your conversion data never leaves your device.</p>
                 </div>
-                <p className="text-xs text-neutral-500 dark:text-neutral-500 leading-relaxed max-w-3xl">
+                <p className="text-xs text-neutral-500 dark:text-neutral-500 leading-relaxed max-w-3xl whitespace-normal break-words">
                   <strong>Disclaimer:</strong> While we strive to provide accurate information, QuickConvert makes no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability or availability of the conversion calculators. Any reliance you place on such information is therefore strictly at your own risk.
                 </p>
               </div>
-              <div className="flex flex-wrap items-center justify-center md:justify-end gap-x-4 gap-y-2 shrink-0">
+              <div className="flex flex-wrap items-center justify-center lg:justify-end gap-x-4 gap-y-3 shrink lg:shrink-0 lg:max-w-[50%]">
+                <Link to="/time-zone-converter" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium text-neutral-800 dark:text-neutral-200">
+                  Time Zone Converter
+                </Link>
+                <Link to="/kg-to-lbs" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium text-neutral-800 dark:text-neutral-200">
+                  Kg to Lbs
+                </Link>
+                <Link to="/cm-to-inches" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium text-neutral-800 dark:text-neutral-200">
+                  CM to Inches
+                </Link>
+                <Link to="/fahrenheit-to-celsius" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium text-neutral-800 dark:text-neutral-200">
+                  Fahrenheit to Celsius
+                </Link>
+                <Link to="/weight-converter" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium text-neutral-800 dark:text-neutral-200">
+                  Weight Converter
+                </Link>
+                <span className="text-neutral-300 dark:text-neutral-700 hidden md:inline">|</span>
                 <Link
                   to="/conversions"
                   className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
@@ -2637,7 +2795,7 @@ export default function App() {
                   {POPULAR_CONVERSIONS.slice(0, 12).map((conv, i) => (
                     <a
                       key={i}
-                      href={conv.cat === 'time_zone' ? '/time-zone-converter' : `/?category=${conv.cat}&from=${conv.from}&to=${conv.to}`}
+                      href={conv.cat === 'time_zone' ? '/time-zone-converter' : `/${getSEOUrlPath(conv.from, conv.to)}`}
                       onClick={(e) => {
                         e.preventDefault();
                         handleCategoryChange(conv.cat);
