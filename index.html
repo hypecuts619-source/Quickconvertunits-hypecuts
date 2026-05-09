@@ -60,6 +60,49 @@
   </head>
   <body>
     <div id="root">
+      <div id="initial-loader" style="min-height: 100vh; background-color: #f7f7f7; font-family: 'Inter', sans-serif; display: flex; flex-direction: column;">
+        <!-- Header -->
+        <div style="height: 64px; background: rgba(255,255,255,0.8); border-bottom: 1px solid transparent; display: flex; align-items: center; justify-content: space-between; padding: 0 16px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 12px; background: linear-gradient(to bottom right, #3b82f6, #2563eb);"></div>
+            <div style="font-weight: bold; font-size: 18px; color: #171717;">QuickConvert</div>
+          </div>
+          <div style="display: flex; gap: 16px; align-items: center;">
+            <div style="width: 24px; height: 24px; border-radius: 12px; background: #e5e5e5;"></div>
+            <div style="width: 24px; height: 24px; border-radius: 12px; background: #e5e5e5;"></div>
+          </div>
+        </div>
+        <!-- Mobile Search -->
+        <div style="padding: 12px 16px; background: #ffffff; border-bottom: 1px solid #e5e5e5;">
+          <div style="height: 40px; border-radius: 12px; background: #f3f4f6; width: 100%;"></div>
+        </div>
+        <!-- Main Content Skeleton -->
+        <div style="max-width: 800px; margin: 0 auto; width: 100%; padding: 40px 16px; flex: 1;">
+           <div style="height: 36px; width: 50%; background: #e5e5e5; border-radius: 8px; margin: 0 auto 12px auto; animation: pulse 2s infinite;"></div>
+           <div style="height: 20px; width: 30%; background: #e5e5e5; border-radius: 6px; margin: 0 auto 32px auto; animation: pulse 2s infinite;"></div>
+           <div style="height: 280px; width: 100%; background: white; border-radius: 20px; border: 1px solid #e5e5e5; box-shadow: 0 4px 10px rgba(0,0,0,0.02); animation: pulse 2s infinite; padding: 24px;">
+             <div style="height: 48px; border-radius: 8px; background: #f3f4f6; width: 100%; margin-bottom: 24px;"></div>
+             <div style="height: 48px; border-radius: 8px; background: #f3f4f6; width: 100%;"></div>
+           </div>
+        </div>
+        <style>
+          @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+          }
+          @media (prefers-color-scheme: dark) {
+            #initial-loader { background-color: #0d0d0d !important; }
+            #initial-loader > div:first-child { background: rgba(26,26,26,0.8) !important; border-bottom-color: transparent !important; }
+            #initial-loader > div:first-child > div:first-child > div:nth-child(2) { color: #f5f5f5 !important; }
+            #initial-loader > div:first-child > div:nth-child(2) > div { background: #333 !important; }
+            #initial-loader > div:nth-child(2) { background: #171717 !important; border-bottom-color: #262626 !important; }
+            #initial-loader > div:nth-child(2) > div { background: #262626 !important; }
+            #initial-loader > div:nth-child(3) > div:nth-child(1), #initial-loader > div:nth-child(3) > div:nth-child(2) { background: #262626 !important; }
+            #initial-loader > div:nth-child(3) > div:nth-child(3) { background: #171717 !important; border-color: #262626 !important; }
+            #initial-loader > div:nth-child(3) > div:nth-child(3) > div { background: #262626 !important; }
+          }
+        </style>
+      </div>
       <!-- Static content for crawlers before JS initializes -->
       <div style="display:none;" aria-hidden="true">
         <h1>QuickConvert Units</h1>
