@@ -449,6 +449,10 @@ export default {
         formulaText = `The formula in plain text: 1 pound = 0.453592 kilograms`;
       } else if (canonicalPathBase === 'meters-to-feet') {
         formulaText = `The formula in plain text: 1 meter = 3.28084 feet`;
+      } else if (canonicalPathBase === 'km-to-miles') {
+        formulaText = `The formula in plain text: 1 kilometer = 0.621371 miles`;
+      } else if (canonicalPathBase === 'inches-to-cm') {
+        formulaText = `The formula in plain text: 1 inch = 2.54 centimeters`;
       } else if (fromUnit.base === 'temperature') {
         if (fromId === 'celsius' && toId === 'fahrenheit') formulaText = `The formula to convert Celsius to Fahrenheit is: <strong>(°C × 9/5) + 32 = °F</strong>.`;
         else if (fromId === 'fahrenheit' && toId === 'celsius') formulaText = `The formula to convert Fahrenheit to Celsius is: <strong>(°F − 32) × 5/9 = °C</strong>.`;
@@ -507,6 +511,50 @@ export default {
               </tbody>
             </table>
         `;
+      } else if (canonicalPathBase === 'km-to-miles') {
+        customTable = `
+            <table>
+              <thead>
+                <tr>
+                  <th>Kilometers (km)</th>
+                  <th>Miles (mi)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><a href="https://quickconvertunits.com/convert-1-km-to-miles">1 km</a></td><td>0.621371 mi</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-5-km-to-miles">5 km</a></td><td>3.10686 mi</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-10-km-to-miles">10 km</a></td><td>6.21371 mi</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-25-km-to-miles">25 km</a></td><td>15.5343 mi</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-50-km-to-miles">50 km</a></td><td>31.0686 mi</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-100-km-to-miles">100 km</a></td><td>62.1371 mi</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-150-km-to-miles">150 km</a></td><td>93.2057 mi</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-200-km-to-miles">200 km</a></td><td>124.274 mi</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/km-to-miles">Full Kilometer to Mile Series</a></td><td>Varied</td></tr>
+              </tbody>
+            </table>
+        `;
+      } else if (canonicalPathBase === 'inches-to-cm') {
+        customTable = `
+            <table>
+              <thead>
+                <tr>
+                  <th>Inches (in)</th>
+                  <th>Centimeters (cm)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><a href="https://quickconvertunits.com/convert-1-inches-to-cm">1 in</a></td><td>2.54 cm</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-2-inches-to-cm">2 in</a></td><td>5.08 cm</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-5-inches-to-cm">5 in</a></td><td>12.7 cm</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-10-inches-to-cm">10 in</a></td><td>25.4 cm</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-12-inches-to-cm">12 in</a></td><td>30.48 cm</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-24-inches-to-cm">24 in</a></td><td>60.96 cm</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-36-inches-to-cm">36 in</a></td><td>91.44 cm</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-100-inches-to-cm">100 in</a></td><td>254 cm</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/inches-to-cm">Full Inch to Centimeter Series</a></td><td>Varied</td></tr>
+              </tbody>
+            </table>
+        `;
       } else {
         customTable = `
             <table>
@@ -549,6 +597,28 @@ export default {
             <p>To get a rough estimate, you can multiply the meters by 3.3. For exact measurements, multiply the meters by 3.28084.</p>
             <h3>Why is the meter used internationally instead of feet?</h3>
             <p>The meter is the base unit of length in the International System of Units (SI), which is a global standard that makes scientific and international communication much simpler.</p>
+        `;
+      } else if (canonicalPathBase === 'km-to-miles') {
+        customFAQ = `
+            <h3>How many miles are in a kilometer?</h3>
+            <p>One kilometer is equal to approximately 0.621371 miles.</p>
+            <h3>Which is longer, a mile or a kilometer?</h3>
+            <p>A mile is longer. One mile is equal to 1.60934 kilometers, making a mile roughly 1.6 times longer than a kilometer.</p>
+            <h3>How do I convert kilometers to miles easily?</h3>
+            <p>A common mental math trick is to multiply the kilometers by 6 and drop the last digit (or divide by 10). For example, 10 km x 6 = 60, divide by 10 is 6 miles. For better accuracy, use the Fibonacci sequence (e.g. 5 is roughly 3, 8 is roughly 5, 13 is roughly 8).</p>
+            <h3>When did countries stop using miles?</h3>
+            <p>Many countries switched to kilometers during metrication in the late 20th century. However, the UK and US still use miles extensively for road speeds and distances.</p>
+        `;
+      } else if (canonicalPathBase === 'inches-to-cm') {
+        customFAQ = `
+            <h3>How many centimeters are in an inch?</h3>
+            <p>There are exactly 2.54 centimeters in one inch. This is an internationally agreed-upon standard.</p>
+            <h3>How do I convert inches to cm quickly?</h3>
+            <p>Just multiply your inches by 2.54. For an easy mental estimate, multiply by 2.5. So 10 inches is roughly 25 cm (exactly 25.4 cm).</p>
+            <h3>Are there 100 cm in an inch?</h3>
+            <p>No, there are 100 centimeters in one meter! There are 2.54 centimeters in an inch.</p>
+            <h3>How big is 1 inch in cm on a ruler?</h3>
+            <p>If you look at a standard ruler with both metric and imperial units, you will see the 1-inch mark aligns perfectly between the 2.5 cm and 2.6 cm marks.</p>
         `;
       } else {
         customFAQ = `
@@ -595,6 +665,19 @@ export default {
         staticContent
       );
       
+      // Parse custom FAQ for JSON-LD
+      const faqQuestions: { question: string; answer: string }[] = [];
+      const h3Regex = /<h3>(.*?)<\/h3>/g;
+      const pRegex = /<p>(.*?)<\/p>/g;
+      let h3Match;
+      let pMatch;
+      while ((h3Match = h3Regex.exec(customFAQ)) !== null && (pMatch = pRegex.exec(customFAQ)) !== null) {
+        faqQuestions.push({
+          question: h3Match[1].trim(),
+          answer: pMatch[1].trim()
+        });
+      }
+
       // Basic Schema.org injection
       const schema = {
         "@context": "https://schema.org",
@@ -626,27 +709,17 @@ export default {
             ],
             "totalTime": "PT1S"
           },
-          {
+          (faqQuestions.length > 0 ? {
             "@type": "FAQPage",
-            "mainEntity": [
-              {
-                "@type": "Question",
-                "name": val !== 1 ? `How do you convert ${valText} ${fromUnit.symbol} to ${toUnit.symbol}?` : `How do I convert ${fromUnit.name} to ${toUnit.name}?`,
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": val !== 1 ? `To convert ${valText} ${fromUnit.name} to ${toUnit.name}, apply the conversion. ${formulaText.replace(/<strong>/g, '').replace(/<\/strong>/g, '')} Therefore, ${valText} ${fromUnit.symbol} = ${resVal} ${toUnit.symbol}.` : `Simply enter the value of ${fromUnit.name} into our online converter. The tool will instantly calculate and display the corresponding value in ${toUnit.name} based on the most accurate conversion factor.`
-                }
-              },
-              {
-                "@type": "Question",
-                "name": `Is this ${fromUnit.name} to ${toUnit.name} converter free?`,
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": `Yes, our conversion tool is 100% free for all users and works instantly on both mobile and desktop devices.`
-                }
+            "mainEntity": faqQuestions.map(faq => ({
+              "@type": "Question",
+              "name": faq.question,
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": faq.answer
               }
-            ]
-          },
+            }))
+          } : null),
           ...(val !== 1 && resVal !== "N/A" ? [{
             "@type": "MathSolver",
             "name": `Conversion from ${valText} ${fromUnit.symbol} to ${toUnit.symbol}`,
@@ -663,12 +736,12 @@ export default {
               "mathExpression": `${valText} ${fromUnit.name} = x ${toUnit.name}`
             }
           }] : [])
-        ]
+        ].filter(Boolean)
       };
       
       template = template.replace(
         /<\/head>/,
-        `<script type="application/ld+json">${JSON.stringify(schema)}</script></head>`
+        `<script data-rh="true" type="application/ld+json">${JSON.stringify(schema)}</script></head>`
       );
     }
   } else if (urlPath === "bmi-calculator" || urlPath === "time-zone-converter") {

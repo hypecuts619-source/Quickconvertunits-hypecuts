@@ -954,6 +954,7 @@ export default function App() {
   let canonicalUrlStr = "";
   let ogTitleStr = "";
   let schema: any[] = [];
+  let activeCustomSeoContent = "";
 
   const getFAQsFromHtml = (html: string) => {
     const faqs: { question: string; answer: string }[] = [];
@@ -1054,6 +1055,7 @@ export default function App() {
       if (customSeo && !isNumericPath) {
         titleStr = customSeo.title.replace("Converter", "Converter [2026 Free]");
         metaDescStr = customSeo.description;
+        activeCustomSeoContent = customSeo.content;
         customFAQs = getFAQsFromHtml(customSeo.content);
       } else {
         const symFrom = activeFromUnit.symbol;
@@ -1195,7 +1197,14 @@ export default function App() {
         <meta name="twitter:title" content={ogTitleStr} />
         <meta name="twitter:description" content={metaDescStr} />
         <script type="application/ld+json">
-          {JSON.stringify(schema)}
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": schema.map(item => {
+              const copy = { ...item };
+              delete copy["@context"];
+              return copy;
+            })
+          })}
         </script>
       </Helmet>
 
@@ -2708,6 +2717,14 @@ export default function App() {
           <div 
             className="mt-16 bg-white dark:bg-[#111111] rounded-3xl p-8 md:p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-neutral-100 dark:border-neutral-800 prose prose-neutral dark:prose-invert max-w-none category-seo-content"
             dangerouslySetInnerHTML={{ __html: categorySeoContent[category] }}
+          />
+        )}
+
+        {/* Dynamic Specific Conversion SEO Content visible to users AND crawlers */}
+        {!isEmbed && !isHomepage && isSpecificConverter && activeCustomSeoContent && (
+          <div 
+            className="mt-16 bg-white dark:bg-[#111111] rounded-3xl p-8 md:p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-neutral-100 dark:border-neutral-800 prose prose-neutral dark:prose-invert max-w-none category-seo-content"
+            dangerouslySetInnerHTML={{ __html: activeCustomSeoContent }}
           />
         )}
 
