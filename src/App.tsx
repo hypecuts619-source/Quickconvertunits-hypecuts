@@ -2703,6 +2703,14 @@ export default function App() {
           </section>
         )}
 
+        {/* Dynamic Category SEO Content visible to users AND crawlers */}
+        {!isEmbed && !isHomepage && isCategoryPage && categorySeoContent[category] && (
+          <div 
+            className="mt-16 bg-white dark:bg-[#111111] rounded-3xl p-8 md:p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-neutral-100 dark:border-neutral-800 prose prose-neutral dark:prose-invert max-w-none category-seo-content"
+            dangerouslySetInnerHTML={{ __html: categorySeoContent[category] }}
+          />
+        )}
+
           {/* SEO Optional Content area placeholder */}
           {!isEmbed && (
             <div className="mt-16 pt-8 border-t border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 text-sm flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8 text-center lg:text-left">

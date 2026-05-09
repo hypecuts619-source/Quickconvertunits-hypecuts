@@ -427,6 +427,14 @@ export default {
         `<meta data-react-helmet="true" property="og:description" content="${description}" />`
       );
       template = template.replace(
+        /<meta[^>]*name="twitter:title"[^>]*\/>/,
+        `<meta data-react-helmet="true" name="twitter:title" content="${title}" />`
+      );
+      template = template.replace(
+        /<meta[^>]*name="twitter:description"[^>]*\/>/,
+        `<meta data-react-helmet="true" name="twitter:description" content="${description}" />`
+      );
+      template = template.replace(
         /<link[^>]*rel="canonical"[^>]*\/>/,
         `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${finalCanonicalPath}" />`
       );
@@ -437,7 +445,11 @@ export default {
       );
       
       let formulaText = `To calculate, you multiply the ${fromUnit.name} value by the conversion factor.`;
-      if (fromUnit.base === 'temperature') {
+      if (canonicalPathBase === 'lbs-to-kg') {
+        formulaText = `The formula in plain text: 1 pound = 0.453592 kilograms`;
+      } else if (canonicalPathBase === 'meters-to-feet') {
+        formulaText = `The formula in plain text: 1 meter = 3.28084 feet`;
+      } else if (fromUnit.base === 'temperature') {
         if (fromId === 'celsius' && toId === 'fahrenheit') formulaText = `The formula to convert Celsius to Fahrenheit is: <strong>(°C × 9/5) + 32 = °F</strong>.`;
         else if (fromId === 'fahrenheit' && toId === 'celsius') formulaText = `The formula to convert Fahrenheit to Celsius is: <strong>(°F − 32) × 5/9 = °C</strong>.`;
         else if (fromId === 'celsius' && toId === 'kelvin') formulaText = `The formula to convert Celsius to Kelvin is: <strong>°C + 273.15 = K</strong>.`;
@@ -450,6 +462,107 @@ export default {
         formulaText = `The conversion factor is approximately <strong>${formatValue(conversionRatio)}</strong>. Therefore, 1 ${fromUnit.name} is equal to ${calculateConversion(1, fromId, toId)} ${toUnit.name}.`;
       }
       
+      let customTable = "";
+      if (canonicalPathBase === 'lbs-to-kg') {
+        customTable = `
+            <table>
+              <thead>
+                <tr>
+                  <th>Pounds (lb)</th>
+                  <th>Kilograms (kg)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><a href="https://quickconvertunits.com/convert-1-lbs-to-kg">1 lb</a></td><td>0.453592 kg</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-5-lbs-to-kg">5 lb</a></td><td>2.26796 kg</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-10-lbs-to-kg">10 lb</a></td><td>4.53592 kg</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-25-lbs-to-kg">25 lb</a></td><td>11.3398 kg</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-50-lbs-to-kg">50 lb</a></td><td>22.6796 kg</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-100-lbs-to-kg">100 lb</a></td><td>45.3592 kg</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-150-lbs-to-kg">150 lb</a></td><td>68.0388 kg</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-200-lbs-to-kg">200 lb</a></td><td>90.7184 kg</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/lbs-to-kg">Full Pound to Kilogram Series</a></td><td>Varied</td></tr>
+              </tbody>
+            </table>
+        `;
+      } else if (canonicalPathBase === 'meters-to-feet') {
+        customTable = `
+            <table>
+              <thead>
+                <tr>
+                  <th>Meters (m)</th>
+                  <th>Feet (ft)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><a href="https://quickconvertunits.com/convert-1-meters-to-feet">1 m</a></td><td>3.28084 ft</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-5-meters-to-feet">5 m</a></td><td>16.4042 ft</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-10-meters-to-feet">10 m</a></td><td>32.8084 ft</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-25-meters-to-feet">25 m</a></td><td>82.021 ft</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-50-meters-to-feet">50 m</a></td><td>164.042 ft</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-100-meters-to-feet">100 m</a></td><td>328.084 ft</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-150-meters-to-feet">150 m</a></td><td>492.126 ft</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/convert-200-meters-to-feet">200 m</a></td><td>656.168 ft</td></tr>
+                <tr><td><a href="https://quickconvertunits.com/meters-to-feet">Full Meter to Foot Series</a></td><td>Varied</td></tr>
+              </tbody>
+            </table>
+        `;
+      } else {
+        customTable = `
+            <table>
+              <thead>
+                <tr>
+                  <th>${fromUnit.name} (${fromUnit.symbol})</th>
+                  <th>${toUnit.name} (${toUnit.symbol})</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${Array.from(new Set([1, 5, 10, 50, 100, Math.max(1, Math.floor(val - 1)), val, Math.ceil(val + 1), Math.ceil(val + 5), Math.ceil(val + 10), Math.ceil(val * 2)]))
+                  .filter(n => n > 0 && n <= 10000).sort((a,b)=>a-b)
+                  .map(n => `<tr><td><a href="https://quickconvertunits.com/convert-${n}-${canonicalPathBase}">${n} ${fromUnit.name}</a></td><td>${calculateConversion(n, fromId, toId) !== 'N/A' ? calculateConversion(n, fromId, toId) : '?'} ${toUnit.name}</td></tr>`)
+                  .join("\\n")}
+                <tr><td><a href="https://quickconvertunits.com/${canonicalPathBase}">Full ${fromUnit.name} to ${toUnit.name} Series</a></td><td>Varied</td></tr>
+              </tbody>
+            </table>
+        `;
+      }
+
+      let customFAQ = "";
+      if (canonicalPathBase === 'lbs-to-kg') {
+        customFAQ = `
+            <h3>How many kilograms are in a pound?</h3>
+            <p>There are approximately 0.453592 kilograms in one pound.</p>
+            <h3>How do I easily convert lbs to kg in my head?</h3>
+            <p>A quick mental math trick is to divide the pounds by 2, then subtract 10% from that result. For example, for 100 lbs: half is 50, minus 10% (5) is 45 kg (actual is ~45.36 kg).</p>
+            <h3>Is a pound heavier than a kilogram?</h3>
+            <p>No, a kilogram is heavier. One kilogram is equal to about 2.20462 pounds.</p>
+            <h3>Why do we use both pounds and kilograms?</h3>
+            <p>Pounds are primarily used in the United States and a few other countries (Imperial system), while kilograms are the standard unit of mass in the metric system used by most of the world.</p>
+        `;
+      } else if (canonicalPathBase === 'meters-to-feet') {
+        customFAQ = `
+            <h3>How many feet are in a meter?</h3>
+            <p>There are exactly 3.28084 feet in a single meter.</p>
+            <h3>Is 1 meter the same as 3 feet?</h3>
+            <p>It's close, but 1 meter is actually a bit longer than 3 feet. It is exactly 3.28084 feet, or about 3 feet and 3.37 inches.</p>
+            <h3>How do I convert meters to feet easily?</h3>
+            <p>To get a rough estimate, you can multiply the meters by 3.3. For exact measurements, multiply the meters by 3.28084.</p>
+            <h3>Why is the meter used internationally instead of feet?</h3>
+            <p>The meter is the base unit of length in the International System of Units (SI), which is a global standard that makes scientific and international communication much simpler.</p>
+        `;
+      } else {
+        customFAQ = `
+            <h3>How do I convert ${fromUnit.name} to ${toUnit.name}?</h3>
+            <p>Enter the number of ${fromUnit.symbol} you wish to convert in the top input box. The corresponding ${toUnit.symbol} value will instantly populate in the bottom input box.</p>
+            <h3>What is ${fromUnit.name}?</h3>
+            <p>The ${fromUnit.name} (${fromUnit.symbol}) is a unit of measurement. It is commonly used both historically and modernly in various contexts.</p>
+            <h3>What is ${toUnit.name}?</h3>
+            <p>The ${toUnit.name} (${toUnit.symbol}) is another unit of measurement to express similar quantities. Our calculator ensures quick transformation between them.</p>
+            <h3>Is this ${fromUnit.name} to ${toUnit.name} converter free?</h3>
+            <p>Yes, all conversions on QuickConvertUnits including ${fromUnit.name} to ${toUnit.name} are 100% free and work offline.</p>
+        `;
+      }
+
       const staticContent = `
       <div style="display:none;" aria-hidden="true">
         <div>
@@ -466,32 +579,11 @@ export default {
           <section>
             <h2>Quick Conversion Reference (Table)</h2>
             <p>Below is a quick reference table showing common and related values for ${fromUnit.name} and their equivalent in ${toUnit.name}.</p>
-            <table>
-              <thead>
-                <tr>
-                  <th>${fromUnit.name} (${fromUnit.symbol})</th>
-                  <th>${toUnit.name} (${toUnit.symbol})</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${Array.from(new Set([1, 5, 10, 50, 100, Math.max(1, Math.floor(val - 1)), val, Math.ceil(val + 1), Math.ceil(val + 5), Math.ceil(val + 10), Math.ceil(val * 2)]))
-                  .filter(n => n > 0 && n <= 10000).sort((a,b)=>a-b)
-                  .map(n => `<tr><td><a href="https://quickconvertunits.com/convert-${n}-${canonicalPathBase}">${n} ${fromUnit.name}</a></td><td>${calculateConversion(n, fromId, toId) !== 'N/A' ? calculateConversion(n, fromId, toId) : '?'} ${toUnit.name}</td></tr>`)
-                  .join("\\n")}
-                <tr><td><a href="https://quickconvertunits.com/${canonicalPathBase}">Full ${fromUnit.name} to ${toUnit.name} Series</a></td><td>Varied</td></tr>
-              </tbody>
-            </table>
+            ${customTable}
           </section>
           <section>
             <h2>Frequently Asked Questions</h2>
-            <h3>How do I convert ${fromUnit.name} to ${toUnit.name}?</h3>
-            <p>Enter the number of ${fromUnit.symbol} you wish to convert in the top input box. The corresponding ${toUnit.symbol} value will instantly populate in the bottom input box.</p>
-            <h3>What is ${fromUnit.name}?</h3>
-            <p>The ${fromUnit.name} (${fromUnit.symbol}) is a unit of measurement. It is commonly used both historically and modernly in various contexts.</p>
-            <h3>What is ${toUnit.name}?</h3>
-            <p>The ${toUnit.name} (${toUnit.symbol}) is another unit of measurement to express similar quantities. Our calculator ensures quick transformation between them.</p>
-            <h3>Is this ${fromUnit.name} to ${toUnit.name} converter free?</h3>
-            <p>Yes, all conversions on QuickConvertUnits including ${fromUnit.name} to ${toUnit.name} are 100% free and work offline.</p>
+            ${customFAQ}
           </section>
         </div>
       </div>
@@ -594,6 +686,8 @@ export default {
     template = template.replace(/<meta[^>]*name="description"[^>]*\/>/, `<meta data-react-helmet="true" name="description" content="${description}" />`);
     template = template.replace(/<meta[^>]*property="og:title"[^>]*\/>/, `<meta data-react-helmet="true" property="og:title" content="${title}" />`);
     template = template.replace(/<meta[^>]*property="og:description"[^>]*\/>/, `<meta data-react-helmet="true" property="og:description" content="${description}" />`);
+    template = template.replace(/<meta[^>]*name="twitter:title"[^>]*\/>/, `<meta data-react-helmet="true" name="twitter:title" content="${title}" />`);
+    template = template.replace(/<meta[^>]*name="twitter:description"[^>]*\/>/, `<meta data-react-helmet="true" name="twitter:description" content="${description}" />`);
     template = template.replace(/<link[^>]*rel="canonical"[^>]*\/>/, `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${urlPath}" />`);
     template = template.replace(/<meta[^>]*property="og:url"[^>]*\/>/, `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${urlPath}" />`);
     
@@ -757,6 +851,14 @@ export default {
     template = template.replace(
       /<meta[^>]*property="og:description"[^>]*\/>/,
       `<meta data-react-helmet="true" property="og:description" content="${description}" />`
+    );
+    template = template.replace(
+      /<meta[^>]*name="twitter:title"[^>]*\/>/,
+      `<meta data-react-helmet="true" name="twitter:title" content="${title}" />`
+    );
+    template = template.replace(
+      /<meta[^>]*name="twitter:description"[^>]*\/>/,
+      `<meta data-react-helmet="true" name="twitter:description" content="${description}" />`
     );
     const finalCanonicalPath = lang === 'en' ? urlPath : `${lang}/${urlPath}`;
     
