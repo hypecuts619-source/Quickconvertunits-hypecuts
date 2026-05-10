@@ -2750,81 +2750,104 @@ export default function App() {
           />
         )}
 
-          {/* SEO Optional Content area placeholder */}
+          {/* SEO Optimized Footer */}
           {!isEmbed && (
-            <div className="mt-16 pt-8 border-t border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 text-sm flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8 text-center lg:text-left">
-              <div className="flex-1 max-w-2xl space-y-3">
-                <div>
-                  <p className="mb-1 font-medium text-neutral-900 dark:text-neutral-200">
-                    &copy; {new Date().getFullYear()} QuickConvert. {t("footerText", "Built for fast, accurate conversions.")}
-                  </p>
-                  <p className="opacity-80 font-medium whitespace-normal">🛡️ Strictly Local: Your conversion data never leaves your device.</p>
+            <footer 
+              className="mt-16 pt-12 border-t border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 text-sm"
+              itemScope 
+              itemType="https://schema.org/Organization"
+            >
+              <meta itemProp="name" content="QuickConvert" />
+              <meta itemProp="url" content="https://quickconvertunits.com" />
+              <meta itemProp="logo" content="https://quickconvertunits.com/favicon.svg" />
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-12 text-left">
+                {/* Column 1: Calculators */}
+                <nav aria-label="Category Converters" className="space-y-4">
+                  <h4 className="font-semibold text-neutral-900 dark:text-neutral-100 uppercase tracking-wider text-xs">Categories</h4>
+                  <ul className="space-y-2">
+                    <li><Link to="/length-converter" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Length Converter</Link></li>
+                    <li><Link to="/weight-converter" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Weight Converter</Link></li>
+                    <li><Link to="/temperature-converter" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Temperature Converter</Link></li>
+                    <li><Link to="/cooking-converter" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Cooking/Baking Converter</Link></li>
+                    <li><Link to="/currency-converter" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Currency Converter</Link></li>
+                    <li><Link to="/time-zone-converter" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Time Zone Converter</Link></li>
+                    <li><Link to="/bmi-calculator" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">BMI Calculator</Link></li>
+                  </ul>
+                </nav>
+
+                {/* Column 2: Popular Conversions */}
+                <nav aria-label="Popular Conversions" className="space-y-4">
+                  <h4 className="font-semibold text-neutral-900 dark:text-neutral-100 uppercase tracking-wider text-xs">Popular Conversions</h4>
+                  <ul className="space-y-2">
+                    <li><Link to="/kg-to-lbs" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Kg to Lbs</Link></li>
+                    <li><Link to="/cm-to-inches" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">CM to Inches</Link></li>
+                    <li><Link to="/fahrenheit-to-celsius" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Fahrenheit to Celsius</Link></li>
+                    <li><Link to="/ounces-to-grams" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Ounces to Grams</Link></li>
+                    <li><Link to="/miles-to-km" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Miles to Km</Link></li>
+                    <li><Link to="/cups-to-ml" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Cups to mL</Link></li>
+                    <li><Link to="/meters-to-feet" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Meters to Feet</Link></li>
+                  </ul>
+                </nav>
+
+                {/* Column 3: Tools & Resources */}
+                <nav aria-label="Tools and Resources" className="space-y-4">
+                  <h4 className="font-semibold text-neutral-900 dark:text-neutral-100 uppercase tracking-wider text-xs">Tools & Resources</h4>
+                  <ul className="space-y-2">
+                    <li><Link to="/conversions" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">All Conversions Directory</Link></li>
+                    <li><Link to="/blog" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Measurement Blog</Link></li>
+                    <li><Link to="/api-docs" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Free Conversion API</Link></li>
+                  </ul>
+                </nav>
+
+                {/* Column 4: Global Editions */}
+                <nav aria-label="International Sites" className="space-y-4">
+                  <h4 className="font-semibold text-neutral-900 dark:text-neutral-100 uppercase tracking-wider text-xs">Global Editions</h4>
+                  <ul className="space-y-2">
+                    <li><a href="/es/" hrefLang="es" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Español (ES)</a></li>
+                    <li><a href="/fr/" hrefLang="fr" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Français (FR)</a></li>
+                    <li><a href="/de/" hrefLang="de" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Deutsch (DE)</a></li>
+                    <li><a href="/hi/" hrefLang="hi" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">हिन्दी (HI)</a></li>
+                    <li><a href="/pt/" hrefLang="pt" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Português (PT)</a></li>
+                    <li><a href="/zh/" hrefLang="zh" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">中文 (ZH)</a></li>
+                    <li><a href="/ja/" hrefLang="ja" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">日本語 (JA)</a></li>
+                  </ul>
+                </nav>
+
+                {/* Column 5: QuickConvert */}
+                <nav aria-label="Corporate Information" className="space-y-4">
+                  <h4 className="font-semibold text-neutral-900 dark:text-neutral-100 uppercase tracking-wider text-xs">QuickConvert</h4>
+                  <ul className="space-y-2">
+                    <li><Link to="/about" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">About Us</Link></li>
+                    <li><Link to="/contact" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Contact</Link></li>
+                    <li><Link to="/terms" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Terms of Service</Link></li>
+                    <li><Link to="/privacy-policy" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Privacy Policy</Link></li>
+                  </ul>
+                  <div className="pt-4 border-t border-neutral-100 dark:border-neutral-800">
+                    <p className="text-xs text-neutral-500 leading-relaxed mb-2">
+                      🛡️ <strong className="text-neutral-700 dark:text-neutral-300">Strictly Local:</strong> Your conversion data never leaves your device. Built as a PWA for offline use.
+                    </p>
+                  </div>
+                </nav>
+              </div>
+
+              <div className="border-t border-neutral-200 dark:border-neutral-800 pt-8 pb-4 flex flex-col items-center justify-center text-center text-xs text-neutral-500 gap-4">
+                <p>
+                  &copy; {new Date().getFullYear()} QuickConvert. {t("footerText", "Built for fast, accurate conversions.")}
+                </p>
+                <div className="flex gap-4 mt-1 mb-2">
+                  <a href="https://twitter.com/quickconvert" itemProp="sameAs" target="_blank" rel="noopener noreferrer" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors" aria-label="Twitter profile">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                  </a>
+                  <a href="https://github.com/quickconvert" itemProp="sameAs" target="_blank" rel="noopener noreferrer" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors" aria-label="GitHub repository">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd"/></svg>
+                  </a>
                 </div>
-                <p className="text-xs text-neutral-500 dark:text-neutral-500 leading-relaxed max-w-3xl whitespace-normal break-words">
+                <p className="leading-relaxed max-w-4xl">
                   <strong>Disclaimer:</strong> While we strive to provide accurate information, QuickConvert makes no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability or availability of the conversion calculators. Any reliance you place on such information is therefore strictly at your own risk.
                 </p>
               </div>
-              <div className="flex flex-wrap items-center justify-center lg:justify-end gap-x-4 gap-y-3 shrink lg:shrink-0 lg:max-w-[50%]">
-                <Link to="/time-zone-converter" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium text-neutral-800 dark:text-neutral-200">
-                  Time Zone Converter
-                </Link>
-                <Link to="/kg-to-lbs" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium text-neutral-800 dark:text-neutral-200">
-                  Kg to Lbs
-                </Link>
-                <Link to="/cm-to-inches" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium text-neutral-800 dark:text-neutral-200">
-                  CM to Inches
-                </Link>
-                <Link to="/fahrenheit-to-celsius" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium text-neutral-800 dark:text-neutral-200">
-                  Fahrenheit to Celsius
-                </Link>
-                <Link to="/weight-converter" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium text-neutral-800 dark:text-neutral-200">
-                  Weight Converter
-                </Link>
-                <span className="text-neutral-300 dark:text-neutral-700 hidden md:inline">|</span>
-                <Link
-                  to="/conversions"
-                  className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                >
-                  Conversions Directory
-                </Link>
-                <Link
-                  to="/about"
-                  className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                >
-                  About Us
-                </Link>
-                <Link
-                  to="/blog"
-                  className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                >
-                  Blog
-                </Link>
-                <Link
-                  to="/api-docs"
-                  className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors border-emerald-200 dark:border-emerald-800 border bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded text-emerald-700 dark:text-emerald-400 font-medium"
-                >
-                  Free API
-                </Link>
-                <Link
-                  to="/contact"
-                  className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                >
-                  Contact
-                </Link>
-                <Link
-                  to="/terms"
-                  className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                >
-                  Terms
-                </Link>
-                <Link
-                  to="/privacy-policy"
-                  className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                >
-                  Privacy
-                </Link>
-              </div>
-            </div>
+            </footer>
           )}
         </div>
 
