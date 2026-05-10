@@ -1210,18 +1210,40 @@ export default function App() {
       const numVal = parseFloat(valTextStr) || 1;
       const resValCurrent = convert(numVal, unitFrom, unitTo, category);
       
-      const formulaText = `To calculate, you multiply the ${activeFromUnit.name} value by the conversion factor.`;
+      const formulaText = `To calculate, you multiply the ${activeFromUnit.name} value by the conversion factor of ${formatNumber(resVal1)}.`;
 
       finalFAQs = [
         {
           question: numVal !== 1 ? `How do you convert ${valTextStr} ${activeFromUnit.symbol} to ${activeToUnit.symbol}?` : `How do I convert ${activeFromUnit.name} to ${activeToUnit.name}?`,
-          answer: numVal !== 1 ? `To convert ${valTextStr} ${activeFromUnit.name} to ${activeToUnit.name}, apply the conversion. ${formulaText} Therefore, ${valTextStr} ${activeFromUnit.symbol} = ${resValCurrent} ${activeToUnit.symbol}.` : `Simply enter the value of ${activeFromUnit.name} into our online converter. The tool will instantly calculate and display the corresponding value in ${activeToUnit.name} based on the most accurate conversion factor.`
+          answer: numVal !== 1 ? `To convert ${valTextStr} ${activeFromUnit.name} into ${activeToUnit.name}, you multiply ${valTextStr} by ${formatNumber(resVal1)}. The result of this calculation is ${formatNumber(resValCurrent)} ${activeToUnit.name}. Detailed step: ${valTextStr} × ${formatNumber(resVal1)} = ${formatNumber(resValCurrent)}.` : `Simply enter the value of ${activeFromUnit.name} into our online converter. The tool will calculate the result by multiplying your input by ${formatNumber(resVal1)}. 1 ${activeFromUnit.symbol} equals ${formatNumber(resVal1)} ${activeToUnit.symbol}.`
         },
         {
-          question: `Is this ${activeFromUnit.name} to ${activeToUnit.name} converter free?`,
-          answer: `Yes, our conversion tool is 100% free for all users and works instantly on both mobile and desktop devices.`
+          question: `What is the formula for ${activeFromUnit.name} to ${activeToUnit.name}?`,
+          answer: `The official formula is: [${activeToUnit.name}] = [${activeFromUnit.name}] × ${formatNumber(resVal1)}. This scientific conversion ensures absolute precision across all metric and imperial scales.`
         }
       ];
+
+      // Add MathSolver for AI Search / Knowledge base
+      schema.push({
+        "@type": "MathSolver",
+        "@id": `${canonicalUrlStr}#mathsolver`,
+        "name": `${activeFromUnit.name} to ${activeToUnit.name} Calculation`,
+        "learningResourceType": "Formula",
+        "educationalAlignment": {
+          "@type": "AlignmentObject",
+          "educationalFramework": "Educational",
+          "targetName": "Unit Conversion",
+          "targetUrl": canonicalUrlStr
+        },
+        "potentialAction": {
+          "@type": "SolveMathAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": `${canonicalUrlStr}?val={value}`,
+            "description": `Solve conversion from ${activeFromUnit.name} to ${activeToUnit.name}`
+          }
+        }
+      });
     }
 
     if (finalFAQs.length > 0) {

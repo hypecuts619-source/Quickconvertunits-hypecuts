@@ -846,7 +846,23 @@ export default {
               "eduQuestionType": "Conversion",
               "mathExpression": `${valText} ${fromUnit.name} = x ${toUnit.name}`
             }
-          }] : [])
+          }] : [{
+            "@type": "MathSolver",
+            "@id": `https://quickconvertunits.com/${urlPath}#mathsolver`,
+            "name": `${fromUnit.name} to ${toUnit.name} Formula`,
+            "learningResourceType": "Formula",
+            "educationalAlignment": {
+              "@type": "AlignmentObject",
+              "alignmentType": "educationalSubject",
+              "targetName": "Math"
+            },
+            "potentialAction": {
+              "@type": "SolveMathAction",
+              "target": `https://quickconvertunits.com/${urlPath}?val={value}`,
+              "eduQuestionType": "Conversion",
+              "mathExpression": `1 ${fromUnit.name} = x ${toUnit.name}`
+            }
+          }])
         ].filter(Boolean)
       };
       
