@@ -12,6 +12,90 @@ export interface BlogPost {
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: 'converting-baking-measurements-without-scale',
+    title: 'How to convert baking measurements without a scale',
+    excerpt: 'Cooking and baking without a digital kitchen scale can be intimidating, but mastering a few reliable volume tricks can salvage your recipes.',
+    date: 'May 10, 2026',
+    readTime: '6 min read',
+    content: `
+      <p class="lead text-xl text-neutral-600 dark:text-neutral-300 mb-8">
+        We firmly believe every home baker should own a digital kitchen scale. However, there are times—like baking at an Airbnb, or when the scale batteries die mid-recipe—when you have to rely on cups and spoons. Let's look at how to convert recipes reliably.
+      </p>
+
+      <h2>The Problem with Volume</h2>
+      <p>
+        The core issue with converting weights (grams/ounces) to volume (cups) without a scale is <strong>density</strong>. A cup of water weighs exactly 236 grams. But a cup of all-purpose flour might weigh 120 grams if it's sifted, or 150 grams if it's densely packed. 
+      </p>
+
+      <h2>The "Spoon and Level" Method</h2>
+      <p>
+        If a recipe calls for "120g of flour" and you need to use cups, you must use the standard "Spoon and Level" method to ensure your cup represents 120g. If you scoop directly into the flour bag, you will compress the flour, packing in up to 150g, making your cake incredibly dense.
+      </p>
+      <ol>
+        <li>Fluff the flour inside the bag or canister using a fork.</li>
+        <li>Gently spoon the fluffed flour into your measuring cup until it mounds over the top.</li>
+        <li>Take a flat-edged knife and sweep it across the top of the cup to level it off.</li>
+      </ol>
+
+      <h2>Visualizations for Small Measurements</h2>
+      <p>
+        If you are stuck trying to convert small gram measurements to spoons, use these rough visualization tricks:
+      </p>
+      <ul>
+        <li><strong>5 grams:</strong> About the size of a standard teaspoon of liquid or sugar.</li>
+        <li><strong>15 grams:</strong> Roughly one tablespoon.</li>
+        <li><strong>28 grams (1 ounce):</strong> Look at a standard AA battery or a slice of sandwich bread; that's about one ounce.</li>
+      </ul>
+
+      <h2>The Ultimate Fallback: Ratios</h2>
+      <p>
+        If you have absolutely no measuring tools, you can bake using standard culinary ratios using any vessel (like a coffee mug). A classic pound cake is a 1:1:1:1 ratio by weight of flour, sugar, butter, and egg. As long as you maintain the ratios by comparing the sheer mass of the ingredients by hand, you can successfully bake.
+      </p>
+    `
+  },
+  {
+    slug: 'history-metric-vs-imperial-system',
+    title: 'The History of the Metric System vs Imperial',
+    excerpt: 'Why do three countries still use the Imperial system? We dive into the fascinating history of the French Revolution, the British Empire, and global standardization.',
+    date: 'May 10, 2026',
+    readTime: '8 min read',
+    content: `
+      <p class="lead text-xl text-neutral-600 dark:text-neutral-300 mb-8">
+        Depending on where you were born, you likely view the world through either meters and kilograms or yards and pounds. This division has caused crashed satellites, architectural blunders, and endless confusion. But how did the world end up split between two measurement systems?
+      </p>
+
+      <h2>The Chaos of Antiquity</h2>
+      <p>
+        Before the 18th century, standardization did not exist. Measurements were often tied to human anatomy (a "foot") or agriculture (an "acre" was the land one man and an ox could plow in a day). This was disastrous for trade. A merchant traveling from Paris to Marseille could encounter dozens of completely different measurements for grain.
+      </p>
+
+      <h2>The French Revolution and the Metric System</h2>
+      <p>
+        During the late 1700s, the French Revolution sought to overhaul society rationally. They proposed a revolutionary idea: a measurement system based on the natural world, using base-10 mathematics. 
+      </p>
+      <ul>
+        <li>The <strong>meter</strong> was defined as one ten-millionth of the distance from the equator to the North Pole.</li>
+        <li>The <strong>gram</strong> was defined as the mass of one cubic centimeter of water at its freezing point.</li>
+      </ul>
+      <p>
+        Because the math was beautiful and universal, scientists across the globe quickly endorsed the metric system. 
+      </p>
+
+      <h2>The British Empire and the Imperial System</h2>
+      <p>
+        However, the British Empire—then at the height of its geopolitical power and fiercely opposed to the French Revolution—refused to adopt the metric system. Instead, in 1824, they formalized their chaotic historical units into the official <strong>British Imperial System</strong>. 
+      </p>
+      <p>
+        Because the British Empire controlled a massive portion of global trade, the Imperial system became deeply entrenched in North America and Commonwealth nations. 
+      </p>
+
+      <h2>The US and Metrication</h2>
+      <p>
+        The United States is one of only three countries (alongside Liberia and Myanmar) that has not fully adopted the metric system. However, this is slightly misleading. In 1959, the US actually tied its customary units to metric standards—an inch is legally defined as exactly 2.54 centimeters. The US government, military, and scientific sectors use the metric system completely. But customary units (miles, gallons, pounds) remain so culturally ingrained in daily American life that standardizing road signs and weather reports has proven politically impossible.
+      </p>
+    `
+  },
+  {
     slug: 'converting-grandma-european-cake-recipe-to-us-cups',
     title: 'Converting Grandma\'s European Cake Recipe to US Cups',
     excerpt: 'European baking recipes rely on precise weight measurements, while US recipes favor volume. Learn how to convert grams of flour, sugar, and butter into standard US cups for perfect baking.',

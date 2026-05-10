@@ -366,32 +366,28 @@ export default {
     template = template.replace(/<head>/i, `<head>\n    ${hreflangTags}`);
     template = template.replace(/<html lang="en">/i, `<html lang="${lang}">`);
 
-    if (urlPath && urlPath.includes("-to-") && !urlPath.includes("blog")) {
-      const parts = urlPath.split("-to-");
-      if (parts.length === 2 && parts[0] && parts[1]) {
-        let val = 1;
-        let fromId = parts[0];
-        const toId = parts[1];
+    const matchParts = urlPath.match(/^(?:(.*\/)?)?(?:convert-([\d.]+)-)?(.+?)-(?:to|a|en|zu)-(.+)$/i);
+    
+    if (matchParts && !urlPath.includes("blog") && !urlPath.includes("api-docs")) {
+      let val = 1;
+      let fromId = matchParts[3];
+      const toId = matchParts[4];
 
-        if (fromId.startsWith("convert-")) {
-          const valMatch = fromId.match(/^convert-([\d.]+)-(.*)$/);
-          if (valMatch) {
-            val = parseFloat(valMatch[1]);
-            fromId = valMatch[2];
-          }
-        }
-        
-        const fromUnit = popularUnits[fromId] || { name: capitalize(fromId), symbol: capitalize(fromId) };
-        const toUnit = popularUnits[toId] || { name: capitalize(toId), symbol: capitalize(toId) };
-        
-        const valText = val === 1 ? "1" : val.toString();
-        const resVal = calculateConversion(val, fromId, toId);
-        
-        const canonicalFromId = getCanonicalUnitId(fromId);
-        const canonicalToId = getCanonicalUnitId(toId);
-        const canonicalPathBase = getSEOUrlPath(canonicalFromId, canonicalToId);
-        const canonicalPath = val === 1 ? canonicalPathBase : `convert-${val}-${canonicalPathBase}`;
-        const finalCanonicalPath = lang === 'en' ? canonicalPath : `${lang}/${canonicalPath}`;
+      if (matchParts[2]) {
+        val = parseFloat(matchParts[2]);
+      }
+      
+      const canonicalFromId = getCanonicalUnitId(fromId);
+      const canonicalToId = getCanonicalUnitId(toId);
+      const fromUnit = popularUnits[canonicalFromId] || { name: capitalize(canonicalFromId), symbol: capitalize(canonicalFromId) };
+      const toUnit = popularUnits[canonicalToId] || { name: capitalize(canonicalToId), symbol: capitalize(canonicalToId) };
+      
+      const valText = val === 1 ? "1" : val.toString();
+      const resVal = calculateConversion(val, canonicalFromId, canonicalToId);
+      
+      const canonicalPathBase = getSEOUrlPath(canonicalFromId, canonicalToId);
+      const canonicalPath = val === 1 ? canonicalPathBase : `convert-${val}-${canonicalPathBase}`;
+      const finalCanonicalPath = lang === 'en' ? canonicalPath : `${lang}/${canonicalPath}`;
         
         let intentAction = "Converter";
         if (fromUnit.base === "weight") intentAction = "Weight Calculator";
@@ -698,10 +694,10 @@ export default {
             <h2>Step-by-Step ${fromUnit.name} to ${toUnit.name} Guide</h2>
             <p>Converting between ${fromUnit.name.toLowerCase()} and ${toUnit.name.toLowerCase()} is straightforward when you understand the exact mathematical relationship. Here is the best way to calculate the result:</p>
             <ol>
-              <li><strong>Identify the exact conversion factor:</strong> 1 ${fromUnit.name.toLowerCase()} is exactly ${formatNum(convFactor)} ${toUnit.name.toLowerCase()}.</li>
+              <li><strong>Identify the exact conversion factor:</strong> 1 ${fromUnit.name.toLowerCase()} is exactly ${calculateConversion(1, canonicalFromId, canonicalToId)} ${toUnit.name.toLowerCase()}.</li>
               <li><strong>Determine your starting measurement:</strong> For instance, let's say you need to convert 10 ${fromUnit.name.toLowerCase()}.</li>
-              <li><strong>Apply the mathematical formula:</strong> Multiply your starting value by the conversion factor.</li>
-              <li><strong>Calculate the final result:</strong> 10 &times; ${formatNum(convFactor)} = ${formatNum(10 * convFactor)} ${toUnit.symbol}.</li>
+              <li><strong>Apply the mathematical formula:</strong> Use the conversion factor to compute the new value.</li>
+              <li><strong>Calculate the final result:</strong> 10 ${fromUnit.name.toLowerCase()} = ${calculateConversion(10, canonicalFromId, canonicalToId)} ${toUnit.symbol}.</li>
             </ol>
           </section>
 
@@ -715,10 +711,10 @@ export default {
             <h2>Fractional Values: ${fromUnit.name} to ${toUnit.name}</h2>
             <p>In many practical, everyday scenarios, you might need to convert fractions or decimals of a ${fromUnit.name.toLowerCase()}. Here are the most common fractional conversions, perfect for precise measurements in cooking, engineering, or scientific applications:</p>
             <ul>
-              <li>0.1 ${fromUnit.symbol} = ${formatNum(0.1 * convFactor)} ${toUnit.symbol}</li>
-              <li>0.25 ${fromUnit.symbol} = ${formatNum(0.25 * convFactor)} ${toUnit.symbol}</li>
-              <li>0.5 ${fromUnit.symbol} = ${formatNum(0.5 * convFactor)} ${toUnit.symbol}</li>
-              <li>0.75 ${fromUnit.symbol} = ${formatNum(0.75 * convFactor)} ${toUnit.symbol}</li>
+              <li>0.1 ${fromUnit.symbol} = ${calculateConversion(0.1, canonicalFromId, canonicalToId)} ${toUnit.symbol}</li>
+              <li>0.25 ${fromUnit.symbol} = ${calculateConversion(0.25, canonicalFromId, canonicalToId)} ${toUnit.symbol}</li>
+              <li>0.5 ${fromUnit.symbol} = ${calculateConversion(0.5, canonicalFromId, canonicalToId)} ${toUnit.symbol}</li>
+              <li>0.75 ${fromUnit.symbol} = ${calculateConversion(0.75, canonicalFromId, canonicalToId)} ${toUnit.symbol}</li>
             </ul>
           </section>
 
@@ -853,7 +849,6 @@ export default {
         /<\/head>/,
         `<script data-rh="true" type="application/ld+json">${JSON.stringify(schema)}</script></head>`
       );
-    }
   } else if (urlPath === "bmi-calculator" || urlPath === "time-zone-converter") {
     let title = "";
     let description = "";
@@ -958,9 +953,9 @@ export default {
         tableItem3: "UTC - 8 = PST",
         tableItem4: "UTC + 1 = CET"
       },
-      "cooking": {
-        desc: "Accurate cooking measurement converter. Convert cups to ml, teaspoons to tablespoons, and ounces to grams.",
-        intro: "Precision in cooking and baking often requires converting between volume and weight. Our converter helps you scale recipes perfectly across international standards.",
+      "volume": {
+        desc: "Accurate volume measurement converter. Convert cups to ml, teaspoons to tablespoons, and liters to gallons.",
+        intro: "Precision in capacity measurement requires converting between metric and imperial correctly. Our converter helps you scale perfect volumes easily.",
         faq2: "How many teaspoons are in a tablespoon?",
         faq2A: "There are exactly 3 US teaspoons in 1 US tablespoon.",
         faq3: "Is a US cup different from a UK cup?",
@@ -999,6 +994,20 @@ export default {
         tableItem2: "1 Sq Meter = 10.76 Sq Ft",
         tableItem3: "1 Acre = 43,560 Sq Ft",
         tableItem4: "1 Sq Mile = 640 Acres"
+      },
+      "cooking": {
+        desc: "Convert cooking measurements and ingredient weights to volumes. Accurately translate cups to grams for flour, sugar, butter, and more.",
+        intro: "Transform standard baking weights into easily measurable cups and spoons based on ingredient density.",
+        faq2: "Why do cups to grams vary by ingredient?",
+        faq2A: "Because ingredients have different densities. A cup of fluffy flour weighs about 120 grams, while a cup of dense sugar weighs 200 grams.",
+        faq3: "How do I measure flour without a scale?",
+        faq3A: "Use the spoon and level method: lightly spoon the flour into your cup until it mounds over, then level it cleanly with a knife.",
+        faq4: "How many grams are in 1 US cup of water?",
+        faq4A: "One US liquid cup of water or milk weighs roughly 236 grams.",
+        tableItem1: "1 Cup All-Purpose Flour = 120g",
+        tableItem2: "1 Cup Granulated Sugar = 200g",
+        tableItem3: "1 Cup Butter (2 sticks) = 227g",
+        tableItem4: "1 Cup Cocoa Powder = 100g"
       }
     };
 

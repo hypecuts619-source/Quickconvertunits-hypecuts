@@ -158,7 +158,7 @@ const CurrencyPairsTable = () => {
 }
 
 const QuickLinksSection = ({ fromUnit, toUnit, category, baseVal }: { fromUnit: any; toUnit: any; category: string; baseVal: string }) => {
-  const currentVal = parseFloat(baseVal) || 1;
+  const currentVal = parseInput(baseVal) || 1;
   const numsStr = new Set([1, 5, 10, 20, 25, 50, 100, 150, 180, 200, 250, 500, 1000, 1500, 2000, 3000, 5000]);
   
   if (currentVal > 0) {
@@ -444,6 +444,28 @@ function PwaPrompt() {
 
 
 
+function parseInput(val: string): number {
+  if (!val) return NaN;
+  const numMatches = val.trim().match(/^(-?\d+)\s+?(\d+)\/(\d+)$/);
+  if (numMatches) {
+    const whole = parseFloat(numMatches[1]);
+    const isNegative = whole < 0 || numMatches[1] === '-0';
+    const num = parseFloat(numMatches[2]);
+    const den = parseFloat(numMatches[3]);
+    if (den === 0) return NaN;
+    const fraction = num / den;
+    return isNegative ? whole - fraction : whole + fraction;
+  }
+  const fracMatches = val.trim().match(/^(-?\d+)\/(\d+)$/);
+  if (fracMatches) {
+    const num = parseFloat(fracMatches[1]);
+    const den = parseFloat(fracMatches[2]);
+    if (den === 0) return NaN;
+    return num / den;
+  }
+  return parseFloat(val);
+}
+
 // SEO functions have been moved to src/lib/units.ts
 
 export default function App() {
@@ -577,7 +599,7 @@ export default function App() {
   });
   
   const [valTo, setValTo] = useState(() => {
-    const num = parseFloat(valFrom);
+    const num = parseInput(valFrom);
     if (!isNaN(num) && category && unitFrom && unitTo) {
       const res = convert(num, unitFrom, unitTo, category);
       return Number.isInteger(res)
@@ -669,7 +691,7 @@ export default function App() {
       setValTo("");
       return;
     }
-    const num = parseFloat(valFrom);
+    const num = parseInput(valFrom);
     if (!isNaN(num)) {
       const res = convert(num, unitFrom, unitTo, category);
       // Format nicely to avoid floating point issues like 0.30000000000000004
@@ -736,7 +758,7 @@ export default function App() {
       setValFrom("");
       return;
     }
-    const num = parseFloat(v);
+    const num = parseInput(v);
     if (!isNaN(num)) {
       const res = convert(num, unitTo, unitFrom, category);
       if (Math.abs(res) < 1e-6 || Math.abs(res) >= 1e12) {

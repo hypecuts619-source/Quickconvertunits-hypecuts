@@ -81,6 +81,8 @@ export const categories: UnitCategory[] = [
       { id: 'us_pint', name: 'US Pint', symbol: 'pt', factor: 0.473176473, description: 'A US customary unit of volume, equal to one eighth of a gallon, typically used for serving beverages like beer in the US.' },
       { id: 'us_cup', name: 'US Cup', symbol: 'cup', factor: 0.236588236, description: 'A US customary unit of volume, equal to 8 fluid ounces, heavily used in American culinary recipes and baking.' },
       { id: 'us_fluid_ounce', name: 'US Fluid Ounce', symbol: 'fl oz', factor: 0.0295735296, description: 'A US customary unit of volume, historically based on the volume of one ounce of wine, used for drinks and liquid cosmetics.' },
+      { id: 'tablespoon_us', name: 'US Tablespoon', symbol: 'tbsp', factor: 0.0147867648, description: 'A US customary unit of volume equal to 3 teaspoons.' },
+      { id: 'teaspoon_us', name: 'US Teaspoon', symbol: 'tsp', factor: 0.0049289216, description: 'A US customary unit of volume, used in recipes and cooking.' },
     ],
   },
   {
@@ -163,18 +165,21 @@ export const categories: UnitCategory[] = [
   },
   {
     id: 'cooking',
-    name: 'Cooking',
-    baseUnit: 'milliliter',
+    name: 'Cooking Ingredients',
+    baseUnit: 'gram',
     units: [
-      { id: 'milliliter', name: 'Milliliter', symbol: 'mL', factor: 1, description: 'A metric unit of volume equal to one thousandth of a liter.' },
-      { id: 'liter', name: 'Liter', symbol: 'L', factor: 1000, description: 'A metric unit of volume equal to 1 cubic decimeter.' },
-      { id: 'teaspoon_us', name: 'US Teaspoon', symbol: 'tsp', factor: 4.92892, description: 'A US customary unit of volume, used in recipes and cooking.' },
-      { id: 'tablespoon_us', name: 'US Tablespoon', symbol: 'tbsp', factor: 14.7868, description: 'A US customary unit of volume equal to 3 teaspoons.' },
-      { id: 'cup_us', name: 'US Cup', symbol: 'cup', factor: 236.588, description: 'A US customary unit of volume, used extensively in cooking and baking.' },
-      { id: 'fluid_ounce_us', name: 'US Fluid Ounce', symbol: 'fl oz', factor: 29.5735, description: 'A unit of volume in the US customary system.' },
-      { id: 'pint_us', name: 'US Pint', symbol: 'pt', factor: 473.176, description: 'A metric unit of volume equal to 16 US fluid ounces.' },
-      { id: 'quart_us', name: 'US Quart', symbol: 'qt', factor: 946.353, description: 'A US customary unit equal to 2 pints.' },
-      { id: 'gallon_us', name: 'US Gallon', symbol: 'gal', factor: 3785.41, description: 'A US customary unit equal to 4 quarts.' },
+      { id: 'gram', name: 'Gram', symbol: 'g', factor: 1, description: 'A metric unit of mass, the standard for professional baking and cooking.' },
+      { id: 'ounce', name: 'Ounce', symbol: 'oz', factor: 28.3495, description: 'An imperial unit of mass widely used in US recipes.' },
+      { id: 'cup_water', name: 'Cup (Water/Milk)', symbol: 'c', factor: 236.588, description: '1 US liquid cup of water or milk weighs roughly 236 grams.' },
+      { id: 'cup_flour_ap', name: 'Cup (All-Purpose Flour)', symbol: 'c', factor: 120, description: '1 US cup of properly spooned and leveled all-purpose flour weighs 120 grams.' },
+      { id: 'cup_flour_bread', name: 'Cup (Bread Flour)', symbol: 'c', factor: 127, description: '1 US cup of bread flour weighs slightly more than all-purpose at 127 grams.' },
+      { id: 'cup_sugar_granulated', name: 'Cup (Granulated Sugar)', symbol: 'c', factor: 200, description: '1 US cup of standard granulated white sugar weighs 200 grams.' },
+      { id: 'cup_sugar_brown', name: 'Cup (Packed Brown Sugar)', symbol: 'c', factor: 213, description: '1 US cup of tightly packed brown sugar weighs 213 grams.' },
+      { id: 'cup_sugar_powdered', name: 'Cup (Powdered Sugar)', symbol: 'c', factor: 113, description: '1 US cup of powdered or confectioner\'s sugar is very light, weighing 113 grams.' },
+      { id: 'cup_butter', name: 'Cup (Butter / 2 Sticks)', symbol: 'c', factor: 227, description: '1 US cup of butter weighs 227 grams. This is exactly two standard US sticks of butter.' },
+      { id: 'tbsp_butter', name: 'Tablespoon (Butter)', symbol: 'tbsp', factor: 14.18, description: '1 tablespoon of butter weighs approximately 14.2 grams.' },
+      { id: 'cup_cocoa', name: 'Cup (Cocoa Powder)', symbol: 'c', factor: 100, description: '1 US cup of unsweetened cocoa powder weighs 100 grams.' },
+      { id: 'cup_honey', name: 'Cup (Honey / Syrup)', symbol: 'c', factor: 340, description: 'Dense liquids like honey or maple syrup are incredibly heavy, weighing 340 grams per cup.' }
     ]
   },
   {
@@ -703,39 +708,46 @@ export const getUnitIdsFromPath = (path: string) => {
 export const getCanonicalUnitId = (alias: string): string => {
   const map: Record<string, string> = {
     'lbs': 'pound', 'lb': 'pound', 'pounds': 'pound', 'pound': 'pound',
+    'libras': 'pound', 'libra': 'pound', 'livres': 'pound', 'livre': 'pound', 'pfund': 'pound',
     'kg': 'kilogram', 'kgs': 'kilogram', 'kilograms': 'kilogram', 'kilogram': 'kilogram',
-    'g': 'gram', 'gs': 'gram', 'grams': 'gram', 'gram': 'gram',
-    'oz': 'ounce', 'ozs': 'ounce', 'ounces': 'ounce', 'ounce': 'ounce',
-    'm': 'meter', 'meters': 'meter', 'meter': 'meter',
-    'ft': 'foot', 'feet': 'foot', 'foot': 'foot',
-    'inch': 'inch', 'inches': 'inch', 'in': 'inch',
+    'kilogramos': 'kilogram', 'kilogrammes': 'kilogram', 'kilogramm': 'kilogram',
+    'g': 'gram', 'gs': 'gram', 'grams': 'gram', 'gram': 'gram', 'gramos': 'gram', 'gramm': 'gram',
+    'oz': 'ounce', 'ozs': 'ounce', 'ounces': 'ounce', 'ounce': 'ounce', 'onzas': 'ounce', 'unzen': 'ounce',
+    'm': 'meter', 'meters': 'meter', 'meter': 'meter', 'metros': 'meter', 'metres': 'meter',
+    'ft': 'foot', 'feet': 'foot', 'foot': 'foot', 'pies': 'foot', 'pie': 'foot', 'pieds': 'foot', 'pied': 'foot', 'fuss': 'foot',
+    'inch': 'inch', 'inches': 'inch', 'in': 'inch', 'pulgadas': 'inch', 'pulgada': 'inch', 'pouces': 'inch', 'pouce': 'inch', 'zoll': 'inch',
     'cm': 'centimeter', 'cms': 'centimeter', 'centimeters': 'centimeter', 'centimeter': 'centimeter',
+    'centimetros': 'centimeter', 'centimetres': 'centimeter', 'zentimeter': 'centimeter',
     'mm': 'millimeter', 'mms': 'millimeter', 'millimeters': 'millimeter', 'millimeter': 'millimeter',
+    'milimetros': 'millimeter', 'millimetres': 'millimeter',
     'km': 'kilometer', 'kms': 'kilometer', 'kilometers': 'kilometer', 'kilometer': 'kilometer',
-    'mile': 'mile', 'miles': 'mile', 'mi': 'mile',
-    'yard': 'yard', 'yards': 'yard', 'yd': 'yard',
-    'ton': 'metric_ton', 'tons': 'metric_ton', 'metric_ton': 'metric_ton',
+    'kilometros': 'kilometer', 'kilometres': 'kilometer',
+    'mile': 'mile', 'miles': 'mile', 'mi': 'mile', 'millas': 'mile', 'milla': 'mile', 'milles': 'mile', 'meilen': 'mile',
+    'yard': 'yard', 'yards': 'yard', 'yd': 'yard', 'yardas': 'yard',
+    'ton': 'metric_ton', 'tons': 'metric_ton', 'metric_ton': 'metric_ton', 'toneladas': 'metric_ton',
     'celsius': 'celsius', 'c': 'celsius',
     'fahrenheit': 'fahrenheit', 'f': 'fahrenheit',
     'kelvin': 'kelvin', 'k': 'kelvin',
-    'liter': 'liter', 'liters': 'liter', 'l': 'liter',
-    'us_gallon': 'us_gallon', 'gallon': 'us_gallon', 'gallons': 'us_gallon', 'gal': 'us_gallon',
-    'us_cup': 'us_cup', 'cup': 'us_cup', 'cups': 'us_cup',
+    'liter': 'liter', 'liters': 'liter', 'l': 'liter', 'litros': 'liter', 'litres': 'liter',
+    'us_gallon': 'us_gallon', 'gallon': 'us_gallon', 'gallons': 'us_gallon', 'gal': 'us_gallon', 'galones': 'us_gallon',
+    'us_cup': 'us_cup', 'cup': 'us_cup', 'cups': 'us_cup', 'tazas': 'us_cup', 'taza': 'us_cup',
     'milliliter': 'milliliter', 'milliliters': 'milliliter', 'ml': 'milliliter',
     'us_fluid_ounce': 'us_fluid_ounce', 'fluid_ounce': 'us_fluid_ounce', 'fluid_ounces': 'us_fluid_ounce', 'fl_oz': 'us_fluid_ounce',
+    'teaspoon_us': 'teaspoon_us', 'teaspoon': 'teaspoon_us', 'teaspoons': 'teaspoon_us', 'tsp': 'teaspoon_us',
+    'tablespoon_us': 'tablespoon_us', 'tablespoon': 'tablespoon_us', 'tablespoons': 'tablespoon_us', 'tbsp': 'tablespoon_us',
     'mile_per_hour': 'mile_per_hour', 'mph': 'mile_per_hour',
     'kilometer_per_hour': 'kilometer_per_hour', 'kph': 'kilometer_per_hour',
     'meter_per_second': 'meter_per_second', 'mps': 'meter_per_second',
     'knot': 'knot', 'knots': 'knot',
     'acre': 'acre', 'acres': 'acre',
-    'square_meter': 'square_meter', 'square_meters': 'square_meter', 'sq_m': 'square_meter',
-    'square_foot': 'square_foot', 'square_feet': 'square_foot', 'sq_ft': 'square_foot',
+    'square_meter': 'square_meter', 'square_meters': 'square_meter', 'sq_m': 'square_meter', 'metros_cuadrados': 'square_meter',
+    'square_foot': 'square_foot', 'square_feet': 'square_foot', 'sq_ft': 'square_foot', 'pies_cuadrados': 'square_foot',
     'hectare': 'hectare', 'hectares': 'hectare', 'ha': 'hectare',
-    'hour': 'hour', 'hours': 'hour', 'hr': 'hour', 'hrs': 'hour',
-    'minute': 'minute', 'minutes': 'minute', 'min': 'minute', 'mins': 'minute',
-    'second': 'second', 'seconds': 'second', 'sec': 'second', 'secs': 'second',
-    'day': 'day', 'days': 'day',
-    'week': 'week', 'weeks': 'week',
+    'hour': 'hour', 'hours': 'hour', 'hr': 'hour', 'hrs': 'hour', 'horas': 'hour', 'heures': 'hour', 'stunden': 'hour',
+    'minute': 'minute', 'minutes': 'minute', 'min': 'minute', 'mins': 'minute', 'minutos': 'minute', 'minuten': 'minute',
+    'second': 'second', 'seconds': 'second', 'sec': 'second', 'secs': 'second', 'segundos': 'second', 'sekunden': 'second',
+    'day': 'day', 'days': 'day', 'dias': 'day', 'jours': 'day', 'tage': 'day',
+    'week': 'week', 'weeks': 'week', 'semanas': 'week', 'semaines': 'week', 'wochen': 'week',
     'megabyte': 'megabyte', 'megabytes': 'megabyte', 'mb': 'megabyte',
     'gigabyte': 'gigabyte', 'gigabytes': 'gigabyte', 'gb': 'gigabyte',
     'terabyte': 'terabyte', 'terabytes': 'terabyte', 'tb': 'terabyte',
@@ -760,15 +772,27 @@ export const getCanonicalUnitId = (alias: string): string => {
 };
 
 export const getParsedParamsFromPath = (path: string): { val: string | null, from: string | null, to: string | null } => {
-  const match = path.match(/^convert-([\d.]+)-(.+)-to-(.+)$/);
-  if (match) {
-    const rawFrom = getCanonicalUnitId(match[2]);
-    const rawTo = getCanonicalUnitId(match[3]);
+  const matchWithVal = path.match(/^convert-([\d.]+)-(.+)-(?:to|a|en|zu)-(.+)$/i);
+  if (matchWithVal) {
+    const rawFrom = getCanonicalUnitId(matchWithVal[2]);
+    const rawTo = getCanonicalUnitId(matchWithVal[3]);
     const parts = getUnitIdsFromPath(`${rawFrom}-to-${rawTo}`);
     if (parts.length === 2 && parts[0] === parts[0].toLowerCase()) {
-      return { val: match[1], from: parts[0], to: parts[1] };
+      return { val: matchWithVal[1], from: parts[0], to: parts[1] };
     }
-    return { val: match[1], from: rawFrom, to: rawTo };
+    return { val: matchWithVal[1], from: rawFrom, to: rawTo };
   }
+  
+  const matchWithoutVal = path.match(/^(.+)-(?:to|a|en|zu)-(.+)$/i);
+  if (matchWithoutVal && !path.includes('blog')) {
+    const rawFrom = getCanonicalUnitId(matchWithoutVal[1]);
+    const rawTo = getCanonicalUnitId(matchWithoutVal[2]);
+    const parts = getUnitIdsFromPath(`${rawFrom}-to-${rawTo}`);
+    if (parts.length === 2 && parts[0] === parts[0].toLowerCase()) {
+      return { val: null, from: parts[0], to: parts[1] };
+    }
+    return { val: null, from: rawFrom, to: rawTo };
+  }
+
   return { val: null, from: null, to: null };
 };
