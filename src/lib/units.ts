@@ -367,25 +367,29 @@ export async function updateCurrencyRates() {
     try {
       const res = await fetch('https://open.er-api.com/v6/latest/USD');
       currencyData = await res.json();
-      if (currencyData && currencyData.rates) {
+      if (currencyData && currencyData.rates && typeof window !== "undefined") {
         localStorage.setItem('cached_currency_rates', JSON.stringify(currencyData));
       }
     } catch (e) {
       console.warn("Offline or fetch failed for currency rates. Using cache if available.");
-      const cached = localStorage.getItem('cached_currency_rates');
-      if (cached) currencyData = JSON.parse(cached);
+      if (typeof window !== "undefined") {
+        const cached = localStorage.getItem('cached_currency_rates');
+        if (cached) currencyData = JSON.parse(cached);
+      }
     }
 
     try {
       const cryptoRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd');
       cryptoData = await cryptoRes.json();
-      if (cryptoData) {
+      if (cryptoData && typeof window !== "undefined") {
         localStorage.setItem('cached_crypto_rates', JSON.stringify(cryptoData));
       }
     } catch (e) {
       console.warn("Offline or fetch failed for crypto rates. Using cache if available.");
-      const cached = localStorage.getItem('cached_crypto_rates');
-      if (cached) cryptoData = JSON.parse(cached);
+      if (typeof window !== "undefined") {
+        const cached = localStorage.getItem('cached_crypto_rates');
+        if (cached) cryptoData = JSON.parse(cached);
+      }
     }
 
     if (currencyData && currencyData.rates) {

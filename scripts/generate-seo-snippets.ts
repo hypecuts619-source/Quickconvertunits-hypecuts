@@ -74,7 +74,7 @@ Required JSON Output Structure:
         }
       });
       
-      const snippet = JSON.parse(response.text() || "{}");
+      const snippet = JSON.parse(response.text || "{}");
       const key = `${sourceId}-to-${targetId}`;
       results[key] = snippet;
       
