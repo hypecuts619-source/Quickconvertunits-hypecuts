@@ -36,6 +36,8 @@ for (const post of blogPosts) {
 const getSEOUrlPath = (fromId, toId) => {
   if (fromId === 'kilogram' && toId === 'pound') return '/kg-to-lbs';
   if (fromId === 'inch' && toId === 'centimeter') return '/inches-to-cm';
+  if (fromId === 'inch' && toId === 'pixel') return '/inches-to-pixels';
+  if (fromId === 'pixel' && toId === 'inch') return '/pixels-to-inches';
   if (fromId === 'centimeter' && toId === 'inch') return '/cm-to-inches';
   if (fromId === 'pound' && toId === 'kilogram') return '/lbs-to-kg';
   if (fromId === 'foot' && toId === 'meter') return '/feet-to-meters';
@@ -68,7 +70,7 @@ for (const category of categories) {
         let pathStr = getSEOUrlPath(fromUnit.id, toUnit.id);
         // bump priority of top 10 keywords
         let priority = "0.7";
-        if (["/kg-to-lbs", "/inches-to-cm", "/cm-to-inches", "/lbs-to-kg", "/feet-to-meters", "/miles-to-km", "/mm-to-inches"].includes(pathStr)) {
+        if (["/kg-to-lbs", "/inches-to-cm", "/cm-to-inches", "/lbs-to-kg", "/feet-to-meters", "/miles-to-km", "/mm-to-inches", "/inches-to-pixels", "/pixels-to-inches"].includes(pathStr)) {
           priority = "0.9";
         }
         addUrl(pathStr, priority, "monthly");

@@ -91,11 +91,22 @@ export function SeoContent({
         {t("seoFormulaDesc2", "For example, to convert 5 {{fromUnit}} to {{toUnit}}:", { fromUnit: fUnitName, toUnit: tUnitName })}<br/>
         5 {fUnit.symbol} × {formatNum(convFactor)} = {formatNum(5 * convFactor)} {tUnit.symbol}
       </p>
-      <p>
+      
+      <h2>Step-by-Step {fUnitName} to {tUnitName} Guide</h2>
+      <p>Converting between {fUnitName.toLowerCase()} and {tUnitName.toLowerCase()} is straightforward when you understand the exact mathematical relationship. Here is the best way to calculate the result:</p>
+      <ol className="list-decimal pl-5 space-y-2 mt-4 ml-4">
+        <li><strong>Identify the exact conversion factor:</strong> 1 {fUnitName.toLowerCase()} is exactly {formatNum(convFactor)} {tUnitName.toLowerCase()}.</li>
+        <li><strong>Determine your starting measurement:</strong> For instance, let's say you need to convert 10 {fUnitName.toLowerCase()}.</li>
+        <li><strong>Apply the mathematical formula:</strong> Multiply your starting value by the conversion factor.</li>
+        <li><strong>Calculate the final result:</strong> 10 × {formatNum(convFactor)} = {formatNum(10 * convFactor)} {tUnit.symbol}.</li>
+      </ol>
+
+      <p className="mt-4">
         {fUnit.description || t("seoDescription", "Converting {{fromUnit}} to {{toUnit}} is a common {{category}} conversion.", { fromUnit: fUnitName, toUnit: tUnitName, category: catName })}
       </p>
 
       <h2>{t("seoTable", "{{fromUnit}} to {{toUnit}} Conversion Table", { fromUnit: fUnitName, toUnit: tUnitName })}</h2>
+      <p>A quick reference table covering standard {catName} conversions from {fUnitName.toLowerCase()} to {tUnitName.toLowerCase()}:</p>
       <div className="not-prose overflow-x-auto my-6 border border-neutral-200 dark:border-neutral-800 rounded-xl max-w-sm mx-auto shadow-sm">
         <table className="w-full text-sm text-center">
           <thead className="bg-neutral-50 dark:bg-[#1a1a1a] border-b border-neutral-200 dark:border-neutral-800 text-neutral-500 font-medium">
@@ -107,7 +118,11 @@ export function SeoContent({
           <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/50">
             {commonValues.map(val => (
               <tr key={val} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/20 transition-colors">
-                <td className="px-4 py-2 font-medium bg-white dark:bg-[#111111]">{val} {fUnit.symbol}</td>
+                <td className="px-4 py-2 font-medium bg-white dark:bg-[#111111]">
+                  <Link to={`/${getSEOUrlPath(unitFrom, unitTo)}?val=${val}`} className="hover:underline">
+                    {val} {fUnit.symbol}
+                  </Link>
+                </td>
                 <td className="px-4 py-2 text-neutral-600 dark:text-neutral-300 bg-white/50 dark:bg-neutral-900/50">{formatNum(convert(val, unitFrom, unitTo, category))} {tUnit.symbol}</td>
               </tr>
             ))}
@@ -115,15 +130,29 @@ export function SeoContent({
         </table>
       </div>
 
-      <h2>{t("seoCommonConvs", "Common {{fromUnit}} to {{toUnit}} Conversions", { fromUnit: fUnitName, toUnit: tUnitName })}</h2>
-      <ul className="grid grid-cols-2 gap-2">
-        {[50, 60, 70, 80, 90, 100].map(val => (
-          <li key={val}>
-            <Link to={`/${getSEOUrlPath(unitFrom, unitTo)}?val=${val}`} className="text-primary-600 dark:text-primary-400 hover:underline">
-              {val} {fUnit.symbol} to {tUnit.symbol}
+      <h2>Fractional Values: {fUnitName} to {tUnitName}</h2>
+      <p>In many practical, everyday scenarios, you might need to convert fractions or decimals of a {fUnitName.toLowerCase()}. Here are the most common fractional conversions, perfect for precise measurements in cooking, engineering, or scientific applications:</p>
+      <ul className="grid grid-cols-2 md:grid-cols-4 gap-2 my-6">
+        {[0.1, 0.25, 0.5, 0.75].map(val => (
+          <li key={val} className="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded-lg text-sm text-center">
+            <Link to={`/${getSEOUrlPath(unitFrom, unitTo)}?val=${val}`} className="text-primary-600 dark:text-primary-400 hover:underline block font-semibold mb-1">
+              {val} {fUnit.symbol}
             </Link>
+            <span className="text-neutral-500 dark:text-neutral-400">= {formatNum(val * convFactor)} {tUnit.symbol}</span>
           </li>
         ))}
+      </ul>
+
+      <h2>Historical Origins and Context</h2>
+      <p>The origins of the <strong>{fUnitName}</strong> and the <strong>{tUnitName}</strong> trace back to the pressing need for standardized <em>{catName}</em> tracking in commerce, agriculture, engineering, and science. In early civilizations, physical artifacts, local agreements, or natural phenomena were used to define local units. Over time, groups like the International System of Units (SI) standardized the conversion factors you rely on today.</p>
+      <p>While the {fUnitName.toLowerCase()} may be rooted in older traditional systems or regional standards, it maintains a permanent, precise mathematical relationship with the {tUnitName.toLowerCase()}. Knowing the history helps appreciate why accurate, digital unit converters have become indispensable computing tools today.</p>
+
+      <h2>Real-World Examples: When to Use {fUnitName} vs {tUnitName}</h2>
+      <p>{fUnitName} and {tUnitName} are utilized differently globally depending on the specific contextual application, geographical location, and industry norms:</p>
+      <ul className="list-disc pl-5 space-y-2 mt-4 ml-4">
+        <li><strong>Daily Life & Home:</strong> Depending on where you live (regions adopting the metric system versus those using the US customary / imperial system), you might use {fUnitName} for everyday measurements while someone in another country natively uses {tUnitName}.</li>
+        <li><strong>Science and Engineering:</strong> Professionals heavily favor standard metric units. When drafting architecture, writing code, or communicating blueprints across borders, converting {fUnitName} to {tUnitName} ensures absolute precision and avoids critical errors.</li>
+        <li><strong>Trade and Commerce:</strong> Packaging manufactured goods often requires strict dual labeling, prominently displaying both {fUnit.symbol} and {tUnit.symbol} to satisfy rigorous international shipping laws and retail regulations.</li>
       </ul>
 
       <h2>{t("seoFaq", "Frequently Asked Questions")}</h2>

@@ -177,6 +177,32 @@ export const customSeoData: Record<string, CustomSeoContent> = {
       <p>This comes from the international definition where 1 pound equals exactly 0.45359237 kilograms. The reciprocal of this number is 2.20462, which is why we multiply kg by 2.20462 to get pounds.</p>
     `
   },
+  "inches-to-pixels": {
+    title: "Inches to Pixels (in to px) Converter | QuickConvert",
+    description: "Convert inches to pixels instantly using the standard CSS resolution of 96 DPI. Find out how many pixels are in an inch for web, graphic design, and screens.",
+    content: `
+      <h2>Frequently Asked Questions</h2>
+      <h3>How many pixels are in an inch?</h3>
+      <p>For standard web design and CSS, there are exactly 96 pixels in one inch (96 DPI/PPI). This means 1 inch equals 96 pixels.</p>
+      <h3>Does the number of pixels in an inch change?</h3>
+      <p>In physical print environments, the number can change depending on your resolution (e.g., 300 DPI for high-quality print means 300 pixels per inch). However, for web browsers and CSS standards, 1 inch is always equal to 96 pixels.</p>
+      <h3>How do I convert inches to pixels?</h3>
+      <p>Simply multiply the number of inches by 96 (assuming standard screen resolution). For example, 2 inches x 96 = 192 pixels.</p>
+    `
+  },
+  "pixels-to-inches": {
+    title: "Pixels to Inches (px to in) Converter | QuickConvert",
+    description: "Convert pixels to inches for standard screens (96 DPI). Free pixels to inches calculator for web designers and developers.",
+    content: `
+      <h2>Frequently Asked Questions</h2>
+      <h3>How many inches is 100 pixels?</h3>
+      <p>At standard CSS resolution (96 DPI/PPI), 100 pixels is equal to approximately 1.04 inches (100 ÷ 96).</p>
+      <h3>How do you convert pixels to inches?</h3>
+      <p>Divide the number of pixels by the resolution (DPI or PPI). For standard web design, divide by 96. For print, you would often divide by 300.</p>
+      <h3>Are pixels physical inches?</h3>
+      <p>Pixels are not physical measurements themselves—they are individual dots of light on a screen. The "inch" relative to pixels in web design (96px = 1in) is a standardized digital measurement, not necessarily an exact physical inch on every screen.</p>
+    `
+  },
   "inches-to-cm": {
     title: "Inches to Centimeters (inches to cm) - Free Converter | QuickConvert",
     description: "Convert inches to cm instantly. 1 inch = 2.54 centimeters. Free calculator with conversion table, formula, and examples. Accurate and fast.",

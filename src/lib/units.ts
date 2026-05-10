@@ -553,6 +553,8 @@ export function formatNumber(num: number): string {
 }
 
 export const getSEOUrlPath = (fromId: string, toId: string) => {
+  if (fromId === 'inch' && toId === 'pixel') return 'inches-to-pixels';
+  if (fromId === 'pixel' && toId === 'inch') return 'pixels-to-inches';
   if (fromId === 'meter' && toId === 'foot') return 'meters-to-feet';
   if (fromId === 'foot' && toId === 'meter') return 'feet-to-meters';
   if (fromId === 'kilometer' && toId === 'mile') return 'km-to-miles';
@@ -628,6 +630,8 @@ export const getUnitIdsFromPath = (path: string) => {
   if (path === 'time-zone-converter') return ['time_zone', 'time_zone'];
   if (path === 'est-to-utc' || path === 'pst-to-est') return ['time_zone', 'time_zone'];
   
+  if (path === 'inches-to-pixels') return ['inch', 'pixel'];
+  if (path === 'pixels-to-inches') return ['pixel', 'inch'];
   if (path === 'meters-to-feet') return ['meter', 'foot'];
   if (path === 'feet-to-meters') return ['foot', 'meter'];
   if (path === 'km-to-miles') return ['kilometer', 'mile'];
@@ -737,6 +741,7 @@ export const getCanonicalUnitId = (alias: string): string => {
     'terabyte': 'terabyte', 'terabytes': 'terabyte', 'tb': 'terabyte',
     'bit': 'bit', 'bits': 'bit',
     'byte': 'byte', 'bytes': 'byte',
+    'pixel': 'pixel', 'pixels': 'pixel', 'px': 'pixel',
     'miles_per_gallon': 'miles_per_gallon', 'mpg': 'miles_per_gallon',
     'km_per_liter': 'km_per_liter', 'kml': 'km_per_liter',
     'joule': 'joule', 'joules': 'joule', 'j': 'joule',
