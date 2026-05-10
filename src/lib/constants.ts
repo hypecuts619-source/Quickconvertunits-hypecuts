@@ -1,6 +1,8 @@
 export const POPULAR_CONVERSIONS = [
   { from: 'time_zone', to: 'time_zone', label: 'Time Zone Converter', cat: 'time_zone' },
   { from: 'usd', to: 'eur', label: 'Currency Converter', cat: 'currency' },
+  { from: 'bmi', to: 'bmi', label: 'BMI Calculator', cat: 'bmi' },
+  { from: 'gram', to: 'cup_flour_ap', label: 'Cooking Converter', cat: 'cooking' },
   { from: 'kilogram', to: 'pound', label: 'KG to LBS', cat: 'weight' },
   { from: 'pound', to: 'kilogram', label: 'LBS to KG', cat: 'weight' },
   { from: 'meter', to: 'foot', label: 'Meters to Feet', cat: 'length' },
@@ -8,6 +10,8 @@ export const POPULAR_CONVERSIONS = [
   { from: 'celsius', to: 'fahrenheit', label: 'Celsius to Fahrenheit', cat: 'temperature' },
   { from: 'fahrenheit', to: 'celsius', label: 'Fahrenheit to Celsius', cat: 'temperature' },
   { from: 'kilometer', to: 'mile', label: 'KM to Miles', cat: 'length' },
+  { from: 'mg_dl', to: 'mmol_l', label: 'Blood Sugar Converter', cat: 'blood_sugar' },
+  { from: 'min_per_km', to: 'min_per_mile', label: 'Pace Calculator', cat: 'pace' },
   { from: 'mile', to: 'kilometer', label: 'Miles to KM', cat: 'length' },
   { from: 'gram', to: 'ounce', label: 'Grams to Ounces', cat: 'weight' },
   { from: 'ounce', to: 'gram', label: 'Ounces to Grams', cat: 'weight' },

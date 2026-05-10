@@ -307,61 +307,113 @@ export const categories: UnitCategory[] = [
       { id: 'pound_inch', name: 'Pound-inch', symbol: 'lb·in', factor: 0.112984829, description: 'An imperial unit of torque used to measure smaller forces, such as the tightening specification of small bolts.' },
       { id: 'kilogram_meter', name: 'Kilogram-meter', symbol: 'kg·m', factor: 9.80665, description: 'A metric (though non-SI) unit of torque equivalent to the force of one kilogram in Earth\'s gravity at a distance of one meter.' }
     ]
+  },
+  {
+    id: 'force',
+    name: 'Force',
+    baseUnit: 'newton',
+    units: [
+      { id: 'newton', name: 'Newton', symbol: 'N', factor: 1, description: 'The SI unit of force.' },
+      { id: 'pound_force', name: 'Pound-force', symbol: 'lbf', factor: 4.44822, description: 'An imperial unit of force.' },
+      { id: 'kilogram_force', name: 'Kilogram-force', symbol: 'kgf', factor: 9.80665, description: 'A metric (non-SI) unit of force.' }
+    ]
+  },
+  {
+    id: 'density',
+    name: 'Density',
+    baseUnit: 'kg_per_cubic_meter',
+    units: [
+      { id: 'kg_per_cubic_meter', name: 'Kilogram/Cubic Meter', symbol: 'kg/m³', factor: 1, description: 'The SI unit of density.' },
+      { id: 'g_per_cubic_centimeter', name: 'Gram/Cubic Centimeter', symbol: 'g/cm³', factor: 1000, description: 'A common metric unit of density.' },
+      { id: 'lb_per_cubic_foot', name: 'Pound/Cubic Foot', symbol: 'lb/ft³', factor: 16.01846, description: 'An imperial unit of density.' },
+      { id: 'lb_per_gallon_us', name: 'Pound/US Gallon', symbol: 'lb/gal', factor: 119.8264, description: 'Commonly used to express the density of liquids in the US.' }
+    ]
+  },
+  {
+    id: 'blood_sugar',
+    name: 'Blood Sugar',
+    baseUnit: 'mg_dl',
+    units: [
+      { id: 'mg_dl', name: 'Milligrams per Deciliter', symbol: 'mg/dL', factor: 1, description: 'Standard unit for measuring blood glucose levels in the US.' },
+      { id: 'mmol_l', name: 'Millimoles per Liter', symbol: 'mmol/L', factor: 18.0182, description: 'Standard unit for measuring blood glucose levels in the UK, Canada, and Australia.' },
+    ]
+  },
+  {
+    id: 'pace',
+    name: 'Pace',
+    baseUnit: 'min_per_km',
+    units: [
+      { id: 'min_per_km', name: 'Minutes per Kilometer', symbol: 'min/km', factor: 1, description: 'Pace measured in minutes to complete one kilometer.' },
+      { id: 'min_per_mile', name: 'Minutes per Mile', symbol: 'min/mi', factor: 0.621371192, description: 'Pace measured in minutes to complete one mile.' }
+    ]
+  },
+  {
+    id: 'illuminance',
+    name: 'Illuminance',
+    baseUnit: 'lux',
+    units: [
+      { id: 'lux', name: 'Lux', symbol: 'lx', factor: 1, description: 'The SI derived unit of illuminance, representing lumens per square meter.' },
+      { id: 'foot_candle', name: 'Foot-candle', symbol: 'fc', factor: 10.7639, description: 'A non-SI unit of illuminance widely used in the US for lighting layouts.' }
+    ]
   }
 ];
 
 export async function updateCurrencyRates() {
   try {
-    const res = await fetch('https://open.er-api.com/v6/latest/USD');
-    const data = await res.json();
-    if (data && data.rates) {
+    let currencyData: any = null;
+    let cryptoData: any = null;
+    
+    // Attempt remote fetch
+    try {
+      const res = await fetch('https://open.er-api.com/v6/latest/USD');
+      currencyData = await res.json();
+      if (currencyData && currencyData.rates) {
+        localStorage.setItem('cached_currency_rates', JSON.stringify(currencyData));
+      }
+    } catch (e) {
+      console.warn("Offline or fetch failed for currency rates. Using cache if available.");
+      const cached = localStorage.getItem('cached_currency_rates');
+      if (cached) currencyData = JSON.parse(cached);
+    }
+
+    try {
+      const cryptoRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd');
+      cryptoData = await cryptoRes.json();
+      if (cryptoData) {
+        localStorage.setItem('cached_crypto_rates', JSON.stringify(cryptoData));
+      }
+    } catch (e) {
+      console.warn("Offline or fetch failed for crypto rates. Using cache if available.");
+      const cached = localStorage.getItem('cached_crypto_rates');
+      if (cached) cryptoData = JSON.parse(cached);
+    }
+
+    if (currencyData && currencyData.rates) {
       const currencyCat = categories.find(c => c.id === 'currency');
       if (currencyCat) {
         currencyCat.units.forEach(u => {
           const rateCode = u.id.toUpperCase();
-          if (data.rates[rateCode]) {
-            // factor is the rate against USD, which is our baseUnit
-            // since baseUnit is usd, dividing by factor gives USD value. Wait.
-            // If factor is how much of unit equals 1 baseUnit:
-            // e.g. 1 USD = 0.92 EUR. So factor for EUR should be 0.92?
-            // Let's check how linear conversion works in convert():
-            // baseValue = value * fromUnit.factor
-            // if fromUnit is EUR, and factor is 0.92, baseValue = value * 0.92. NO!
-            // Wait, factor in my initial implementation:
-            // baseValue = value * fromUnit.factor.
-            // If length: 1 km = 1000 m. factor for km is 1000.
-            // So if value is 1 (km), baseValue = 1 * 1000 = 1000m.
-            // So factor of EUR should be 1 / 0.92 = 1.086 USD?
-            // Let's verify data.rates: "EUR": 0.85 means 1 USD = 0.85 EUR.
-            // So 1 EUR = (1 / 0.85) USD.
-            // So in my current implementation, the factor for EUR should be (1 / data.rates[rateCode]).
-            u.factor = 1 / data.rates[rateCode];
+          if (currencyData.rates[rateCode]) {
+            u.factor = 1 / currencyData.rates[rateCode];
           }
         });
         
-        // Fetch Crypto updates from CoinGecko
-        try {
-          const cryptoRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd');
-          const cryptoData = await cryptoRes.json();
-          if (cryptoData) {
-            const updateCrypto = (id: string, coinGeckoId: string) => {
-              const u = currencyCat.units.find(x => x.id === id);
-              if (u && cryptoData[coinGeckoId] && cryptoData[coinGeckoId].usd) {
-                u.factor = cryptoData[coinGeckoId].usd;
-              }
-            };
-            updateCrypto('btc', 'bitcoin');
-            updateCrypto('eth', 'ethereum');
-            updateCrypto('sol', 'solana');
-          }
-        } catch (err) {
-          console.error('Failed to fetch crypto prices from CoinGecko', err);
+        if (cryptoData) {
+          const updateCrypto = (id: string, coinGeckoId: string) => {
+            const u = currencyCat.units.find(x => x.id === id);
+            if (u && cryptoData[coinGeckoId] && cryptoData[coinGeckoId].usd) {
+              u.factor = cryptoData[coinGeckoId].usd;
+            }
+          };
+          updateCrypto('btc', 'bitcoin');
+          updateCrypto('eth', 'ethereum');
+          updateCrypto('sol', 'solana');
         }
       }
       return true;
     }
   } catch (e) {
-    console.error('Failed to fetch currency rates', e);
+    console.error('Failed to update currency rates', e);
   }
   return false;
 }

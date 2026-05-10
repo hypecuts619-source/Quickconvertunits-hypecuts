@@ -3,7 +3,10 @@ import { convert, getSEOUrlPath } from '../lib/units';
 import { useTranslation } from 'react-i18next';
 import { categorySeoContent } from '../lib/seoContent';
 import { customSeoData } from '../lib/customSeoData';
+import seoSnippetsRaw from '../lib/seoSnippets.json';
 import { Link } from 'react-router-dom';
+
+const seoSnippets: Record<string, any> = seoSnippetsRaw;
 
 export function SeoContent({ 
   unitFrom, unitTo, category, categories
@@ -155,8 +158,36 @@ export function SeoContent({
         <li><strong>Trade and Commerce:</strong> Packaging manufactured goods often requires strict dual labeling, prominently displaying both {fUnit.symbol} and {tUnit.symbol} to satisfy rigorous international shipping laws and retail regulations.</li>
       </ul>
 
+      {seoSnippets[urlPath] && (
+        <>
+          <div className="bg-primary-50/50 dark:bg-primary-900/10 p-6 rounded-2xl border border-primary-100 dark:border-primary-900/30 my-8">
+            <h3 className="flex items-center gap-2 mt-0 mb-4 text-primary-900 dark:text-primary-100">
+              <svg className="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              Quick Fact
+            </h3>
+            <p className="mb-4 text-neutral-800 dark:text-neutral-200 leading-relaxed font-medium">
+              {seoSnippets[urlPath].quick_explanation}
+            </p>
+            <p className="mb-0 text-sm italic text-neutral-600 dark:text-neutral-400">
+              💡 {seoSnippets[urlPath].real_world_example}
+            </p>
+          </div>
+        </>
+      )}
+
       <h2>{t("seoFaq", "Frequently Asked Questions")}</h2>
       <div className="space-y-4 mt-6">
+        {seoSnippets[urlPath]?.faq_schema_qa?.map((faq: any, i: number) => (
+          <div key={`snippet-faq-${i}`}>
+            <h3 className="text-lg font-medium text-neutral-900 dark:text-neutral-100">
+              {faq.question}
+            </h3>
+            <p className="mt-1">
+              {faq.answer}
+            </p>
+          </div>
+        ))}
+
         <div>
           <h3 className="text-lg font-medium text-neutral-900 dark:text-neutral-100">
             {t("seoFaq1Q", "How many {{toUnit}} are in 1 {{fromUnit}}?", { toUnit: tUnitName, fromUnit: fUnitName })}

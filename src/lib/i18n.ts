@@ -44,7 +44,13 @@ const resources = {
         power: "Power",
         pressure: "Pressure",
         currency: "Currency",
-        typography: "Typography"
+        typography: "Typography",
+        torque: "Torque",
+        force: "Force",
+        density: "Density",
+        blood_sugar: "Blood Sugar",
+        pace: "Pace",
+        illuminance: "Illuminance"
       },
       footerText: "Built for fast, accurate conversions.",
       searchPlaceholder: "Search for units (⌘K)",

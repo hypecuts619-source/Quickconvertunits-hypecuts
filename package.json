@@ -13,7 +13,6 @@
     "submit-hubs": "npx tsx scripts/gsc-indexing.ts"
   },
   "dependencies": {
-    "@google/genai": "^1.29.0",
     "@tailwindcss/vite": "^4.1.14",
     "@types/compression": "^1.8.1",
     "@vitejs/plugin-react": "^5.0.4",
@@ -38,6 +37,7 @@
     "vite": "^6.2.3"
   },
   "devDependencies": {
+    "@google/genai": "^2.0.1",
     "@tailwindcss/typography": "^0.5.19",
     "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",

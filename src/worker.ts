@@ -229,7 +229,7 @@ export default {
     const url = new URL(request.url);
     const pathname = url.pathname.replace(/^\//, "");
 
-    if (pathname === "sitemap.xml") {
+    if (pathname === "sitemap-dynamic.xml") {
       const urls: string[] = [];
       const bases = ["weight", "length", "temperature", "volume", "area", "time", "speed", "power", "digital", "pressure", "frequency", "angle", "data_rate", "torque"];
       bases.forEach(base => {
