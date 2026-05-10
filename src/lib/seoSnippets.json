@@ -1,1 +1,32 @@
-{}
+{
+  "gram-to-cup_flour_ap": {
+    "quick_explanation": "In professional baking, weights are preferred over volumes because flour density varies significantly by how it is scooped. 120 grams is the standard weight for 1 US Cup of all-purpose flour.",
+    "real_world_example": "If a recipe calls for '1 cup of flour' and you don't have a scale, spoon it into the cup until overflowing, then level it with a knife—roughly 120g.",
+    "faq_schema_qa": [
+      {
+        "question": "Why does my cup of flour weigh more than 120g?",
+        "answer": "If you 'dip and sweep' (scooping directly from the bag), the flour becomes compressed and can weigh up to 140g or more, potentially ruining your bake."
+      }
+    ]
+  },
+  "kilogram-to-pound": {
+    "quick_explanation": "The kilogram is the base unit of mass in the metric system (SI), while the pound is the primary unit in the US customary system. 1 kg is roughly the weight of a 1-liter bottle of water.",
+    "real_world_example": "Checking a suitcase at the airport? A 23kg limit is approximately 50.7 lbs. Most airlines allow 50 lbs as a standard.",
+    "faq_schema_qa": [
+      {
+        "question": "Is 1 kg exactly 2.2 lbs?",
+        "answer": "No, it is approximately 2.20462 lbs. For rough mental math, doubling the kg and adding 10% is a very close shortcut."
+      }
+    ]
+  },
+  "celsius-to-fahrenheit": {
+    "quick_explanation": "Fahrenheit is primarily used in the US, while Celsius is the global standard. The scale offset is 32 degrees, meaning 0°C (freezing) is 32°F.",
+    "real_world_example": "A common 'comfortable' room temperature of 20°C corresponds to 68°F. A high fever is often defined as 38°C or 100.4°F.",
+    "faq_schema_qa": [
+      {
+        "question": "What temperature is the same in Celsius and Fahrenheit?",
+        "answer": "The scales cross at -40 degrees. So, -40°C is exactly equal to -40°F."
+      }
+    ]
+  }
+}

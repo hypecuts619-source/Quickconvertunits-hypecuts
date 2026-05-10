@@ -767,6 +767,7 @@ export default {
         "@graph": [
           {
             "@type": "SoftwareApplication",
+            "@id": `https://quickconvertunits.com/${urlPath}#software`,
             "name": `${title} - QuickConvert`,
             "applicationCategory": "UtilityApplication",
             "operatingSystem": "Windows, macOS, Android, iOS",
@@ -776,6 +777,7 @@ export default {
           },
           {
             "@type": "BreadcrumbList",
+            "@id": `https://quickconvertunits.com/${urlPath}#breadcrumb`,
             "itemListElement": [
               {
                 "@type": "ListItem",
@@ -799,6 +801,7 @@ export default {
           },
           {
             "@type": "HowTo",
+            "@id": `https://quickconvertunits.com/${urlPath}#howto`,
             "name": `How to convert ${fromUnit.name} to ${toUnit.name}`,
             "description": `Instructions to convert ${fromUnit.name} (${fromUnit.symbol}) to ${toUnit.name} (${toUnit.symbol}).`,
             "step": [
@@ -817,6 +820,7 @@ export default {
           },
           (faqQuestions.length > 0 ? {
             "@type": "FAQPage",
+            "@id": `https://quickconvertunits.com/${urlPath}#faq`,
             "mainEntity": faqQuestions.map(faq => ({
               "@type": "Question",
               "name": faq.question,
@@ -828,6 +832,7 @@ export default {
           } : null),
           ...(val !== 1 && resVal !== "N/A" ? [{
             "@type": "MathSolver",
+            "@id": `https://quickconvertunits.com/${urlPath}#mathsolver`,
             "name": `Conversion from ${valText} ${fromUnit.symbol} to ${toUnit.symbol}`,
             "learningResourceType": "Math Solver",
             "educationalAlignment": {
@@ -1130,6 +1135,7 @@ export default {
       "@graph": [
         {
           "@type": "BreadcrumbList",
+          "@id": `https://quickconvertunits.com/${urlPath}#breadcrumb`,
           "itemListElement": [
             {
               "@type": "ListItem",
@@ -1144,6 +1150,16 @@ export default {
               "item": `https://quickconvertunits.com/${urlPath}`
             }
           ]
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": `https://quickconvertunits.com/${urlPath}#software`,
+          "name": title,
+          "applicationCategory": "UtilityApplication",
+          "operatingSystem": "Any",
+          "description": description,
+          "url": `https://quickconvertunits.com/${urlPath}`,
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
         }
       ]
     };

@@ -3,7 +3,7 @@ import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { getSuggestions, convert, categories, formatNumber, getSEOUrlPath, getUnitIdsFromPath, getParsedParamsFromPath, updateCurrencyRates } from "./lib/units";
 import { categorySeoContent } from "./lib/seoContent";
 import { customSeoData } from "./lib/customSeoData";
-import { trackConversionEvent, trackFunnelStep, trackPageView } from "./lib/analytics";
+import { trackConversionEvent, trackFunnelStep, trackPageView, initGA, trackPWAInstall, trackNullState } from "./lib/analytics";
 import { LanguageSelector } from "./components/LanguageSelector";
 import { FormulaBlock } from "./components/FormulaBlock";
 import { useTranslation } from "react-i18next";
@@ -597,6 +597,62 @@ export default function App() {
     const val = params.get("val");
     return val !== null ? val : "1";
   });
+
+  // Analytics initialization and PWA tracking
+  useEffect(() => {
+    initGA();
+    
+    const handleBeforeInstallPrompt = (e: any) => {
+      trackPWAInstall('prompt_shown');
+      e.userChoice.then((choiceResult: any) => {
+        if (choiceResult.outcome === 'accepted') {
+          trackPWAInstall('install_accepted');
+        } else {
+          trackPWAInstall('install_dismissed');
+        }
+      });
+    };
+
+    const handleAppInstalled = () => {
+      trackPWAInstall('installed_success');
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []);
+
+  // Track Page Views with Category/Units
+  useEffect(() => {
+    trackPageView(location.pathname + location.search, {
+      category: category,
+      from_unit: unitFrom,
+      to_unit: unitTo
+    });
+
+    // Check for unit gaps in the current conversion path
+    if (conversion && conversion !== 'time-zone-converter' && !conversion.includes('blog')) {
+      const parsed = getParsedParamsFromPath(conversion);
+      const parts = parsed.from && parsed.to ? [parsed.from, parsed.to] : getUnitIdsFromPath(conversion);
+      
+      if (parts.length === 2) {
+        let foundInAnyCat = false;
+        for (const cat of categories) {
+          if (cat.units.some(u => u.id === parts[0].toLowerCase()) && cat.units.some(u => u.id === parts[1].toLowerCase())) {
+            foundInAnyCat = true;
+            break;
+          }
+        }
+        if (!foundInAnyCat) {
+          trackNullState(category || 'unknown', parts[0], parts[1]);
+        }
+      }
+    }
+  }, [location.pathname, location.search, category, unitFrom, unitTo, conversion]);
   
   const [valTo, setValTo] = useState(() => {
     const num = parseInput(valFrom);
@@ -788,6 +844,7 @@ export default function App() {
     if (valTo) {
       navigator.clipboard.writeText(valTo);
       setCopied(true);
+      trackConversionEvent(category, unitFrom, unitTo);
       
       const toast = document.getElementById('error-toast');
       if (toast) {
@@ -803,6 +860,7 @@ export default function App() {
 
   const handleShare = () => {
     if (valFrom && valTo) {
+      trackConversionEvent(category, unitFrom, unitTo);
       const activeCat = categories.find((c) => c.id === category);
       const fUnit = activeCat?.units.find((u) => u.id === unitFrom);
       const tUnit = activeCat?.units.find((u) => u.id === unitTo);
@@ -997,8 +1055,8 @@ export default function App() {
     canonicalUrlStr = "https://quickconvertunits.com/time-zone-converter";
     ogTitleStr = titleStr;
     schema = [{
-      "@context": "https://schema.org",
       "@type": "WebApplication",
+      "@id": `${canonicalUrlStr}#software`,
       name: titleStr,
       url: canonicalUrlStr,
       applicationCategory: "UtilitiesApplication",
@@ -1012,8 +1070,8 @@ export default function App() {
     canonicalUrlStr = "https://quickconvertunits.com/bmi-calculator";
     ogTitleStr = titleStr;
     schema = [{
-      "@context": "https://schema.org",
       "@type": "WebApplication",
+      "@id": `${canonicalUrlStr}#software`,
       name: titleStr,
       url: canonicalUrlStr,
       applicationCategory: "HealthApplication",
@@ -1101,8 +1159,8 @@ export default function App() {
 
     schema = [
       {
-        "@context": "https://schema.org",
         "@type": "SoftwareApplication",
+        "@id": `${canonicalUrlStr}#software`,
         name: isSpecificConverter ? `${pluralFrom} to ${pluralTo} Converter` : `${titleStr}`,
         url: canonicalUrlStr,
         applicationCategory: "UtilityApplication",
@@ -1114,8 +1172,28 @@ export default function App() {
 
     if (isSpecificConverter && activeFromUnit && activeToUnit && category !== 'time_zone') {
       schema.push({
-        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "@id": `${canonicalUrlStr}#howto`,
+        "name": `How to convert ${activeFromUnit.name} to ${activeToUnit.name}`,
+        "step": [
+          {
+            "@type": "HowToStep",
+            "text": `Identify the conversion factor for ${activeFromUnit.name} to ${activeToUnit.name}.`
+          },
+          {
+            "@type": "HowToStep",
+            "text": `Multiply your value in ${activeFromUnit.name} by the factor.`
+          },
+          {
+            "@type": "HowToStep",
+            "text": "The result is your value in the target unit."
+          }
+        ]
+      });
+
+      schema.push({
         "@type": "Action",
+        "@id": `${canonicalUrlStr}#action`,
         name: `Converting ${activeFromUnit.name} to ${activeToUnit.name}`,
         fromUnit: activeFromUnit.name,
         toUnit: activeToUnit.name,
@@ -1148,8 +1226,8 @@ export default function App() {
 
     if (finalFAQs.length > 0) {
       schema.push({
-        "@context": "https://schema.org",
         "@type": "FAQPage",
+        "@id": `${canonicalUrlStr}#faq`,
         mainEntity: finalFAQs.map(faq => ({
           "@type": "Question",
           name: faq.question,
@@ -1163,8 +1241,8 @@ export default function App() {
 
     if (isSpecificConverter && activeCategory && activeFromUnit && activeToUnit) {
       schema.push({
-        "@context": "https://schema.org",
         "@type": "BreadcrumbList",
+        "@id": `${canonicalUrlStr}#breadcrumb`,
         "itemListElement": [
           { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quickconvertunits.com/" },
           { "@type": "ListItem", "position": 2, "name": activeCategory.name, "item": `https://quickconvertunits.com/${activeCategory.id.replace(/_/g, '-')}-converter` },
@@ -1218,14 +1296,10 @@ export default function App() {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={ogTitleStr} />
         <meta name="twitter:description" content={metaDescStr} />
-        <script type="application/ld+json">
+        <script type="application/ld+json" data-rh="true">
           {JSON.stringify({
             "@context": "https://schema.org",
-            "@graph": schema.map(item => {
-              const copy = { ...item };
-              delete copy["@context"];
-              return copy;
-            })
+            "@graph": schema
           })}
         </script>
       </Helmet>
