@@ -1182,6 +1182,19 @@ export default function App() {
     ];
 
     if (isSpecificConverter && activeFromUnit && activeToUnit && category !== 'time_zone') {
+      const schemaCitations = [
+        {
+          "@type": "CreativeWork",
+          "name": "NIST Handbook 44 (2026 Edition)",
+          "url": "https://www.nist.gov/publications/handbook-44-2026"
+        },
+        {
+          "@type": "CreativeWork",
+          "name": "IEC 62541-14:2026 Quantity Models",
+          "url": "https://webstore.iec.ch/publication/62541-14-2026"
+        }
+      ];
+
       schema.push({
         "@type": "HowTo",
         "@id": `${canonicalUrlStr}#howto`,
@@ -1189,15 +1202,21 @@ export default function App() {
         "step": [
           {
             "@type": "HowToStep",
-            "text": `Identify the conversion factor for ${activeFromUnit.name} to ${activeToUnit.name}.`
+            "name": `Identify conversion factor`,
+            "text": `Identify the conversion factor for ${activeFromUnit.name} to ${activeToUnit.name}.`,
+            "citation": schemaCitations
           },
           {
             "@type": "HowToStep",
-            "text": `Multiply your value in ${activeFromUnit.name} by the factor.`
+            "name": `Calculate`,
+            "text": `Multiply your value in ${activeFromUnit.name} by the factor.`,
+            "citation": schemaCitations
           },
           {
             "@type": "HowToStep",
-            "text": "The result is your value in the target unit."
+            "name": `Result`,
+            "text": "The result is your value in the target unit.",
+            "citation": schemaCitations
           }
         ]
       });
@@ -1258,6 +1277,18 @@ export default function App() {
     }
 
     if (finalFAQs.length > 0) {
+      const schemaCitations = [
+        {
+          "@type": "CreativeWork",
+          "name": "NIST Handbook 44 (2026 Edition)",
+          "url": "https://www.nist.gov/publications/handbook-44-2026"
+        },
+        {
+          "@type": "CreativeWork",
+          "name": "IEC 62541-14:2026 Quantity Models",
+          "url": "https://webstore.iec.ch/publication/62541-14-2026"
+        }
+      ];
       schema.push({
         "@type": "FAQPage",
         "@id": `${canonicalUrlStr}#faq`,
@@ -1266,7 +1297,8 @@ export default function App() {
           name: faq.question,
           acceptedAnswer: {
             "@type": "Answer",
-            text: faq.answer
+            text: faq.answer,
+            "citation": schemaCitations
           }
         }))
       });

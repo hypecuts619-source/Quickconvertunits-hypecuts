@@ -1,17 +1,24 @@
 User-agent: *
 Allow: /
 
-User-agent: Mediapartners-Google
+# AI crawlers for AEO/GEO - CRITICAL for 2026
+User-agent: GPTBot
 Allow: /
 
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Google's primary crawlers
 User-agent: Googlebot
 Allow: /
 
-User-agent: bingbot
+User-agent: Googlebot-Image
 Allow: /
-Crawl-delay: 1
 
-User-agent: Applebot
+User-agent: Mediapartners-Google
 Allow: /
 
 Sitemap: https://quickconvertunits.com/sitemap.xml

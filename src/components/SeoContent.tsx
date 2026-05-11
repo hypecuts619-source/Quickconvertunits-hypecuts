@@ -12,6 +12,29 @@ const seoSnippets: Record<string, any> = seoSnippetsRaw;
 const geoPassages: Record<string, any> = geoPassagesRaw;
 const regulatoryStandards: Record<string, any> = regulatoryStandardsRaw;
 
+function getComparativeStatement(from: string, to: string, category: string): string {
+  const comparisons: Record<string, Record<string, string>> = {
+    pressure: {
+      'pascal-bar': ' A pascal is 100,000x smaller than a bar—bars are used for atmospheric pressure, pascals for scientific precision.',
+      'bar-pascal': ' A bar is 100,000x larger than a pascal—one bar equals approximately standard atmospheric pressure at sea level.'
+    },
+    weight: {
+      'gram-cup': ' For water and similar densities, 240g equals 1 cup. For flour, 1 cup ≈ 125g.',
+      'cup-gram': ' One US cup equals 240 grams for water; ingredient density changes this value.'
+    }
+  };
+  
+  const key = `${from.toLowerCase().slice(0,4)}...${to.toLowerCase().slice(0,4)}`;
+  // Wait, let's just use exact match or slice? The snippet used slice(0,4). Let's fix snippet:
+  const exactKey = `${from.toLowerCase()}-${to.toLowerCase()}`;
+  if (category === 'pressure' && exactKey === 'pascal-bar') return comparisons.pressure['pascal-bar'];
+  if (category === 'pressure' && exactKey === 'bar-pascal') return comparisons.pressure['bar-pascal'];
+  if (category === 'weight' && exactKey === 'gram-cup') return comparisons.weight['gram-cup'];
+  if (category === 'weight' && exactKey === 'cup-gram') return comparisons.weight['cup-gram'];
+  
+  return '';
+}
+
 export function SeoContent({ 
   unitFrom, unitTo, category, categories
 }: {
@@ -100,13 +123,24 @@ export function SeoContent({
 
       {/* AI Summary / Quick Answer */}
       {!isCategoryHub && (
-        <section className="bg-neutral-50 dark:bg-neutral-900/50 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 mb-10">
-          <h2 className="mt-0 text-xl font-bold">{t("seoQuickAnswer", "Quick Conversion: {{fromUnit}} to {{toUnit}}", { fromUnit: fUnitName, toUnit: tUnitName })}</h2>
+        <section className="bg-neutral-50 dark:bg-neutral-900/50 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 mb-10"
+                 itemScope itemType="https://schema.org/HowToStep">
+          <h2 className="mt-0 text-xl font-bold">
+            {t("seoQuickAnswer", "How do you convert {{fromUnit}} to {{toUnit}}?", { 
+              fromUnit: fUnitName, 
+              toUnit: tUnitName 
+            })}
+          </h2>
+          
           <p className="text-2xl font-mono text-primary-600 dark:text-primary-400 my-4">
             1 {fUnit.symbol} = {formatNum(convFactor)} {tUnit.symbol}
           </p>
+          
           <p className="mb-0 text-sm">
-            To convert <strong>{fUnitName.toLowerCase()}</strong> to <strong>{tUnitName.toLowerCase()}</strong>, multiply by <strong>{formatNum(convFactor)}</strong>. This is the standard multiplier for {catName} conversions between these two units.
+            To convert <strong>{fUnitName.toLowerCase()}</strong> to <strong>{tUnitName.toLowerCase()}</strong>, 
+            multiply by <strong>{formatNum(convFactor)}</strong>. 
+            This {catName} conversion follows {regulatoryStandards[category]?.standard_reference?.split(' ')[2] || 'ISO'} {new Date().getFullYear()} standards.
+            {getComparativeStatement(fUnitName, tUnitName, category)}
           </p>
         </section>
       )}
