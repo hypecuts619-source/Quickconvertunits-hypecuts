@@ -357,7 +357,7 @@ function CookieConsent() {
   useEffect(() => {
     // Check if visitor is an AI crawler
     const userAgent = navigator.userAgent || '';
-    const isAICrawler = /Googlebot|GPTBot|ClaudeBot|Google-Extended|bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot|facebot|facebookexternalhit|twitterbot|whatsapp|LinkedInBot/i.test(userAgent);
+    const isAICrawler = /Googlebot|GPTBot|ChatGPT-User|Google-Extended|ClaudeBot|OAI-SearchBot|FacebookBot|TwitterBot/i.test(userAgent);
     
     if (isAICrawler) return;
 
