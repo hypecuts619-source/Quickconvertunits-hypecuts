@@ -1205,6 +1205,10 @@ export default function App() {
         "@type": "HowTo",
         "@id": `${canonicalUrlStr}#howto`,
         "name": `How to convert ${activeFromUnit.name} to ${activeToUnit.name}`,
+        "sameAs": [
+          `https://en.wikipedia.org/wiki/${activeFromUnit.name.replace(" ", "_")}_(unit)`,
+          `https://en.wikipedia.org/wiki/${activeToUnit.name.replace(" ", "_")}_(unit)`
+        ],
         "step": [
           {
             "@type": "HowToStep",

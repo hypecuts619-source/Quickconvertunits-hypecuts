@@ -132,6 +132,11 @@ export function SeoContent({
             })}
           </h2>
           
+          <p className="aeo-context text-sm mb-2">
+            For context, 1 bar is roughly average atmospheric pressure at sea level, 
+            while 1 pascal is a microscopic fraction of it.
+          </p>
+
           <p className="text-2xl font-mono text-primary-600 dark:text-primary-400 my-4">
             1 {fUnit.symbol} = {formatNum(convFactor)} {tUnit.symbol}
           </p>
