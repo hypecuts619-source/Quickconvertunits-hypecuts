@@ -909,8 +909,8 @@ export const getCanonicalUnitId = (alias: string): string => {
     'radian': 'radian', 'radians': 'radian', 'rad': 'radian',
     'usd': 'usd', 'eur': 'eur', 'gbp': 'gbp', 'inr': 'inr', 'aud': 'aud', 'cad': 'cad', 'chf': 'chf', 'cny': 'cny', 'mxn': 'mxn', 'brl': 'brl', 'zar': 'zar', 'rub': 'rub', 'sgd': 'sgd', 'hkd': 'hkd', 'nzd': 'nzd', 'sek': 'sek', 'krw': 'krw', 'aed': 'aed',
     'est': 'est', 'pst': 'pst', 'utc': 'utc',
-    'point': 'point', 'em': 'em', 'rem': 'rem', 'pixel': 'pixel',
-    'degree': 'degree', 'arcsecond': 'arcsecond'
+    'point': 'point', 'em': 'em', 'rem': 'rem',
+    'arcsecond': 'arcsecond'
   };
   
   const normalized = alias.toLowerCase().replace(/-/g, '_');

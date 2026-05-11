@@ -355,6 +355,12 @@ const AdSlot = ({
 function CookieConsent() {
   const [isVisible, setIsVisible] = useState(false);
   useEffect(() => {
+    // Check if visitor is an AI crawler
+    const userAgent = navigator.userAgent || '';
+    const isAICrawler = /Googlebot|GPTBot|ClaudeBot|Google-Extended|bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot|facebot|facebookexternalhit|twitterbot|whatsapp|LinkedInBot/i.test(userAgent);
+    
+    if (isAICrawler) return;
+
     if (!localStorage.getItem("cookie-consent")) {
       setIsVisible(true);
     }
