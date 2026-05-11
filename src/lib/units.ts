@@ -774,10 +774,17 @@ export const getUnitIdsFromPath = (path: string) => {
   if (path === 'cm-to-inches') return ['centimeter', 'inch'];
   if (path === 'mm-to-inches') return ['millimeter', 'inch'];
 
+  if (path === 'teaspoons-to-fluid-ounces') return ['teaspoon_us', 'us_fluid_ounce'];
+  if (path === 'fluid-ounces-to-teaspoons') return ['us_fluid_ounce', 'teaspoon_us'];
+  if (path === 'teaspoon-to-fluid-ounce') return ['teaspoon_us', 'us_fluid_ounce'];
+  if (path === 'fluid-ounce-to-teaspoon') return ['us_fluid_ounce', 'teaspoon_us'];
+  
   if (path === 'kg-to-lbs') return ['kilogram', 'pound'];
   if (path === 'lbs-to-kg') return ['pound', 'kilogram'];
   if (path === 'grams-to-ounces') return ['gram', 'ounce'];
   if (path === 'ounces-to-grams') return ['ounce', 'gram'];
+  if (path === 'gram-to-ounce') return ['gram', 'ounce'];
+  if (path === 'ounce-to-gram') return ['ounce', 'gram'];
   if (path === 'tons-to-pounds') return ['metric_ton', 'pound'];
 
   if (path === 'celsius-to-fahrenheit') return ['celsius', 'fahrenheit'];
@@ -892,8 +899,10 @@ export const getCanonicalUnitId = (alias: string): string => {
     'atmosphere': 'atmosphere', 'atm': 'atmosphere', 'atmospheres': 'atmosphere',
     'degree': 'degree', 'degrees': 'degree', 'deg': 'degree',
     'radian': 'radian', 'radians': 'radian', 'rad': 'radian',
-    'usd': 'usd', 'eur': 'eur', 'gbp': 'gbp', 'inr': 'inr',
-    'est': 'est', 'pst': 'pst', 'utc': 'utc'
+    'usd': 'usd', 'eur': 'eur', 'gbp': 'gbp', 'inr': 'inr', 'aud': 'aud', 'cad': 'cad', 'chf': 'chf', 'cny': 'cny', 'mxn': 'mxn', 'brl': 'brl', 'zar': 'zar', 'rub': 'rub', 'sgd': 'sgd', 'hkd': 'hkd', 'nzd': 'nzd', 'sek': 'sek', 'krw': 'krw', 'aed': 'aed',
+    'est': 'est', 'pst': 'pst', 'utc': 'utc',
+    'point': 'point', 'em': 'em', 'rem': 'rem', 'pixel': 'pixel',
+    'degree': 'degree', 'arcsecond': 'arcsecond'
   };
   
   const normalized = alias.toLowerCase().replace(/-/g, '_');
