@@ -907,7 +907,7 @@ export const getCanonicalUnitId = (alias: string): string => {
     'atmosphere': 'atmosphere', 'atm': 'atmosphere', 'atmospheres': 'atmosphere',
     'degree': 'degree', 'degrees': 'degree', 'deg': 'degree',
     'radian': 'radian', 'radians': 'radian', 'rad': 'radian',
-    'usd': 'usd', 'eur': 'eur', 'gbp': 'gbp', 'inr': 'inr', 'aud': 'aud', 'cad': 'cad', 'chf': 'chf', 'cny': 'cny', 'mxn': 'mxn', 'brl': 'brl', 'zar': 'zar', 'rub': 'rub', 'sgd': 'sgd', 'hkd': 'hkd', 'nzd': 'nzd', 'sek': 'sek', 'krw': 'krw', 'aed': 'aed',
+    'usd': 'usd', 'eur': 'eur', 'gbp': 'gbp', 'inr': 'inr', 'aud': 'aud', 'cad': 'cad', 'chf': 'chf', 'cny': 'cny', 'mxn': 'mxn', 'brl': 'brl', 'zar': 'zar', 'rub': 'rub', 'sgd': 'sgd', 'hkd': 'hkd', 'nzd': 'nzd', 'sek': 'sek', 'krw': 'krw', 'aed': 'aed', 'jpy': 'jpy', 'btc': 'btc', 'eth': 'eth', 'sol': 'sol',
     'est': 'est', 'pst': 'pst', 'utc': 'utc',
     'point': 'point', 'em': 'em', 'rem': 'rem',
     'arcsecond': 'arcsecond'
