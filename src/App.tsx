@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { getSuggestions, convert, categories, formatNumber, getSEOUrlPath, getUnitIdsFromPath, getParsedParamsFromPath, updateCurrencyRates } from "./lib/units";
 import { categorySeoContent } from "./lib/seoContent";
 import { customSeoData } from "./lib/customSeoData";
+import categoryHubsData from "./lib/categoryHubs.json";
 import { trackConversionEvent, trackFunnelStep, trackPageView, initGA, trackPWAInstall, trackNullState } from "./lib/analytics";
 import { LanguageSelector } from "./components/LanguageSelector";
 import { FormulaBlock } from "./components/FormulaBlock";
@@ -44,8 +45,17 @@ const HowToConvertSection = lazy(() => import("./components/HowToConvertSection"
 const RelatedToolsSection = lazy(() => import("./components/RelatedToolsSection"));
 const SeoContent = lazy(() => import("./components/SeoContent").then(module => ({ default: module.SeoContent })));
 const PopularConversions = lazy(() => import("./components/PopularConversions").then(module => ({ default: module.PopularConversions })));
+const CategoryHubContent = lazy(() => import("./components/CategoryHubContent").then(module => ({ default: module.CategoryHubContent })));
 const TimeZoneConverter = lazy(() => import("./components/TimeZoneConverter").then(module => ({ default: module.TimeZoneConverter })));
 const BMICalculator = lazy(() => import("./components/BMICalculator").then(module => ({ default: module.BMICalculator })));
+
+const categoryHubs = categoryHubsData as Record<string, {
+  hub_title: string;
+  authority_intro: string;
+  category_logic: string;
+  semantic_bridges: string[];
+  common_pitfalls: string[];
+}>;
 
 const SpecificConversionSEO = ({ fromUnit, toUnit, category }: { fromUnit: any; toUnit: any; category: string }) => {
   let nums = [1, 2, 3, 4, 5, 10, 25, 50, 100, 200, 250, 500, 1000];
@@ -1096,6 +1106,7 @@ export default function App() {
         { question: "Do I need an internet connection?", answer: "Once the page is loaded, the core conversion engine works offline in your browser, making it extremely fast and accessible anywhere." }
       ];
     } else if (isCategoryPage) {
+      const hub = categoryHubs[category];
       const catName = activeCategory.name;
       const topUnits = `${activeCategory.units[0].name}s to ${activeCategory.units[1].name}s, ${activeCategory.units[2]?.name || ''}s`.replace(/ss/g, 's').replace(/, s/g, '');
       const allTopUnits = activeCategory.units.slice(0, 5).map(u => u.name.toLowerCase() + (u.name.endsWith('s') ? '' : 's')).join(", ");
@@ -1112,7 +1123,7 @@ export default function App() {
         }
       }
 
-      titleStr = `Fast ${catName} Converter - Instant ${topUnits} [2026 Free]`;
+      titleStr = hub ? `${hub.hub_title} | QuickConvert` : `Fast ${catName} Converter - Instant ${topUnits} [2026 Free]`;
       
       const specificDescriptions: Record<string, string> = {
         "length": "Convert length and distance measurements from meters, feet, kilometers, and miles. Real-time formatting with high precision.",
@@ -1122,7 +1133,7 @@ export default function App() {
         "time_zone": "Time zone converter for UTC, EST, PST, CET. Schedule global meetings and convert standard and daylight time accurately."
       };
       
-      metaDescStr = specificDescriptions[category] || `Free ${catName.toLowerCase()} unit converter for ${allTopUnits}. ${seoSnippet || "Precise calculations with real-time results. Convert measurements instantly."}`;
+      metaDescStr = hub ? hub.authority_intro : (specificDescriptions[category] || `Free ${catName.toLowerCase()} unit converter for ${allTopUnits}. ${seoSnippet || "Precise calculations with real-time results. Convert measurements instantly."}`);
       
       canonicalUrlStr = `https://quickconvertunits.com/${category.replace(/_/g, '-')}-converter`;
       ogTitleStr = titleStr;
@@ -1613,7 +1624,9 @@ export default function App() {
                 </h1>
               ) : (
                 <h1 className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-2xl md:text-4xl font-semibold tracking-tight mb-2 text-neutral-900 dark:text-white">
-                  {valFrom && valFrom !== "1" && valFrom !== "0" && !Number.isNaN(parseFloat(valFrom)) ? (
+                  {isCategoryPage && categoryHubs[category] ? (
+                    <>{categoryHubs[category].hub_title}</>
+                  ) : valFrom && valFrom !== "1" && valFrom !== "0" && !Number.isNaN(parseFloat(valFrom)) ? (
                     <>
                       {valFrom} {(parseFloat(valFrom) === 1 ? activeFromUnit?.name : ((activeFromUnit?.name || '').endsWith('s') ? activeFromUnit?.name : `${activeFromUnit?.name}s`))} to {(activeToUnit?.name || '').endsWith('s') ? activeToUnit?.name : `${activeToUnit?.name}s`}
                     </>
@@ -2631,6 +2644,12 @@ export default function App() {
                 ))}
               </div>
             </div>
+
+            {isCategoryPage && (
+              <Suspense fallback={null}>
+                <CategoryHubContent category={category} />
+              </Suspense>
+            )}
 
             <SeoContent 
               unitFrom={unitFrom} 

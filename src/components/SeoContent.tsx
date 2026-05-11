@@ -1,12 +1,16 @@
 import React from 'react';
-import { convert, getSEOUrlPath } from '../lib/units';
+import { convert, getSEOUrlPath, generateLattice } from '../lib/units';
 import { useTranslation } from 'react-i18next';
 import { categorySeoContent } from '../lib/seoContent';
 import { customSeoData } from '../lib/customSeoData';
 import seoSnippetsRaw from '../lib/seoSnippets.json';
-import { Link } from 'react-router-dom';
+import geoPassagesRaw from '../lib/geoPassages.json';
+import regulatoryStandardsRaw from '../lib/regulatoryStandards.json';
+import { Link, useLocation } from 'react-router-dom';
 
 const seoSnippets: Record<string, any> = seoSnippetsRaw;
+const geoPassages: Record<string, any> = geoPassagesRaw;
+const regulatoryStandards: Record<string, any> = regulatoryStandardsRaw;
 
 export function SeoContent({ 
   unitFrom, unitTo, category, categories
@@ -14,6 +18,7 @@ export function SeoContent({
   unitFrom: string, unitTo: string, category: string, categories: any[]
 }) {
   const { t } = useTranslation();
+  const location = useLocation();
   const cat = categories.find(c => c.id === category);
   const fUnit = cat?.units.find((u: any) => u.id === unitFrom);
   const tUnit = cat?.units.find((u: any) => u.id === unitTo);
@@ -24,30 +29,39 @@ export function SeoContent({
   const customContent = customSeoData[urlPath];
 
   if (customContent) {
+    const lattice = generateLattice(unitFrom, unitTo, category);
+
     return (
       <div className="prose prose-neutral dark:prose-invert max-w-none mb-10 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-2xl prose-h3:text-lg prose-p:font-light prose-p:leading-relaxed prose-p:text-neutral-600 dark:prose-p:text-neutral-400">
         <div dangerouslySetInnerHTML={{ __html: customContent.content }} />
         
-        {cat && cat.units.length > 2 && (
-          <div className="mt-10 pt-8 border-t border-neutral-100 dark:border-neutral-800">
-            <h2 className="mt-0">{t("seoRelated", "Related Converters")}</h2>
-            <ul className="grid grid-cols-2 md:grid-cols-3 gap-2">
-              <li>
-                <Link to={`/${getSEOUrlPath(unitTo, unitFrom)}`} className="text-primary-600 dark:text-primary-400 hover:underline">
-                  {t(`units.${tUnit.id}`, tUnit.name)} to {t(`units.${fUnit.id}`, fUnit.name)}
+        {lattice.length > 0 && (
+          <div className="mt-12 pt-8 border-t border-neutral-100 dark:border-neutral-800">
+            <h2 className="mt-0 mb-6 flex items-center gap-2">
+              <svg className="w-6 h-6 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.803a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+              {t("seoRelated", "Discovery Lattice: Related Converters")}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 not-prose">
+              {lattice.map((item, idx) => (
+                <Link 
+                  key={`${item.fromId}-${item.toId}-${idx}`}
+                  to={`/${getSEOUrlPath(item.fromId, item.toId)}`} 
+                  className="group flex flex-items gap-3 p-4 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl hover:border-primary-500 dark:hover:border-primary-500/50 hover:shadow-md transition-all"
+                >
+                  <div className="flex-shrink-0 mt-0.5">
+                    <div className="w-2 h-2 rounded-full bg-primary-400 group-hover:scale-125 transition-transform"></div>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                      {item.text}
+                    </span>
+                    {item.categoryId !== category && (
+                      <span className="text-[10px] uppercase tracking-wider font-bold text-neutral-400 mt-1">Cross-Category Bridge</span>
+                    )}
+                  </div>
                 </Link>
-              </li>
-              {cat.units
-                .filter((u: any) => u.id !== unitFrom && u.id !== unitTo)
-                .slice(0, 5)
-                .map((u: any) => (
-                  <li key={u.id}>
-                    <Link to={`/${getSEOUrlPath(unitFrom, u.id)}`} className="text-primary-600 dark:text-primary-400 hover:underline">
-                      {t(`units.${fUnit.id}`, fUnit.name)} to {t(`units.${u.id}`, u.name)}
-                    </Link>
-                  </li>
               ))}
-            </ul>
+            </div>
           </div>
         )}
       </div>
@@ -71,10 +85,13 @@ export function SeoContent({
 
   const catSeoHtml = categorySeoContent[category];
 
+  const lattice = generateLattice(unitFrom, unitTo, category);
+  const isCategoryHub = unitFrom === unitTo || (unitFrom === cat?.units[0]?.id && unitTo === cat?.units[1]?.id && location.pathname.endsWith('-converter'));
+
   return (
     <article className="prose prose-neutral dark:prose-invert max-w-none mb-10 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:text-2xl prose-h3:text-lg prose-p:font-light prose-p:leading-relaxed prose-p:text-neutral-600 dark:prose-p:text-neutral-400">
       
-      {catSeoHtml && (
+      {!isCategoryHub && catSeoHtml && (
         <div 
           className="mb-8 pb-8 border-b border-neutral-100 dark:border-neutral-800"
           dangerouslySetInnerHTML={{ __html: catSeoHtml }} 
@@ -82,15 +99,108 @@ export function SeoContent({
       )}
 
       {/* AI Summary / Quick Answer */}
-      <section className="bg-neutral-50 dark:bg-neutral-900/50 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 mb-10">
-        <h2 className="mt-0 text-xl font-bold">{t("seoQuickAnswer", "Quick Conversion: {{fromUnit}} to {{toUnit}}", { fromUnit: fUnitName, toUnit: tUnitName })}</h2>
-        <p className="text-2xl font-mono text-primary-600 dark:text-primary-400 my-4">
-          1 {fUnit.symbol} = {formatNum(convFactor)} {tUnit.symbol}
-        </p>
-        <p className="mb-0 text-sm">
-          To convert <strong>{fUnitName.toLowerCase()}</strong> to <strong>{tUnitName.toLowerCase()}</strong>, multiply by <strong>{formatNum(convFactor)}</strong>. This is the standard multiplier for {catName} conversions between these two units.
-        </p>
-      </section>
+      {!isCategoryHub && (
+        <section className="bg-neutral-50 dark:bg-neutral-900/50 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 mb-10">
+          <h2 className="mt-0 text-xl font-bold">{t("seoQuickAnswer", "Quick Conversion: {{fromUnit}} to {{toUnit}}", { fromUnit: fUnitName, toUnit: tUnitName })}</h2>
+          <p className="text-2xl font-mono text-primary-600 dark:text-primary-400 my-4">
+            1 {fUnit.symbol} = {formatNum(convFactor)} {tUnit.symbol}
+          </p>
+          <p className="mb-0 text-sm">
+            To convert <strong>{fUnitName.toLowerCase()}</strong> to <strong>{tUnitName.toLowerCase()}</strong>, multiply by <strong>{formatNum(convFactor)}</strong>. This is the standard multiplier for {catName} conversions between these two units.
+          </p>
+        </section>
+      )}
+
+      {/* GEO Optimized Passage */}
+      {geoPassages[urlPath] && (
+        <section className="my-12 p-8 bg-primary-50/30 dark:bg-primary-900/5 rounded-3xl border-2 border-primary-100/50 dark:border-primary-900/20 shadow-sm relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4 opacity-10">
+            <svg className="w-24 h-24 text-primary-500" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21L14.017 18C14.017 16.8954 13.1216 16 12.017 16L9.01703 16C7.91246 16 7.01703 16.8954 7.01703 18L7.01703 21M14.017 21L17.017 21C18.1216 21 19.017 20.1046 19.017 19L19.017 5C19.017 3.89543 18.1216 3 17.017 3L7.01703 3C5.91246 3 5.01703 3.89543 5.01703 5L5.01703 19C5.01703 20.1046 5.91246 21 7.01703 21L14.017 21ZM14.017 21L14.017 12L10.017 12L10.017 21"></path></svg>
+          </div>
+          
+          <div className="relative z-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary-100 dark:bg-primary-900/30 rounded-full text-primary-700 dark:text-primary-300 text-[10px] font-bold uppercase tracking-wider mb-6">
+              <span className="w-2 h-2 rounded-full bg-primary-500 animate-pulse"></span>
+              Generative Engine Optimized (Answer Capsule)
+            </div>
+            
+            <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-4 leading-tight">
+              {geoPassages[urlPath].conversational_heading}
+            </h2>
+            
+            <div className="text-lg text-neutral-800 dark:text-neutral-200 font-medium mb-6 leading-relaxed">
+              {geoPassages[urlPath].quotable_answer}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10 pt-8 border-t border-primary-100 dark:border-primary-900/20">
+              <div className="bg-white dark:bg-neutral-900/50 p-4 rounded-xl border border-neutral-100 dark:border-neutral-800 shadow-sm">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 mb-4 italic">Island Test Citation Passage</h3>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed mb-0">
+                  {geoPassages[urlPath].quotable_answer.split('. ').slice(0, 2).join('. ') + '.'}
+                </p>
+              </div>
+              
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 mb-4 italic">AI Fact Sheet (2026)</h3>
+                <dl className="grid grid-cols-1 gap-3">
+                  {Object.entries(geoPassages[urlPath].ai_fact_sheet).map(([key, value]) => (
+                    <div key={key} className="flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800 pb-2">
+                      <dt className="text-[10px] font-semibold text-neutral-400 dark:text-neutral-500">{key}</dt>
+                      <dd className="text-xs font-mono font-bold text-primary-600 dark:text-primary-400">{String(value)}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Regulatory Freshness Block */}
+      {regulatoryStandards[category] && (
+        <section className="my-12 p-6 bg-neutral-50 dark:bg-neutral-900/40 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex-shrink-0 w-10 h-10 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center text-amber-600 dark:text-amber-400">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            </div>
+            <div>
+              <h2 className="text-xl font-bold m-0 text-neutral-900 dark:text-white">Regulatory & Engineering Standards</h2>
+              <div className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-black text-amber-600 dark:text-amber-400 mt-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span>
+                {regulatoryStandards[category].freshness_stamp}
+              </div>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 mb-2">Regulatory Benchmark</h3>
+                <p className="text-sm text-neutral-800 dark:text-neutral-200 leading-relaxed font-medium">
+                  {regulatoryStandards[category].regulatory_benchmark}
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 mb-2">Legal Metrology Warning</h3>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed italic">
+                  {regulatoryStandards[category].legal_metrology_warning}
+                </p>
+              </div>
+            </div>
+            
+            <div className="bg-white dark:bg-neutral-950 p-5 rounded-xl border border-neutral-100 dark:border-neutral-800 shadow-inner">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 mb-3 flex items-center gap-2">
+                <svg className="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                2026 Quantity Model Note
+              </h3>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-loose">
+                {regulatoryStandards[category].quantity_model_note}
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+
 
       <section>
         <h2>{t("seoHowTo", "How to Convert {{fromUnit}} to {{toUnit}}", { fromUnit: fUnitName, toUnit: tUnitName })}</h2>
@@ -183,18 +293,65 @@ export function SeoContent({
       </section>
 
       {seoSnippets[urlPath] && (
-        <section aria-labelledby="quick-fact-title">
-          <div className="bg-primary-50/50 dark:bg-primary-900/10 p-6 rounded-2xl border border-primary-100 dark:border-primary-900/30 my-8">
-            <h3 id="quick-fact-title" className="flex items-center gap-2 mt-0 mb-4 text-primary-900 dark:text-primary-100">
-              <svg className="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              Quick Fact
-            </h3>
-            <p className="mb-4 text-neutral-800 dark:text-neutral-200 leading-relaxed font-medium">
-              {seoSnippets[urlPath].quick_explanation}
-            </p>
-            <p className="mb-0 text-sm italic text-neutral-600 dark:text-neutral-400">
-              💡 {seoSnippets[urlPath].real_world_example}
-            </p>
+        <section aria-labelledby="expert-insights-title" className="my-12">
+          <h2 id="expert-insights-title" className="text-2xl font-bold mb-6 tracking-tight text-neutral-900 dark:text-white">Expert Insights & Context</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Quick Explanation */}
+            <div className="bg-neutral-50 dark:bg-neutral-900/40 p-5 rounded-2xl border border-neutral-200/60 dark:border-neutral-800/60 flex flex-col h-full hover:border-primary-500/30 transition-colors">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                  <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Definition</span>
+              </div>
+              <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed font-medium">
+                {seoSnippets[urlPath].quick_explanation}
+              </p>
+            </div>
+
+            {/* Formula Context */}
+            {seoSnippets[urlPath].formula_context && (
+              <div className="bg-neutral-50 dark:bg-neutral-900/40 p-5 rounded-2xl border border-neutral-200/60 dark:border-neutral-800/60 flex flex-col h-full hover:border-primary-500/30 transition-colors">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="p-1.5 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                    <svg className="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                  </div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Why?</span>
+                </div>
+                <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">
+                  {seoSnippets[urlPath].formula_context}
+                </p>
+              </div>
+            )}
+
+            {/* Real World Example */}
+            <div className="bg-neutral-50 dark:bg-neutral-900/40 p-5 rounded-2xl border border-neutral-200/60 dark:border-neutral-800/60 flex flex-col h-full hover:border-primary-500/30 transition-colors">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="p-1.5 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                  <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2 2.5 2.5 0 002.5-2.5V4a2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Scale</span>
+              </div>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed italic">
+                "{seoSnippets[urlPath].real_world_example}"
+              </p>
+            </div>
+
+            {/* Pro Tip */}
+            {seoSnippets[urlPath].pro_tip && (
+              <div className="bg-primary-50/50 dark:bg-primary-900/10 p-5 rounded-2xl border border-primary-200/50 dark:border-primary-800/30 flex flex-col h-full hover:shadow-lg hover:shadow-primary-500/5 transition-all">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="p-1.5 bg-primary-100 dark:bg-primary-900/50 rounded-lg">
+                    <svg className="w-4 h-4 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                  </div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-primary-700 dark:text-primary-400">Pro Tip</span>
+                </div>
+                <p className="text-sm text-primary-900 dark:text-primary-100 font-semibold leading-relaxed">
+                  {seoSnippets[urlPath].pro_tip}
+                </p>
+              </div>
+            )}
           </div>
         </section>
       )}
@@ -254,29 +411,35 @@ export function SeoContent({
         </p>
       </section>
 
-      {cat && cat.units.length > 2 && (
-        <section>
-          <h2>{t("seoRelated", "Related Converters")}</h2>
-          <ul className="grid grid-cols-2 md:grid-cols-3 gap-2">
-            <li>
-              <Link to={`/${getSEOUrlPath(unitTo, unitFrom)}`} className="text-primary-600 dark:text-primary-400 hover:underline">
-                {t(`units.${tUnit.id}`, tUnit.name)} to {t(`units.${fUnit.id}`, fUnit.name)}
+      {lattice.length > 0 && (
+        <section className="mt-12 pt-8 border-t border-neutral-100 dark:border-neutral-800">
+          <h2 className="mt-0 mb-6 flex items-center gap-2">
+            <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.803a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+            Discovery Lattice: Related Converters
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 not-prose">
+            {lattice.map((item, idx) => (
+              <Link 
+                key={`${item.fromId}-${item.toId}-${idx}`}
+                to={`/${getSEOUrlPath(item.fromId, item.toId)}`} 
+                className="group flex items-start gap-3 p-4 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl hover:border-primary-500 dark:hover:border-primary-500/50 hover:shadow-md transition-all"
+              >
+                <div className="flex-shrink-0 mt-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary-400 group-hover:scale-125 transition-transform"></div>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                    {item.text}
+                  </span>
+                  {item.categoryId !== category && (
+                    <span className="text-[10px] uppercase tracking-wider font-bold text-neutral-400 mt-1">Cross-Category Bridge</span>
+                  )}
+                </div>
               </Link>
-            </li>
-            {cat.units
-              .filter((u: any) => u.id !== unitFrom && u.id !== unitTo)
-              .slice(0, 5)
-              .map((u: any) => (
-                <li key={u.id}>
-                  <Link to={`/${getSEOUrlPath(unitFrom, u.id)}`} className="text-primary-600 dark:text-primary-400 hover:underline">
-                    {t(`units.${fUnit.id}`, fUnit.name)} to {t(`units.${u.id}`, u.name)}
-                  </Link>
-                </li>
             ))}
-          </ul>
+          </div>
         </section>
       )}
     </article>
   );
-
 }

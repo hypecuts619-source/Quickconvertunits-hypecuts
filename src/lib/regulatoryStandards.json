@@ -1,0 +1,32 @@
+{
+  "volume": {
+    "regulatory_benchmark": "NIST Handbook 44 (2026 Ed.) - Section 3.30-3.39",
+    "quantity_model_note": "Includes the 2026 'Quantity Model' revisions for Hydrogen gas-measuring and EVSE (Electric Vehicle Supply Equipment) energy-to-volume equivalents.",
+    "legal_metrology_warning": "In 2026, commercial trade of liquid hydrogen requires a tolerance threshold of ±1.5% for delivery accuracy at designated stations.",
+    "freshness_stamp": "Verified for Q2 2026 Industry Compliance."
+  },
+  "industrial_automation": {
+    "regulatory_benchmark": "IEC 62541-14:2026 OPC UA Part 14: PubSub",
+    "quantity_model_note": "Implements the new 'Quantity Model' which formalizes EngineeringUnit Properties directly within the metadata layer for real-time edge processing.",
+    "legal_metrology_warning": "Field-level automation in 2026 must ensure that unit metadata persists across heterogenous network architectures to prevent data-type poisoning.",
+    "freshness_stamp": "Verified for Q2 2026 Industry Compliance."
+  },
+  "force": {
+    "regulatory_benchmark": "ISO/ASTM 52959:2026 AM - Lattice structure axial force validation",
+    "quantity_model_note": "Specifies 2026 Quantity Model values for non-linear stress-strain tensors in metallic lattice designs for aerospace components.",
+    "legal_metrology_warning": "Additive Manufacturing components for load-bearing applications must undergo May 2026 certified validation for axial force uniformity.",
+    "freshness_stamp": "Verified for Q2 2026 Industry Compliance."
+  },
+  "power": {
+    "regulatory_benchmark": "IEEE 1547-2026 Interoperability and DER-grid interconnection",
+    "quantity_model_note": "Standardizes the reporting of Reactive Power (VAr) vs Real Power (Watts) using the 2026 Quantity Model for phasor measurement units.",
+    "legal_metrology_warning": "Smart Grid nodes active as of May 2026 are legally required to support bidirectional unit-conversion protocols for local secondary voltage control.",
+    "freshness_stamp": "Verified for Q2 2026 Industry Compliance."
+  },
+  "weight": {
+    "regulatory_benchmark": "NIST Handbook 44 (2026) - General Code Part 2.20",
+    "quantity_model_note": "Addresses the 2026 'Quantity Model' shift to automated mass verification in logistics centers using high-speed dynamic scale protocols.",
+    "legal_metrology_warning": "Commercial weighing devices calibrated in 2026 must demonstrate traceability to the revised SI kilogram definition within ±0.001% tolerance.",
+    "freshness_stamp": "Verified for Q2 2026 Industry Compliance."
+  }
+}

@@ -6,6 +6,7 @@ export interface Unit {
   // For temperature, it's irrelevant, we use specific functions
   factor?: number;
   description?: string;
+  popularity?: number; // 1-100 score for SEO prioritisation
 }
 
 export interface UnitCategory {
@@ -21,14 +22,14 @@ export const categories: UnitCategory[] = [
     name: 'Length',
     baseUnit: 'meter',
     units: [
-      { id: 'meter', name: 'Meter', symbol: 'm', factor: 1, description: 'The base unit of length in the International System of Units (SI), originally defined as one ten-millionth of the distance from the equator to the North Pole.' },
-      { id: 'kilometer', name: 'Kilometer', symbol: 'km', factor: 1000, description: 'A metric unit equal to 1,000 meters, universally used for expressing distances between geographical locations on land.' },
-      { id: 'centimeter', name: 'Centimeter', symbol: 'cm', factor: 0.01, description: 'A metric unit equal to one hundredth of a meter, commonly used in everyday measurements, clothing sizes, and drafting.' },
-      { id: 'millimeter', name: 'Millimeter', symbol: 'mm', factor: 0.001, description: 'A metric unit equal to one thousandth of a meter, used for precise measurements in engineering, machining, and rainfall.' },
-      { id: 'mile', name: 'Mile', symbol: 'mi', factor: 1609.344, description: 'An imperial unit of length equal to 5,280 feet, originating from the Roman \'mille passus\' (thousand paces), used for road distances in the US and UK.' },
-      { id: 'yard', name: 'Yard', symbol: 'yd', factor: 0.9144, description: 'An imperial unit of length equal to 3 feet, originally derived from the length of a person\'s stride or arm, commonly used in American football and landscaping.' },
-      { id: 'foot', name: 'Foot', symbol: 'ft', factor: 0.3048, description: 'An imperial unit of length equal to 12 inches, historically based on the human foot, widely used for human height and building dimensions in the US.' },
-      { id: 'inch', name: 'Inch', symbol: 'in', factor: 0.0254, description: 'An imperial unit of length, exactly 2.54 centimeters, originating from the width of a human thumb, used for screen sizes and small components.' },
+      { id: 'meter', name: 'Meter', symbol: 'm', factor: 1, popularity: 95, description: 'The base unit of length in the International System of Units (SI), originally defined as one ten-millionth of the distance from the equator to the North Pole.' },
+      { id: 'kilometer', name: 'Kilometer', symbol: 'km', factor: 1000, popularity: 90, description: 'A metric unit equal to 1,000 meters, universally used for expressing distances between geographical locations on land.' },
+      { id: 'centimeter', name: 'Centimeter', symbol: 'cm', factor: 0.01, popularity: 85, description: 'A metric unit equal to one hundredth of a meter, commonly used in everyday measurements, clothing sizes, and drafting.' },
+      { id: 'millimeter', name: 'Millimeter', symbol: 'mm', factor: 0.001, popularity: 80, description: 'A metric unit equal to one thousandth of a meter, used for precise measurements in engineering, machining, and rainfall.' },
+      { id: 'mile', name: 'Mile', symbol: 'mi', factor: 1609.344, popularity: 95, description: 'An imperial unit of length equal to 5,280 feet, originating from the Roman \'mille passus\' (thousand paces), used for road distances in the US and UK.' },
+      { id: 'yard', name: 'Yard', symbol: 'yd', factor: 0.9144, popularity: 70, description: 'An imperial unit of length equal to 3 feet, originally derived from the length of a person\'s stride or arm, commonly used in American football and landscaping.' },
+      { id: 'foot', name: 'Foot', symbol: 'ft', factor: 0.3048, popularity: 90, description: 'An imperial unit of length equal to 12 inches, historically based on the human foot, widely used for human height and building dimensions in the US.' },
+      { id: 'inch', name: 'Inch', symbol: 'in', factor: 0.0254, popularity: 98, description: 'An imperial unit of length, exactly 2.54 centimeters, originating from the width of a human thumb, used for screen sizes and small components.' },
     ],
   },
   {
@@ -36,12 +37,12 @@ export const categories: UnitCategory[] = [
     name: 'Weight / Mass',
     baseUnit: 'kilogram',
     units: [
-      { id: 'kilogram', name: 'Kilogram', symbol: 'kg', factor: 1, description: 'The base unit of mass in the International System of Units (SI), historically defined by the mass of one liter of water.' },
-      { id: 'gram', name: 'Gram', symbol: 'g', factor: 0.001, description: 'A metric unit of mass equal to one thousandth of a kilogram, commonly used in baking recipes and weighing small items.' },
-      { id: 'milligram', name: 'Milligram', symbol: 'mg', factor: 0.000001, description: 'A metric unit of mass equal to one thousandth of a gram, used primarily in pharmacology to measure medication doses.' },
-      { id: 'metric_ton', name: 'Metric Ton', symbol: 't', factor: 1000, description: 'A non-SI metric unit of mass equal to 1,000 kilograms, used worldwide for heavy industrial and agricultural shipments.' },
-      { id: 'pound', name: 'Pound', symbol: 'lb', factor: 0.45359237, description: 'An imperial unit of mass equal to 16 ounces, descended from the Roman libra, used for body weight and groceries in the US.' },
-      { id: 'ounce', name: 'Ounce', symbol: 'oz', factor: 0.0283495231, description: 'An imperial unit of mass equal to 1/16 of a pound, commonly used for letters, portions of food, and precious metals.' },
+      { id: 'kilogram', name: 'Kilogram', symbol: 'kg', factor: 1, popularity: 98, description: 'The base unit of mass in the International System of Units (SI), historically defined by the mass of one liter of water.' },
+      { id: 'gram', name: 'Gram', symbol: 'g', factor: 0.001, popularity: 95, description: 'A metric unit of mass equal to one thousandth of a kilogram, commonly used in baking recipes and weighing small items.' },
+      { id: 'milligram', name: 'Milligram', symbol: 'mg', factor: 0.000001, popularity: 75, description: 'A metric unit of mass equal to one thousandth of a gram, used primarily in pharmacology to measure medication doses.' },
+      { id: 'metric_ton', name: 'Metric Ton', symbol: 't', factor: 1000, popularity: 80, description: 'A non-SI metric unit of mass equal to 1,000 kilograms, used worldwide for heavy industrial and agricultural shipments.' },
+      { id: 'pound', name: 'Pound', symbol: 'lb', factor: 0.45359237, popularity: 98, description: 'An imperial unit of mass equal to 16 ounces, descended from the Roman libra, used for body weight and groceries in the US.' },
+      { id: 'ounce', name: 'Ounce', symbol: 'oz', factor: 0.0283495231, popularity: 90, description: 'An imperial unit of mass equal to 1/16 of a pound, commonly used for letters, portions of food, and precious metals.' },
     ],
   },
   {
@@ -220,7 +221,8 @@ export const categories: UnitCategory[] = [
       { id: 'kilowatt', name: 'Kilowatt', symbol: 'kW', factor: 1000, description: 'One thousand watts, typically used to express the output power of engines and the power consumption of electric motors.' },
       { id: 'megawatt', name: 'Megawatt', symbol: 'MW', factor: 1000000, description: 'One million watts, commonly used to measure the output of power plants or the power consumption of large facilities.' },
       { id: 'horsepower', name: 'Horsepower (Mechanical)', symbol: 'hp', factor: 745.699872, description: 'A unit of power denoting the rate at which work is done, famously established by James Watt to compare steam engines with draft horses.' },
-      { id: 'metric_horsepower', name: 'Metric Horsepower', symbol: 'PS', factor: 735.49875, description: 'The metric equivalent of horsepower, defined as the power required to raise a mass of 75 kilograms against Earth\'s gravity over one meter in one second.' }
+      { id: 'metric_horsepower', name: 'Metric Horsepower', symbol: 'PS', factor: 735.49875, description: 'The metric equivalent of horsepower, defined as the power required to raise a mass of 75 kilograms against Earth\'s gravity over one meter in one second.' },
+      { id: 'btu_per_hour', name: 'BTU per Hour', symbol: 'BTU/h', factor: 0.293071, description: 'A unit of power typically used in the heating and air conditioning industry.' }
     ],
   },
   {
@@ -597,6 +599,77 @@ export function getSuggestions(query: string) {
 }
 
 // Ensure categorzeQuery doesn't cause errors if not imported, replacing it with getSuggestions in App.tsx
+
+export const categoryBridges: Record<string, { categoryId: string, fromId: string, toId: string }[]> = {
+  'length': [{ categoryId: 'area', fromId: 'square_meter', toId: 'square_foot' }],
+  'weight': [{ categoryId: 'cooking', fromId: 'gram', toId: 'cup_flour_ap' }],
+  'volume': [{ categoryId: 'cooking', fromId: 'milliliter', toId: 'us_cup' }],
+  'area': [{ categoryId: 'length', fromId: 'meter', toId: 'foot' }],
+  'speed': [{ categoryId: 'time', fromId: 'hour', toId: 'minute' }],
+  'data': [{ categoryId: 'data_rate', fromId: 'mbps', toId: 'kbps' }],
+  'cooking': [{ categoryId: 'weight', fromId: 'gram', toId: 'pound' }],
+  'currency': [{ categoryId: 'data', fromId: 'megabyte', toId: 'gigabyte' }], // High overlap in tech/fin
+  'energy': [{ categoryId: 'power', fromId: 'watt', toId: 'kilowatt' }],
+  'power': [{ categoryId: 'energy', fromId: 'joule', toId: 'watt_hour' }]
+};
+
+export const generateLattice = (
+  fromId: string, 
+  toId: string, 
+  categoryId: string
+): { fromId: string, toId: string, categoryId: string, text: string }[] => {
+  const lattice: { fromId: string, toId: string, categoryId: string, text: string }[] = [];
+  const cat = categories.find(c => c.id === categoryId);
+  if (!cat) return [];
+
+  const fromUnit = cat.units.find(u => u.id === fromId);
+  const toUnit = cat.units.find(u => u.id === toId);
+  if (!fromUnit || !toUnit) return [];
+
+  // 1. Find the Inverse Pair
+  lattice.push({
+    fromId: toId,
+    toId: fromId,
+    categoryId: categoryId,
+    text: `${toUnit.name} to ${fromUnit.name}`
+  });
+
+  // 2. Find siblings in the same category (sort by popularity, exclude current pair)
+  const siblings = cat.units
+    .filter(u => u.id !== fromId && u.id !== toId)
+    .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+    .slice(0, 4);
+
+  siblings.forEach(s => {
+    // Alternate linking from -> sibling and sibling -> to
+    lattice.push({
+      fromId: fromId,
+      toId: s.id,
+      categoryId: categoryId,
+      text: `${fromUnit.name} to ${s.name}`
+    });
+  });
+
+  // 3. Find one "Bridge" to a related category
+  const bridges = categoryBridges[categoryId];
+  if (bridges && bridges.length > 0) {
+    const bridge = bridges[0];
+    const bridgeCat = categories.find(c => c.id === bridge.categoryId);
+    const bf = bridgeCat?.units.find(u => u.id === bridge.fromId);
+    const bt = bridgeCat?.units.find(u => u.id === bridge.toId);
+    if (bf && bt) {
+      lattice.push({
+        fromId: bridge.fromId,
+        toId: bridge.toId,
+        categoryId: bridge.categoryId,
+        text: `${bf.name} to ${bt.name} (${bridgeCat?.name || ''})`
+      });
+    }
+  }
+
+  // Ensure we have unique pairs and limit to 6-8
+  return lattice.slice(0, 7);
+};
 
 export function formatNumber(num: number): string {
   if (Number.isNaN(num)) return "0";

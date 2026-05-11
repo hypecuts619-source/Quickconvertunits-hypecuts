@@ -1,7 +1,9 @@
 {
   "gram-to-cup_flour_ap": {
-    "quick_explanation": "In professional baking, weights are preferred over volumes because flour density varies significantly by how it is scooped. 120 grams is the standard weight for 1 US Cup of all-purpose flour.",
-    "real_world_example": "If a recipe calls for '1 cup of flour' and you don't have a scale, spoon it into the cup until overflowing, then level it with a knife—roughly 120g.",
+    "quick_explanation": "120 grams is the industry-standard weight for one US Cup of all-purpose flour, used by professional bakers for consistency.",
+    "formula_context": "Density varies by sifting; 120g/cup assumes the 'spoon and level' method, whereas 'dipping' can pack 20% more weight.",
+    "real_world_example": "A standard 5lb bag of flour contains approximately 18.9 cups when measured at 120g per cup.",
+    "pro_tip": "Always weigh flour for bread; a 10g error alters hydration significantly, resulting in a dense or overly sticky loaf.",
     "faq_schema_qa": [
       {
         "question": "Why does my cup of flour weigh more than 120g?",
@@ -10,8 +12,10 @@
     ]
   },
   "kilogram-to-pound": {
-    "quick_explanation": "The kilogram is the base unit of mass in the metric system (SI), while the pound is the primary unit in the US customary system. 1 kg is roughly the weight of a 1-liter bottle of water.",
-    "real_world_example": "Checking a suitcase at the airport? A 23kg limit is approximately 50.7 lbs. Most airlines allow 50 lbs as a standard.",
+    "quick_explanation": "One kilogram is defined by the Planck constant, while the international pound is exactly 0.45359237 kilograms.",
+    "formula_context": "The 2.20462 factor is the reciprocal of the 1959 international agreement fixing the pound's mass to the metric system.",
+    "real_world_example": "A standard 2kg dumbbell is roughly 4.4 lbs; checking a 50lb suitcase means you must stay under 22.68kg.",
+    "pro_tip": "For rough mental math, double the kg and add 10% to find pounds quickly with less than 0.2% error.",
     "faq_schema_qa": [
       {
         "question": "Is 1 kg exactly 2.2 lbs?",
@@ -20,12 +24,98 @@
     ]
   },
   "celsius-to-fahrenheit": {
-    "quick_explanation": "Fahrenheit is primarily used in the US, while Celsius is the global standard. The scale offset is 32 degrees, meaning 0°C (freezing) is 32°F.",
-    "real_world_example": "A common 'comfortable' room temperature of 20°C corresponds to 68°F. A high fever is often defined as 38°C or 100.4°F.",
+    "quick_explanation": "Celsius is based on water's phase changes, while Fahrenheit was originally calibrated using a brine solution and human body heat.",
+    "formula_context": "The 9/5 ratio represents the difference in degree size; there are 180 Fahrenheit degrees between freezing and boiling vs 100 Celsius degrees.",
+    "real_world_example": "A hot summer day of 100°F is exactly 37.7°C, just slightly higher than normal human body temperature (37°C).",
+    "pro_tip": "To estimate °F from °C in your head, double the Celsius value and add 30 for a quick, near-accurate result.",
     "faq_schema_qa": [
       {
         "question": "What temperature is the same in Celsius and Fahrenheit?",
         "answer": "The scales cross at -40 degrees. So, -40°C is exactly equal to -40°F."
+      }
+    ]
+  },
+  "inch-to-centimeter": {
+    "quick_explanation": "The international inch is defined as exactly 2.54 centimeters, bridging the imperial and metric systems.",
+    "formula_context": "Standardized in 1959, this exact factor replaced varying regional definitions of the inch to facilitate global manufacturing.",
+    "real_world_example": "A standard 12-inch ruler is exactly 30.48 cm long; a typical 15.6-inch laptop screen is 39.6 cm diagonally.",
+    "pro_tip": "When measuring hardware, 1/4 inch is roughly 6.35mm. Use 25mm as a quick mental proxy for one inch in non-critical tasks.",
+    "faq_schema_qa": [
+      {
+        "question": "Is an inch exactly 2.54 cm?",
+        "answer": "Yes, by international agreement since 1959, 1 inch equals exactly 2.54 centimeters."
+      }
+    ]
+  },
+  "mile-to-kilometer": {
+    "quick_explanation": "A mile is 5,280 feet, whereas a kilometer is exactly 1,000 meters; both are primary units for long-distance travel.",
+    "formula_context": "The factor 1.60934 comes from the definition of the international mile as 1,609.344 meters.",
+    "real_world_example": "A 5K race is 3.1 miles; driving at 60 mph is equivalent to traveling at 96.5 km/h.",
+    "pro_tip": "Use the Fibonacci sequence for mental conversion: 5 miles ≈ 8 km, 8 miles ≈ 13 km. The next number is a great approximation.",
+    "faq_schema_qa": [
+      {
+        "question": "How many km in 1 mile?",
+        "answer": "1 mile is approximately 1.61 kilometers."
+      }
+    ]
+  },
+  "meter-to-foot": {
+    "quick_explanation": "The meter is the SI base unit of length, while the foot is an imperial unit equal to exactly 0.3048 meters.",
+    "formula_context": "One meter is roughly 3.28084 feet, calculated by dividing 1 by 0.3048, the legal definition of a foot in the US.",
+    "real_world_example": "A standard 2-meter door frame is approximately 6 feet 6.7 inches high.",
+    "pro_tip": "In aviation, 1,000 feet is roughly 300 meters. Pilots and air traffic controllers use this for quick vertical separation math.",
+    "faq_schema_qa": [
+      {
+        "question": "Is a meter longer than a yard?",
+        "answer": "Yes, a meter is about 39.37 inches, while a yard is exactly 36 inches."
+      }
+    ]
+  },
+  "eur-to-usd": {
+    "quick_explanation": "The EUR/USD pair represents the exchange rate between the world's two largest reserve currencies.",
+    "formula_context": "Floating exchange rates are determined by interest rate parity, economic growth, and central bank policies of the ECB and Fed.",
+    "real_world_example": "If the rate is 1.08, a 50€ dinner will cost you $54.00, excluding any bank foreign transaction fees.",
+    "pro_tip": "For travelers, the 'mid-market rate' shown here is the wholesale price; consumer rates at airports are often 5-10% worse.",
+    "faq_schema_qa": [
+      {
+        "question": "Why does the Euro change against the Dollar?",
+        "answer": "Fluctuations are driven by relative interest rates, inflation levels, and geopolitical stability between the EU and USA."
+      }
+    ]
+  },
+  "ounce-to-gram": {
+    "quick_explanation": "The ounce (avoirdupois) is an imperial mass unit, while the gram is a metric unit fundamental to the SI system.",
+    "formula_context": "Exactly 28.3495231 grams per ounce, derived from the international pound (16 oz) being fixed to 453.59g.",
+    "real_world_example": "A standard slice of bread weighs approximately 1 ounce, or about 28 grams.",
+    "pro_tip": "Don't confuse weight ounces with fluid ounces. A fluid ounce of honey weighs roughly 1.5 standard ounces.",
+    "faq_schema_qa": [
+      {
+        "question": "How many grams are in an ounce?",
+        "answer": "There are approximately 28.35 grams in a standard ounce."
+      }
+    ]
+  },
+  "mb-to-gb": {
+    "quick_explanation": "Megabytes (MB) and Gigabytes (GB) measure digital storage capacity using decimal or binary prefixes.",
+    "formula_context": "Standard consumer devices use decimal prefix (1,000 MB = 1 GB), but OS software often uses binary (1,024 MiB = 1 GiB).",
+    "real_world_example": "A high-quality 4-minute MP3 is roughly 10MB; a 64GB smartphone can hold about 6,000 such songs.",
+    "pro_tip": "If your new 500GB drive shows only 465GB in Windows, it's due to the conversion between decimal market-rating and binary OS-reading.",
+    "faq_schema_qa": [
+      {
+        "question": "Is 1000MB equal to 1GB?",
+        "answer": "Yes, in standard metric (SI), 1000MB = 1GB. However, computer systems often use 1024MB = 1GB (properly called 1 GiB)."
+      }
+    ]
+  },
+  "bar-to-psi": {
+    "quick_explanation": "Bar is a metric unit approximating atmospheric pressure, while PSI (pounds per square inch) is the US standard.",
+    "formula_context": "1 Bar is defined as exactly 100,000 Pascals, leading to the conversion factor of 14.5038 PSI.",
+    "real_world_example": "A typical car tire is inflated to 32-35 PSI, which equals roughly 2.2 to 2.4 Bar.",
+    "pro_tip": "Standard atmospheric pressure at sea level is 1.01325 Bar, or roughly 14.7 PSI.",
+    "faq_schema_qa": [
+      {
+        "question": "Which is more pressure, 1 bar or 1 psi?",
+        "answer": "1 bar is much higher pressure, equal to about 14.5 psi."
       }
     ]
   }
