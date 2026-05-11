@@ -838,6 +838,14 @@ export const getUnitIdsFromPath = (path: string) => {
   if (path === 'gbp-to-usd') return ['gbp', 'usd'];
   if (path === 'usd-to-inr') return ['usd', 'inr'];
 
+  // Generic fallback if -to- is present
+  if (path.includes('-to-')) {
+    const parts = path.split('-to-');
+    if (parts.length === 2) {
+      return [getCanonicalUnitId(parts[0]), getCanonicalUnitId(parts[1])];
+    }
+  }
+
   return path.split('-to-');
 };
 
