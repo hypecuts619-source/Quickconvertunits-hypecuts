@@ -309,16 +309,16 @@ export const blogPosts: BlogPost[] = [
       </p>
 
       <h2>Frequently Asked Questions</h2>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">How many ounces in a gallon?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">1 US gallon equals 128 fluid ounces, while 1 UK gallon equals 160 fluid ounces.</p>
+      <div>
+        <h3>How many ounces in a gallon?</h3>
+        <div>
+          <p>1 US gallon equals 128 fluid ounces, while 1 UK gallon equals 160 fluid ounces.</p>
         </div>
       </div>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">How many 16 oz bottles are in a gallon?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">There are 8 bottles of 16 ounces in 1 US gallon.</p>
+      <div>
+        <h3>How many 16 oz bottles are in a gallon?</h3>
+        <div>
+          <p>There are 8 bottles of 16 ounces in 1 US gallon.</p>
         </div>
       </div>
     `
@@ -387,16 +387,16 @@ export const blogPosts: BlogPost[] = [
       </p>
 
       <h2>Frequently Asked Questions</h2>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">What is the formula to convert Celsius to Fahrenheit?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">The formula is (°C × 9/5) + 32 = °F.</p>
+      <div>
+        <h3>What is the formula to convert Celsius to Fahrenheit?</h3>
+        <div>
+          <p>The formula is (°C × 9/5) + 32 = °F.</p>
         </div>
       </div>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">What is 0 degrees Celsius in Fahrenheit?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">0 degrees Celsius is equal to 32 degrees Fahrenheit, which is the freezing point of water.</p>
+      <div>
+        <h3>What is 0 degrees Celsius in Fahrenheit?</h3>
+        <div>
+          <p>0 degrees Celsius is equal to 32 degrees Fahrenheit, which is the freezing point of water.</p>
         </div>
       </div>
     `
@@ -452,16 +452,16 @@ export const blogPosts: BlogPost[] = [
       </p>
 
       <h2>Frequently Asked Questions</h2>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">Which is longer a meter or a yard?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">A meter is longer than a yard. One meter equals approximately 1.0936 yards.</p>
+      <div>
+        <h3>Which is longer a meter or a yard?</h3>
+        <div>
+          <p>A meter is longer than a yard. One meter equals approximately 1.0936 yards.</p>
         </div>
       </div>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">How many meters are in a 100 yard dash?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">A 100-yard dash is equivalent to exactly 91.44 meters.</p>
+      <div>
+        <h3>How many meters are in a 100 yard dash?</h3>
+        <div>
+          <p>A 100-yard dash is equivalent to exactly 91.44 meters.</p>
         </div>
       </div>
     `
@@ -532,16 +532,16 @@ export const blogPosts: BlogPost[] = [
       </p>
 
       <h2>Frequently Asked Questions</h2>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">How many feet are in a meter?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">There are exactly 3.28084 feet in one meter.</p>
+      <div>
+        <h3>How many feet are in a meter?</h3>
+        <div>
+          <p>There are exactly 3.28084 feet in one meter.</p>
         </div>
       </div>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">How do you convert meters to feet?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">Multiply the number of meters by 3.28084 to get the equivalent measurement in feet.</p>
+      <div>
+        <h3>How do you convert meters to feet?</h3>
+        <div>
+          <p>Multiply the number of meters by 3.28084 to get the equivalent measurement in feet.</p>
         </div>
       </div>
     `
@@ -607,16 +607,16 @@ export const blogPosts: BlogPost[] = [
       </p>
 
       <h2>Frequently Asked Questions</h2>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">How many US fluid ounces are in a liter?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">There are approximately 33.814 fluid ounces in a liter (US).</p>
+      <div>
+        <h3>How many US fluid ounces are in a liter?</h3>
+        <div>
+          <p>There are approximately 33.814 fluid ounces in a liter (US).</p>
         </div>
       </div>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">How many liters is 64 oz of water?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">64 US fluid ounces is approximately 1.89 liters.</p>
+      <div>
+        <h3>How many liters is 64 oz of water?</h3>
+        <div>
+          <p>64 US fluid ounces is approximately 1.89 liters.</p>
         </div>
       </div>
     `
@@ -685,16 +685,16 @@ export const blogPosts: BlogPost[] = [
       </p>
 
       <h2>Frequently Asked Questions</h2>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">How many grams are in one ounce?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">There are exactly 28.3495 grams in one avoirdupois ounce.</p>
+      <div>
+        <h3>How many grams are in one ounce?</h3>
+        <div>
+          <p>There are exactly 28.3495 grams in one avoirdupois ounce.</p>
         </div>
       </div>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">How do you convert 100 grams to ounces?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">Divide 100 by 28.3495. It equals approximately 3.53 ounces.</p>
+      <div>
+        <h3>How do you convert 100 grams to ounces?</h3>
+        <div>
+          <p>Divide 100 by 28.3495. It equals approximately 3.53 ounces.</p>
         </div>
       </div>
     `
@@ -756,16 +756,16 @@ export const blogPosts: BlogPost[] = [
       </p>
 
       <h2>Frequently Asked Questions</h2>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">How many pounds equal one kilogram?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">There are exactly 2.20462 pounds in one kilogram.</p>
+      <div>
+        <h3>How many pounds equal one kilogram?</h3>
+        <div>
+          <p>There are exactly 2.20462 pounds in one kilogram.</p>
         </div>
       </div>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">How do you calculate pounds to kg?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">Divide the weight in pounds by 2.20462.</p>
+      <div>
+        <h3>How do you calculate pounds to kg?</h3>
+        <div>
+          <p>Divide the weight in pounds by 2.20462.</p>
         </div>
       </div>
     `
@@ -828,16 +828,16 @@ export const blogPosts: BlogPost[] = [
       </p>
 
       <h2>Frequently Asked Questions</h2>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">How many milliliters are in one US cup?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">One standard US liquid cup contains 236.588 milliliters.</p>
+      <div>
+        <h3>How many milliliters are in one US cup?</h3>
+        <div>
+          <p>One standard US liquid cup contains 236.588 milliliters.</p>
         </div>
       </div>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">Is 250ml the same as 1 cup?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">250ml is slightly more than a US cup (which is 236.6ml) but it is officially defined as one 'metric cup' in parts of the world like Australia.</p>
+      <div>
+        <h3>Is 250ml the same as 1 cup?</h3>
+        <div>
+          <p>250ml is slightly more than a US cup (which is 236.6ml) but it is officially defined as one 'metric cup' in parts of the world like Australia.</p>
         </div>
       </div>
     `
@@ -901,16 +901,16 @@ export const blogPosts: BlogPost[] = [
       </p>
 
       <h2>Frequently Asked Questions</h2>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">How many centimeters are in an inch?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">There are exactly 2.54 centimeters in one inch.</p>
+      <div>
+        <h3>How many centimeters are in an inch?</h3>
+        <div>
+          <p>There are exactly 2.54 centimeters in one inch.</p>
         </div>
       </div>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">How do you covert 10 cm to inches?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">Divide 10 by 2.54, which equals approximately 3.937 inches.</p>
+      <div>
+        <h3>How do you covert 10 cm to inches?</h3>
+        <div>
+          <p>Divide 10 by 2.54, which equals approximately 3.937 inches.</p>
         </div>
       </div>
     `
@@ -962,16 +962,16 @@ export const blogPosts: BlogPost[] = [
       </p>
 
       <h2>Frequently Asked Questions</h2>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">How many kilometers are in a mile?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">There are exactly 1.60934 kilometers in one mile.</p>
+      <div>
+        <h3>How many kilometers are in a mile?</h3>
+        <div>
+          <p>There are exactly 1.60934 kilometers in one mile.</p>
         </div>
       </div>
-      <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">What is a 5K race in miles?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">A 5K (5 kilometer) race is approximately 3.1 miles long.</p>
+      <div>
+        <h3>What is a 5K race in miles?</h3>
+        <div>
+          <p>A 5K (5 kilometer) race is approximately 3.1 miles long.</p>
         </div>
       </div>
     `

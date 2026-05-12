@@ -1882,13 +1882,20 @@ export default function App() {
               </div>
 
               {/* SWAP BUTTON */}
-              <button
-                onClick={handleSwap}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 bg-white dark:bg-[#1e1e1e] text-neutral-500 dark:text-neutral-400 p-3 md:p-4 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)] border border-neutral-100 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-[#252525] hover:scale-105 active:scale-95 transition-all focus:outline-none focus:ring-4 focus:ring-primary-500/10 hover:text-primary-600 dark:hover:text-primary-400 group"
-                aria-label={t("swap", "Swap units")}
-              >
-                <ArrowRightLeft className="w-5 h-5 pointer-events-none group-hover:rotate-180 transition-transform duration-500" />
-              </button>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center gap-2">
+                <button
+                  onClick={handleSwap}
+                  className="bg-white dark:bg-[#1e1e1e] text-neutral-500 dark:text-neutral-400 p-3 md:p-4 rounded-full shadow-[0_4px_24px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.5)] border border-neutral-100 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-[#252525] hover:scale-110 active:scale-90 transition-all focus:outline-none focus:ring-4 focus:ring-primary-500/10 hover:text-primary-600 dark:hover:text-primary-400 group"
+                  aria-label={t("swap", "Swap units")}
+                >
+                  <motion.div
+                    whileTap={{ rotate: 180 }}
+                    transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                  >
+                    <ArrowRightLeft className="w-5 h-5 pointer-events-none group-hover:rotate-180 transition-transform duration-500" />
+                  </motion.div>
+                </button>
+              </div>
 
               {/* TO */}
               <div className="flex-1 w-full bg-neutral-50/50 dark:bg-[#161616] rounded-3xl p-6 border border-neutral-100 dark:border-neutral-800 focus-within:border-primary-500 dark:focus-within:border-primary-400 focus-within:ring-4 focus-within:ring-primary-500/10 dark:focus-within:ring-primary-400/10 transition-all relative group">
