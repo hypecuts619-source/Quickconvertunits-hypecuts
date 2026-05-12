@@ -189,27 +189,27 @@ export const categories: UnitCategory[] = [
     baseUnit: 'usd',
     units: [
       { id: 'usd', name: 'US Dollar', symbol: '$', factor: 1, description: 'The United States Dollar, the official currency of the United States and the world\'s primary reserve currency.' },
-      { id: 'eur', name: 'Euro', symbol: '€', factor: 0.92, description: 'The Euro, the official currency of 20 of the 27 member states of the European Union, making it the second most traded currency globally.' },
-      { id: 'gbp', name: 'British Pound', symbol: '£', factor: 0.79, description: 'The British Pound Sterling, the official currency of the United Kingdom and its territories, and one of the oldest currencies still in use.' },
-      { id: 'jpy', name: 'Japanese Yen', symbol: '¥', factor: 150, description: 'The Japanese Yen, the official currency of Japan, serving as a major reserve currency and widely traded in foreign exchange markets.' },
-      { id: 'inr', name: 'Indian Rupee', symbol: '₹', factor: 83, description: 'The Indian Rupee, the official currency of India, regulated by the Reserve Bank of India and used across the Indian subcontinent.' },
-      { id: 'aud', name: 'Australian Dollar', symbol: 'A$', factor: 1.53, description: 'The Australian Dollar, the official currency of Australia and its territories, popular among traders due to Australia\'s rich natural resources.' },
-      { id: 'cad', name: 'Canadian Dollar', symbol: 'C$', factor: 1.35, description: 'The Canadian Dollar, the official currency of Canada, often referred to as the \'Loonie\' and heavily influenced by commodity prices.' },
-      { id: 'chf', name: 'Swiss Franc', symbol: 'CHF', factor: 0.88, description: 'The Swiss Franc, the official currency of Switzerland and Liechtenstein, widely considered a safe-haven asset by investors.' },
-      { id: 'cny', name: 'Chinese Yuan', symbol: '¥', factor: 7.23, description: 'The Chinese Yuan (Renminbi), the primary currency of the People\'s Republic of China, playing an increasingly important role in global trade.' },
-      { id: 'mxn', name: 'Mexican Peso', symbol: '$', factor: 17.0, description: 'The Mexican Peso, the official currency of Mexico and the most traded currency in Latin America.' },
-      { id: 'brl', name: 'Brazilian Real', symbol: 'R$', factor: 5.0, description: 'The Brazilian Real, the official currency of Brazil, the largest economy in South America.' },
-      { id: 'zar', name: 'South African Rand', symbol: 'R', factor: 18.5, description: 'The South African Rand, the official currency of South Africa and the Common Monetary Area.' },
-      { id: 'rub', name: 'Russian Ruble', symbol: '₽', factor: 90.0, description: 'The Russian Ruble, the official currency of the Russian Federation and one of the world\'s oldest currencies.' },
-      { id: 'sgd', name: 'Singapore Dollar', symbol: 'S$', factor: 1.35, description: 'The Singapore Dollar, the official currency of Singapore, known for its stability and strong financial ecosystem.' },
-      { id: 'hkd', name: 'Hong Kong Dollar', symbol: 'HK$', factor: 7.8, description: 'The Hong Kong Dollar, the official currency of Hong Kong, pegged to the US Dollar to maintain financial stability.' },
-      { id: 'nzd', name: 'New Zealand Dollar', symbol: 'NZ$', factor: 1.6, description: 'The New Zealand Dollar, the official currency of New Zealand, often called the \'Kiwi\' and popular in forex trading.' },
-      { id: 'sek', name: 'Swedish Krona', symbol: 'kr', factor: 10.5, description: 'The Swedish Krona, the official currency of Sweden, functioning as a free-floating currency.' },
-      { id: 'krw', name: 'South Korean Won', symbol: '₩', factor: 1300.0, description: 'The South Korean Won, the official currency of South Korea, issued by the Bank of Korea.' },
-      { id: 'aed', name: 'UAE Dirham', symbol: 'د.إ', factor: 3.67, description: 'The United Arab Emirates Dirham, the official currency of the UAE, pegged to the US Dollar.' },
-      { id: 'btc', name: 'Bitcoin', symbol: 'BTC', factor: 1 / 65000, description: 'Bitcoin, the first and most widely recognized cryptocurrency.' },
-      { id: 'eth', name: 'Ethereum', symbol: 'ETH', factor: 1 / 3500, description: 'Ethereum, a decentralized, open-source blockchain with smart contract functionality.' },
-      { id: 'sol', name: 'Solana', symbol: 'SOL', factor: 1 / 150, description: 'Solana, a high-performance blockchain supporting builders around the world creating crypto apps that scale today.' },
+      { id: 'eur', name: 'Euro', symbol: '€', factor: 1.08, description: 'The Euro, the official currency of 20 of the 27 member states of the European Union, making it the second most traded currency globally.' },
+      { id: 'gbp', name: 'British Pound', symbol: '£', factor: 1.25, description: 'The British Pound Sterling, the official currency of the United Kingdom and its territories, and one of the oldest currencies still in use.' },
+      { id: 'jpy', name: 'Japanese Yen', symbol: '¥', factor: 0.0066, description: 'The Japanese Yen, the official currency of Japan, serving as a major reserve currency and widely traded in foreign exchange markets.' },
+      { id: 'inr', name: 'Indian Rupee', symbol: '₹', factor: 0.012, description: 'The Indian Rupee, the official currency of India, regulated by the Reserve Bank of India and used across the Indian subcontinent.' },
+      { id: 'aud', name: 'Australian Dollar', symbol: 'A$', factor: 0.65, description: 'The Australian Dollar, the official currency of Australia and its territories, popular among traders due to Australia\'s rich natural resources.' },
+      { id: 'cad', name: 'Canadian Dollar', symbol: 'C$', factor: 0.74, description: 'The Canadian Dollar, the official currency of Canada, often referred to as the \'Loonie\' and heavily influenced by commodity prices.' },
+      { id: 'chf', name: 'Swiss Franc', symbol: 'CHF', factor: 1.12, description: 'The Swiss Franc, the official currency of Switzerland and Liechtenstein, widely considered a safe-haven asset by investors.' },
+      { id: 'cny', name: 'Chinese Yuan', symbol: '¥', factor: 0.14, description: 'The Chinese Yuan (Renminbi), the primary currency of the People\'s Republic of China, playing an increasingly important role in global trade.' },
+      { id: 'mxn', name: 'Mexican Peso', symbol: '$', factor: 0.058, description: 'The Mexican Peso, the official currency of Mexico and the most traded currency in Latin America.' },
+      { id: 'brl', name: 'Brazilian Real', symbol: 'R$', factor: 0.20, description: 'The Brazilian Real, the official currency of Brazil, the largest economy in South America.' },
+      { id: 'zar', name: 'South African Rand', symbol: 'R', factor: 0.054, description: 'The South African Rand, the official currency of South Africa and the Common Monetary Area.' },
+      { id: 'rub', name: 'Russian Ruble', symbol: '₽', factor: 0.011, description: 'The Russian Ruble, the official currency of the Russian Federation and one of the world\'s oldest currencies.' },
+      { id: 'sgd', name: 'Singapore Dollar', symbol: 'S$', factor: 0.74, description: 'The Singapore Dollar, the official currency of Singapore, known for its stability and strong financial ecosystem.' },
+      { id: 'hkd', name: 'Hong Kong Dollar', symbol: 'HK$', factor: 0.128, description: 'The Hong Kong Dollar, the official currency of Hong Kong, pegged to the US Dollar to maintain financial stability.' },
+      { id: 'nzd', name: 'New Zealand Dollar', symbol: 'NZ$', factor: 0.62, description: 'The New Zealand Dollar, the official currency of New Zealand, often called the \'Kiwi\' and popular in forex trading.' },
+      { id: 'sek', name: 'Swedish Krona', symbol: 'kr', factor: 0.095, description: 'The Swedish Krona, the official currency of Sweden, functioning as a free-floating currency.' },
+      { id: 'krw', name: 'South Korean Won', symbol: '₩', factor: 0.00075, description: 'The South Korean Won, the official currency of South Korea, issued by the Bank of Korea.' },
+      { id: 'aed', name: 'UAE Dirham', symbol: 'د.إ', factor: 0.27, description: 'The United Arab Emirates Dirham, the official currency of the UAE, pegged to the US Dollar.' },
+      { id: 'btc', name: 'Bitcoin', symbol: 'BTC', factor: 65000, description: 'Bitcoin, the first and most widely recognized cryptocurrency.' },
+      { id: 'eth', name: 'Ethereum', symbol: 'ETH', factor: 3500, description: 'Ethereum, a decentralized, open-source blockchain with smart contract functionality.' },
+      { id: 'sol', name: 'Solana', symbol: 'SOL', factor: 150, description: 'Solana, a high-performance blockchain supporting builders around the world creating crypto apps that scale today.' },
     ],
   },
   {
@@ -753,6 +753,14 @@ export const getSEOUrlPath = (fromId: string, toId: string) => {
   if (fromId === 'usd' && toId === 'gbp') return 'usd-to-gbp';
   if (fromId === 'gbp' && toId === 'usd') return 'gbp-to-usd';
   if (fromId === 'usd' && toId === 'inr') return 'usd-to-inr';
+  if (fromId === 'usd' && toId === 'jpy') return 'usd-to-jpy';
+  if (fromId === 'jpy' && toId === 'usd') return 'jpy-to-usd';
+  if (fromId === 'btc' && toId === 'usd') return 'btc-to-usd';
+  if (fromId === 'usd' && toId === 'btc') return 'usd-to-btc';
+  if (fromId === 'eth' && toId === 'usd') return 'eth-to-usd';
+  if (fromId === 'usd' && toId === 'eth') return 'usd-to-eth';
+  if (fromId === 'sol' && toId === 'usd') return 'sol-to-usd';
+  if (fromId === 'usd' && toId === 'sol') return 'usd-to-sol';
 
   if (fromId === 'est' && toId === 'utc') return 'est-to-utc';
   if (fromId === 'pst' && toId === 'est') return 'pst-to-est';
@@ -837,6 +845,14 @@ export const getUnitIdsFromPath = (path: string) => {
   if (path === 'usd-to-gbp') return ['usd', 'gbp'];
   if (path === 'gbp-to-usd') return ['gbp', 'usd'];
   if (path === 'usd-to-inr') return ['usd', 'inr'];
+  if (path === 'usd-to-jpy') return ['usd', 'jpy'];
+  if (path === 'jpy-to-usd') return ['jpy', 'usd'];
+  if (path === 'btc-to-usd') return ['btc', 'usd'];
+  if (path === 'usd-to-btc') return ['usd', 'btc'];
+  if (path === 'eth-to-usd') return ['eth', 'usd'];
+  if (path === 'usd-to-eth') return ['usd', 'eth'];
+  if (path === 'sol-to-usd') return ['sol', 'usd'];
+  if (path === 'usd-to-sol') return ['usd', 'sol'];
 
   // Generic fallback if -to- is present
   if (path.includes('-to-')) {
