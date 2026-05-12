@@ -1049,7 +1049,18 @@ export default function App() {
   let metaDescStr = "";
   let canonicalUrlStr = "";
   let ogTitleStr = "";
-  let schema: any[] = [];
+  let schema: any[] = [
+    {
+      "@type": "Organization",
+      "@id": "https://quickconvertunits.com/#organization",
+      "name": "QuickConvert",
+      "url": "https://quickconvertunits.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://quickconvertunits.com/favicon.svg"
+      }
+    }
+  ];
   let activeCustomSeoContent = "";
 
   const getFAQsFromHtml = (html: string) => {
@@ -1268,6 +1279,13 @@ export default function App() {
         "@type": "MathSolver",
         "@id": `${canonicalUrlStr}#mathsolver`,
         "name": `${activeFromUnit.name} to ${activeToUnit.name} Calculation`,
+        "url": canonicalUrlStr,
+        "usageInfo": {
+          "@type": "CreativeWork",
+          "name": "QuickConvert Terms and Usage Information",
+          "url": canonicalUrlStr
+        },
+        "inLanguage": "en",
         "learningResourceType": "Formula",
         "educationalAlignment": {
           "@type": "AlignmentObject",
@@ -1277,6 +1295,7 @@ export default function App() {
         },
         "potentialAction": {
           "@type": "SolveMathAction",
+          "eduQuestionType": "Arithmetic",
           "target": {
             "@type": "EntryPoint",
             "urlTemplate": `${canonicalUrlStr}?val={value}`,
@@ -2911,13 +2930,7 @@ export default function App() {
           {!isEmbed && (
             <footer 
               className="mt-16 pt-12 border-t border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 text-sm"
-              itemScope 
-              itemType="https://schema.org/Organization"
             >
-              <meta itemProp="name" content="QuickConvert" />
-              <meta itemProp="url" content="https://quickconvertunits.com" />
-              <meta itemProp="logo" content="https://quickconvertunits.com/favicon.svg" />
-              
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-12 text-left">
                 {/* Column 1: Calculators */}
                 <nav aria-label="Category Converters" className="space-y-4">

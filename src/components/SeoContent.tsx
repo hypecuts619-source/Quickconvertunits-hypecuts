@@ -123,8 +123,7 @@ export function SeoContent({
 
       {/* AI Summary / Quick Answer */}
       {!isCategoryHub && (
-        <section className="bg-neutral-50 dark:bg-neutral-900/50 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 mb-10"
-                 itemScope itemType="https://schema.org/HowToStep">
+        <section className="bg-neutral-50 dark:bg-neutral-900/50 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 mb-10">
           <h2 className="mt-0 text-xl font-bold">
             {t("seoQuickAnswer", "How do you convert {{fromUnit}} to {{toUnit}}?", { 
               fromUnit: fUnitName, 

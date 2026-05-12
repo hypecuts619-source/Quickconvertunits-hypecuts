@@ -766,6 +766,16 @@ export default {
         "@context": "https://schema.org",
         "@graph": [
           {
+            "@type": "Organization",
+            "@id": "https://quickconvertunits.com/#organization",
+            "name": "QuickConvert",
+            "url": "https://quickconvertunits.com/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://quickconvertunits.com/favicon.svg"
+            }
+          },
+          {
             "@type": "SoftwareApplication",
             "@id": `https://quickconvertunits.com/${urlPath}#software`,
             "name": `${title} - QuickConvert`,
@@ -834,7 +844,14 @@ export default {
             "@type": "MathSolver",
             "@id": `https://quickconvertunits.com/${urlPath}#mathsolver`,
             "name": `Conversion from ${valText} ${fromUnit.symbol} to ${toUnit.symbol}`,
-            "learningResourceType": "Math Solver",
+            "url": `https://quickconvertunits.com/convert-${valText}-${canonicalPathBase}`,
+            "usageInfo": {
+              "@type": "CreativeWork",
+              "name": "QuickConvert Terms and Usage Information",
+              "url": `https://quickconvertunits.com/convert-${valText}-${canonicalPathBase}`
+            },
+            "inLanguage": "en",
+            "learningResourceType": "Formula",
             "educationalAlignment": {
               "@type": "AlignmentObject",
               "alignmentType": "educationalSubject",
@@ -843,13 +860,20 @@ export default {
             "potentialAction": {
               "@type": "SolveMathAction",
               "target": `https://quickconvertunits.com/convert-${valText}-${canonicalPathBase}`,
-              "eduQuestionType": "Conversion",
+              "eduQuestionType": "Arithmetic",
               "mathExpression": `${valText} ${fromUnit.name} = x ${toUnit.name}`
             }
           }] : [{
             "@type": "MathSolver",
             "@id": `https://quickconvertunits.com/${urlPath}#mathsolver`,
             "name": `${fromUnit.name} to ${toUnit.name} Formula`,
+            "url": `https://quickconvertunits.com/${urlPath}`,
+            "usageInfo": {
+              "@type": "CreativeWork",
+              "name": "QuickConvert Terms and Usage Information",
+              "url": `https://quickconvertunits.com/${urlPath}`
+            },
+            "inLanguage": "en",
             "learningResourceType": "Formula",
             "educationalAlignment": {
               "@type": "AlignmentObject",
@@ -859,7 +883,7 @@ export default {
             "potentialAction": {
               "@type": "SolveMathAction",
               "target": `https://quickconvertunits.com/${urlPath}?val={value}`,
-              "eduQuestionType": "Conversion",
+              "eduQuestionType": "Arithmetic",
               "mathExpression": `1 ${fromUnit.name} = x ${toUnit.name}`
             }
           }])
@@ -1149,6 +1173,16 @@ export default {
     const categorySchema = {
       "@context": "https://schema.org",
       "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://quickconvertunits.com/#organization",
+          "name": "QuickConvert",
+          "url": "https://quickconvertunits.com/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://quickconvertunits.com/favicon.svg"
+          }
+        },
         {
           "@type": "BreadcrumbList",
           "@id": `https://quickconvertunits.com/${urlPath}#breadcrumb`,
