@@ -1108,5 +1108,169 @@ export const blogPosts: BlogPost[] = [
         Because the conversion factor is exactly <a href="/mile_per_hour-to-kilometer_per_hour" class="text-primary-600 dark:text-primary-400 hover:underline">1 mph = 1.609 km/h</a>, European drivers should be highly vigilant that a "50" sign means you can drive much faster than 50 km/h!
       </p>
     `
+  },
+  {
+    slug: 'the-surprising-history-of-the-ounce',
+    title: 'The Surprising History of the Ounce: From Ancient Rome to the Modern Kitchen',
+    excerpt: 'The word ‘ounce’ dates back over two millennia. Learn about its Roman roots, why we abbreviate it as ‘oz’, and how it became a staple in recipes.',
+    date: 'May 14, 2026',
+    readTime: '5 min read',
+    faqSchema: {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why is ounce abbreviated as oz?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The abbreviation 'oz' comes from the Italian word 'onza', which was historically used to denote the measurement." }
+        },
+        {
+          "@type": "Question",
+          "name": "Where does the word ounce come from?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The word ounce derives from the Latin word 'uncia', which meant 'a twelfth part'." }
+        }
+      ]
+    },
+    content: `
+      <p class="lead text-xl text-neutral-600 dark:text-neutral-300 mb-8">
+        If you have ever baked a cake or sent a letter at the post office, you have interacted with the ounce. But have you ever wondered why we abbreviate a word that has no "Z" in it as "oz"?
+      </p>
+      <h2>The Roman Roots of "Uncia"</h2>
+      <p>
+        The story of the ounce begins over 2,000 years ago in Ancient Rome. The Romans used a mass measurement called the <em>libra</em> (which is why the pound is abbreviated as "lb"). The libra was divided into 12 equal parts. The Latin word for "a twelfth part" was <em>uncia</em>.
+      </p>
+      <p>
+        Over centuries, as the Roman Empire expanded, their words evolved across Europe. In Old English, <em>uncia</em> morphed into <em>ynce</em> (which eventually became the word "inch"). But in the sphere of weight, the Latin term traveled through Norman French into Middle English, morphing into the word <em>ounce</em>.
+      </p>
+      <h2>Why the "oz" Abbreviation?</h2>
+      <p>
+        During the Renaissance, Italian merchants were the absolute masters of global trade and banking. They traded silks, spices, and precious metals using their own standardized units. In 15th-century Italian, the word for ounce was <em>onza</em>. The heavy influence of Italian financial ledgers across Europe meant that the abbreviation "oz" became universally recognized shorthand in the commercial world, completely supplanting any English abbreviation.
+      </p>
+      <h2>The Ounce in Modern Measure</h2>
+      <p>
+        Today, the ounce is primarily utilized in the United States, but it exists in two distinct forms that often trip people up:
+      </p>
+      <ul>
+        <li><strong>Avoirdupois Ounce (Dry):</strong> Used for measuring physical weight. It is exactly defined as <a href="/ounce-to-gram" class="text-primary-600 dark:text-primary-400 hover:underline">28.3495 grams</a>. You use this to weigh flour, meat, or mail.</li>
+        <li><strong>Fluid Ounce (Volume):</strong> Used for measuring liquid space. One US fluid ounce equals <a href="/us_fluid_ounce-to-milliliter" class="text-primary-600 dark:text-primary-400 hover:underline">29.573 milliliters</a>. You use this for milk, water, and cocktails.</li>
+      </ul>
+      <p>
+        Despite the sweeping adoption of the metric system globally, the ounce holds strong due to its deep cultural integration and utility in fraction-based math. The next time you weigh an ounce of coffee or measure an ounce of syrup, you're engaging in a trading legacy that spans back to Caesars and medieval merchants!
+      </p>
+    `
+  },
+  {
+    slug: 'gallons-vs-liters-global-divide',
+    title: 'Gallons vs. Liters: The Global Divide in Liquid Volume',
+    excerpt: 'Why do Americans buy milk by the gallon but soda by the liter? Unravel the fascinating clash between metric and imperial volume measurements.',
+    date: 'May 14, 2026',
+    readTime: '6 min read',
+    faqSchema: {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How many liters are in one gallon?",
+          "acceptedAnswer": { "@type": "Answer", "text": "One US gallon is equal to approximately 3.785 liters." }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is soda sold in liters but milk in gallons?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Soda companies adopted the 2-liter bottle in the 1970s to standardize global plastic production, while the domestic dairy industry successfully resisted metrication, keeping the historic gallon jug." }
+        }
+      ]
+    },
+    content: `
+      <p class="lead text-xl text-neutral-600 dark:text-neutral-300 mb-8">
+        If you walk into an American supermarket, you will encounter one of the most perplexing remnants of the metrication movement: liquid volume. You buy a <em>gallon</em> of milk, but right down the aisle, you grab a 2-<em>liter</em> bottle of soda. Why the discrepancy?
+      </p>
+      <h2>The Metric Push of the 1970s</h2>
+      <p>
+        In 1975, the US Congress passed the Metric Conversion Act, declaring the metric system "the preferred system of weights and measures." The goal was to align American commerce with the rest of the world. Industries were encouraged—but crucially, not forced—to adapt.
+      </p>
+      <h2>Why Soda Went Metric</h2>
+      <p>
+        Multinational beverage corporations, like Pepsi and Coca-Cola, saw a brilliant economic opportunity. In the 1970s, plastic (PET) bottles were becoming cheap to manufacture. By standardizing on the <strong>2-liter</strong> bottle, beverage companies could use the exact same bottle molds in the US that they used in Europe, Asia, and South America. The uniform global manufacturing drastically cut costs, and the 2-liter bottle became an overnight success.
+      </p>
+      <h2>Why Milk Stayed Imperial</h2>
+      <p>
+        The dairy industry, however, was highly localized. Milk spoils quickly, meaning it is processed and sold domestically, not exported globally in plastic bottles. Milk producers saw no financial benefit in retooling their factories to produce "4-liter" jugs. To the dairy industry, the <strong><a href="/us_gallon-to-liter" class="text-primary-600 dark:text-primary-400 hover:underline">128-ounce US Gallon</a></strong> was already perfect, and switching to metric would only confuse their customers and cost millions. They simply refused to change.
+      </p>
+      <h2>The Exact Conversion</h2>
+      <p>
+        If you are trying to conceptualize international liquid volumes, here is the math:
+      </p>
+      <div class="bg-neutral-50 dark:bg-[#1a1a1a] p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 my-6 font-mono text-sm shadow-inner">
+        1 US Liquid Gallon = 3.78541 Liters
+      </div>
+      <p>
+        This means a 2-liter bottle of soda is roughly a little more than half a gallon. When converting recipes for international audiences, understanding differences in volume is essential. Ensure you specify whether your recipe utilizes metric or US Customary measurements!
+      </p>
+    `
+  },
+  {
+    slug: 'coffee-ratios-grams-to-ounces',
+    title: 'Mastering Coffee Ratios: Grams to Ounces for the Perfect Brew',
+    excerpt: 'Stop guessing your morning coffee measurements. Discover how to use grams and dry ounces to dial in the ultimate golden ratio for your pour-over.',
+    date: 'May 14, 2026',
+    readTime: '5 min read',
+    faqSchema: {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the golden ratio for coffee?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The golden ratio for coffee is generally agreed to be between 1:15 and 1:18 parts coffee to water by weight." }
+        },
+        {
+          "@type": "Question",
+          "name": "How many grams of coffee per cup?",
+          "acceptedAnswer": { "@type": "Answer", "text": "For a standard 8-ounce cup of coffee, you will typically need about 15 grams of coffee beans." }
+        }
+      ]
+    },
+    content: `
+      <p class="lead text-xl text-neutral-600 dark:text-neutral-300 mb-8">
+        If you want a truly spectacular cup of coffee, you need to abandon the scooping method immediately. The secret to world-class coffee is understanding exactly how to measure your beans and water by weight.
+      </p>
+      <h2>The Problem with Volume Scoops</h2>
+      <p>
+        Coffee beans vary wildly in density. A dark roast bean is larger and lighter because it has lost more moisture during roasting. A light roast bean is smaller and denser. If you use a "tablespoon" to measure your coffee, one scoop of dark roast will weigh significantly less than one scoop of light roast. This inconsistency completely wrecks your flavor profile.
+      </p>
+      <h2>Weight is the Ultimate Truth</h2>
+      <p>
+        The only way to guarantee a perfect brew is to measure everything by mass. In specialty coffee shops, the standard unit of measurement is the <strong>gram</strong>. 
+      </p>
+      <p>
+        But what if your kitchen scale only works in ounces? You can easily hit the perfect ratio using our <a href="/weight-converter" class="text-primary-600 dark:text-primary-400 hover:underline">Ounce to Gram converter</a>.
+      </p>
+      <ul>
+        <li>1 Ounce (oz) = 28.35 grams</li>
+        <li>1/2 Ounce (0.5 oz) = 14.17 grams</li>
+      </ul>
+      <h2>The Golden Ratios</h2>
+      <p>
+        A "coffee ratio" is the weight of coffee beans compared to the weight of the water. (Remember: 1 milliliter of water weighs exactly 1 gram, making metric math incredibly easy).
+      </p>
+      <ul>
+        <li><strong>1:15 Ratio:</strong> A strong, bold cup. Good for dark roasts holding up against milk.</li>
+        <li><strong>1:16 Ratio:</strong> The classic "Golden Ratio". Perfect balance of strength and clarity.</li>
+        <li><strong>1:17 Ratio:</strong> A lighter, tea-like brew. Excellent for bringing out fruity notes in light roasts.</li>
+      </ul>
+      <h2>A Practical Example (The 8 oz Cup)</h2>
+      <p>
+        Let's say you want to brew a standard 8-ounce mug of coffee using the 1:16 golden ratio.
+      </p>
+      <ol>
+        <li>Start with your water: 8 fluid ounces of water weighs roughly <strong>236 grams</strong>.</li>
+        <li>Divide your water weight by your ratio target: 236 ÷ 16 = <strong>14.75 grams</strong>.</li>
+        <li>You need 14.75 grams of coffee beans! If your scale only reads in ounces, that is approximately <strong>0.52 ounces</strong> of coffee.</li>
+      </ol>
+      <p>
+        Ditch the scoop! Start using ratios and weights, and your morning brew will instantly rival your local cafe.
+      </p>
+    `
   }
 ];
