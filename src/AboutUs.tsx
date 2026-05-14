@@ -72,7 +72,7 @@ export default function AboutUs() {
             <h2 className="text-2xl font-semibold mb-6 text-neutral-900 dark:text-neutral-100">Our Team</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div className="p-5 border border-neutral-200 dark:border-neutral-800 rounded-xl bg-neutral-50 dark:bg-neutral-800/30">
-                <h3 className="font-semibold text-lg text-neutral-900 dark:text-neutral-100">Harish Mohammed</h3>
+                <h3 className="font-semibold text-lg text-neutral-900 dark:text-neutral-100">Stephen Sebastian</h3>
                 <p className="text-primary-600 dark:text-primary-400 font-medium text-sm mb-2">IT Head</p>
                 <p className="text-sm text-neutral-600 dark:text-neutral-400">Leading the technical architecture and ensuring our local-first rendering engine delivers instantaneous, precise calculations.</p>
               </div>

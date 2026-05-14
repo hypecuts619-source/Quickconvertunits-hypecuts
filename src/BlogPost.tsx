@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useParams, useNavigate, MemoryRouter } from 'react-router-dom';
+import { Link, useParams, useNavigate, MemoryRouter, Routes, Route } from 'react-router-dom';
 import { ArrowLeft, Clock, Calendar, User } from 'lucide-react';
 import { blogPosts } from './lib/blogPosts';
 import App from './App';
@@ -102,19 +102,22 @@ export default function BlogPost() {
 
           <div className="content-wrapper">
             {post.content.split(/(\{\{WIDGET:[^}]+\}\})/g).map((part, index) => {
+              const uniqueKey = `${post.slug}-${index}`;
               if (part.startsWith('{{WIDGET:')) {
                 const route = part.replace('{{WIDGET:', '').replace('}}', '');
                 return (
-                  <div key={index} className="my-10 rounded-[2.5rem] overflow-hidden -mx-4 md:mx-0 relative">
+                  <div key={uniqueKey} className="my-10 rounded-[2.5rem] overflow-hidden -mx-4 md:mx-0 relative">
                     <MemoryRouter initialEntries={[`/${route}?embed=true`]}>
-                      <App />
+                      <Routes>
+                        <Route path="/:conversion" element={<App />} />
+                      </Routes>
                     </MemoryRouter>
                   </div>
                 );
               }
               return (
                 <div 
-                  key={index}
+                  key={uniqueKey}
                   className="prose prose-neutral dark:prose-invert prose-lg max-w-none font-light leading-relaxed prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-primary-600 dark:prose-a:text-primary-400"
                   dangerouslySetInnerHTML={{ __html: part }}
                   onClick={handleContentClick}
