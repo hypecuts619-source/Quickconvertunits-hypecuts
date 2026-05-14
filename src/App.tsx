@@ -287,72 +287,7 @@ interface HistoryItem {
 
 const themes = ["blue", "rose", "emerald", "violet", "amber", "cyan", "fuchsia"];
 
-const AdSlot = ({
-  widthClass,
-  heightClass,
-  className,
-  text,
-  mobileText,
-  adSlotId = "1234567890", // Placeholder AdSense slot ID
-}: {
-  widthClass: string;
-  heightClass: string;
-  className?: string;
-  text: string;
-  mobileText?: string;
-  adSlotId?: string;
-}) => {
-  // Set to true to display real Google AdSense ads.
-  // Make sure to add the AdSense script tag to index.html and update data-ad-client
-  const [useRealAds] = useState(false);
 
-  useEffect(() => {
-    if (useRealAds) {
-      try {
-        // @ts-ignore
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-      } catch (err) {
-        console.error("AdSense error", err);
-      }
-    }
-  }, [useRealAds]);
-
-  const extractPx = (cls: string) => {
-    const match = cls.match(/\[(\d+px)\]/);
-    return match ? match[1] : undefined;
-  };
-  
-  const minHeight = extractPx(heightClass);
-  const minWidth = extractPx(widthClass);
-
-  return (
-    <div className={`flex flex-col items-center overflow-hidden max-w-full ${className || ""}`} style={{ minHeight }}>
-      <span className="text-[10px] text-neutral-400 dark:text-neutral-500 uppercase tracking-widest mb-1.5 font-medium">
-        Advertisement
-      </span>
-      {useRealAds ? (
-        <div className={`overflow-hidden flex justify-center ${widthClass} ${heightClass}`} style={{ minHeight, minWidth }}>
-          <ins
-            className="adsbygoogle"
-            style={{ display: "block", width: "100%", height: "100%", minHeight, minWidth }}
-            data-ad-client="ca-pub-0000000000000000" // Replace with your AdSense Publisher ID
-            data-ad-slot={adSlotId}
-            data-ad-format="auto"
-            data-full-width-responsive="true"
-          ></ins>
-        </div>
-      ) : (
-        <div
-          className={`flex flex-col text-center px-4 items-center justify-center bg-neutral-100 dark:bg-[#1a1a1a] text-neutral-400 dark:text-neutral-600 text-xs font-medium border border-dashed border-neutral-200 dark:border-neutral-800 rounded-lg overflow-hidden max-w-full ${widthClass} ${heightClass}`}
-        >
-          <span className="hidden md:inline">{text}</span>
-          <span className="md:hidden">{mobileText || text}</span>
-          <span className="text-[10px] opacity-70 mt-1">Configure in src/App.tsx</span>
-        </div>
-      )}
-    </div>
-  );
-};
 
 function CookieConsent() {
   const [isVisible, setIsVisible] = useState(false);
@@ -2420,17 +2355,7 @@ export default function App() {
             <CurrencyPairsTable />
           )}
 
-          {/* AD: Below Result Ad */}
-          {!isEmbed && (
-            <AdSlot
-              className="mt-8"
-              widthClass="w-full max-w-[728px]"
-              heightClass="h-[100px]"
-              text="Below Result Ad"
-              mobileText="Below Result Ad"
-            />
-          )}
-
+          
           {/* Trust Signals / User Reviews */}
           {!isEmbed && (
             <div className="mt-16 mb-12 px-4 md:px-0">
@@ -2666,15 +2591,7 @@ export default function App() {
               </div>
             </div>
 
-            {/* AD: In-Content Ad */}
-            <AdSlot
-              className="my-10"
-              widthClass="w-full max-w-[728px]"
-              heightClass="h-[100px]"
-              text="Native In-Content Ad"
-              mobileText="Native In-Content Ad"
-            />
-
+            
             {/* Formulas Section */}
             <div className="mb-12">
               <div className="flex items-center gap-2 mb-6">
@@ -3029,9 +2946,6 @@ export default function App() {
                   <a href="https://www.youtube.com/@Quickconvertunits" itemProp="sameAs" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-[#FF0000] transition-colors" aria-label="YouTube channel">
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M19.812 5.418c.861.23 1.538.907 1.768 1.768C21.998 8.746 22 12 22 12s0 3.255-.418 4.814a2.504 2.504 0 0 1-1.768 1.768c-1.56.419-7.814.419-7.814.419s-6.255 0-7.814-.419a2.505 2.505 0 0 1-1.768-1.768C2 15.255 2 12 2 12s0-3.255.417-4.814a2.507 2.507 0 0 1 1.768-1.768C5.744 5 11.998 5 11.998 5s6.255 0 7.814.418ZM15.194 12 10 15V9l5.194 3Z" clipRule="evenodd"/></svg>
                   </a>
-                  <a href="https://www.pinterest.com/quickconvertunits/" itemProp="sameAs" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-[#E60023] transition-colors" aria-label="Pinterest page">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.951-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.367 18.592 0 12.017 0z"/></svg>
-                  </a>
                 </div>
                 <p className="leading-relaxed max-w-4xl">
                   <strong>Disclaimer:</strong> While we strive to provide accurate information, QuickConvert makes no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability or availability of the conversion calculators. Any reliance you place on such information is therefore strictly at your own risk.
@@ -3083,35 +2997,12 @@ export default function App() {
                 </div>
               </div>
 
-              {/* AD: Right Sidebar Sticky 1 */}
-              <AdSlot
-                widthClass="w-[300px]"
-                heightClass="h-[600px]"
-                text="Sticky Sidebar Ad 1 (300x600)"
-              />
-              {/* AD: Right Sidebar Sticky 2 */}
-              <AdSlot
-                widthClass="w-[300px]"
-                heightClass="h-[300px]"
-                text="Sticky Sidebar Ad 2 (300x250)"
-              />
-            </div>
+                                        </div>
           </aside>
         )}
       </div>
 
-      {/* AD: Mobile Sticky Bottom Ad */}
-      {!isEmbed && (
-        <div className="fixed bottom-0 left-0 right-0 z-[40] bg-white dark:bg-[#111111] border-t border-neutral-200 dark:border-neutral-800 p-2 md:hidden flex justify-center pb-[env(safe-area-inset-bottom)]">
-          <AdSlot
-            widthClass="w-[320px]"
-            heightClass="h-[50px]"
-            text="Sticky Bottom Ad (320x50)"
-            mobileText="Sticky Bottom Ad (320x50)"
-          />
-        </div>
-      )}
-
+      
       {!isEmbed && <CookieConsent />}
       {!isEmbed && <PwaPrompt />}
       
