@@ -74,14 +74,6 @@ for (const category of categories) {
           priority = "0.9";
         }
         addUrl(pathStr, priority, "monthly");
-
-        // Add dynamic conversions for popular SEO queries
-        for (const val of magicNumbers) {
-          // pathStr is e.g. "/lbs-to-kg"
-          // we want "/convert-150-lbs-to-kg"
-          const dynamicPath = `/convert-${val}${pathStr.replace('/', '-')}`;
-          addUrl(dynamicPath, priority === "0.9" ? "0.8" : "0.5", "monthly");
-        }
       }
     }
   }

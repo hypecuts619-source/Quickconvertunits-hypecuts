@@ -37,6 +37,7 @@ import { UnitSelector } from "./components/UnitSelector";
 import { Breadcrumbs } from "./components/Breadcrumbs";
 import { DynamicContext } from "./components/DynamicContext";
 import { EmbedWidget } from "./components/EmbedWidget";
+import { RelatableComparison } from "./components/RelatableComparison";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -1049,6 +1050,7 @@ export default function App() {
   let metaDescStr = "";
   let canonicalUrlStr = "";
   let ogTitleStr = "";
+  let isNumericPath = location.pathname.startsWith('/convert-');
   let schema: any[] = [
     {
       "@type": "Organization",
@@ -1155,7 +1157,6 @@ export default function App() {
       canonicalUrlStr = `https://quickconvertunits.com/${category.replace(/_/g, '-')}-converter`;
       ogTitleStr = titleStr;
     } else {
-      const isNumericPath = location.pathname.startsWith('/convert-');
       const valPrefix = valFrom && valFrom !== "1" && valFrom !== "0" ? `${valFrom} ` : "";
       const symbolToPath = getSEOUrlPath(unitFrom, unitTo);
       const customSeo = customSeoData[symbolToPath];
@@ -1178,9 +1179,7 @@ export default function App() {
           metaDescStr = `Convert ${valPrefix}${pluralFrom.toLowerCase()} to ${pluralTo.toLowerCase()} instantly. 1 ${symFrom} = ${convert(1, unitFrom, unitTo, category).toPrecision(6)} ${symTo}. Offline capable, free calculator with conversion table, formula, and examples. Fast and accurate.`;
         }
       }
-      canonicalUrlStr = isNumericPath 
-        ? `https://quickconvertunits.com/convert-${valFrom}-${getSEOUrlPath(unitFrom, unitTo)}`
-        : `https://quickconvertunits.com/${getSEOUrlPath(unitFrom, unitTo)}`;
+      canonicalUrlStr = `https://quickconvertunits.com/${getSEOUrlPath(unitFrom, unitTo)}`;
       ogTitleStr = titleStr;
     }
 
@@ -1382,6 +1381,7 @@ export default function App() {
       <Helmet>
         <title>{titleStr}</title>
         <meta name="description" content={metaDescStr} />
+        {isNumericPath && <meta name="robots" content="noindex" />}
         <link rel="canonical" href={canonicalUrlStr} />
         <meta property="og:title" content={ogTitleStr} />
         <meta property="og:description" content={metaDescStr} />
@@ -1965,7 +1965,7 @@ export default function App() {
               </div>
             </div>
 
-            {/* Quick Info text */}
+              {/* Quick Info text */}
             <div className="mt-6 flex flex-col items-center justify-center gap-2 text-sm text-neutral-400 dark:text-neutral-500">
               {valFrom && valTo && (
                 <p>
@@ -1976,6 +1976,11 @@ export default function App() {
                   {activeToUnit?.symbol}
                 </p>
               )}
+              
+              {(category === 'length' || category === 'weight' || category === 'volume') && valTo && valFrom && (
+                <RelatableComparison category={category} valTo={valTo} unitTo={unitTo} valFrom={valFrom} unitFrom={unitFrom} />
+              )}
+              
               {category === "currency" && (
                 <button
                   aria-label="Refresh exchange rates"
