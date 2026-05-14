@@ -27,6 +27,12 @@ export default function Blog() {
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 text-xs font-medium text-neutral-400 dark:text-neutral-500 mb-3 uppercase tracking-wider">
+                    {post.author && (
+                      <>
+                        <span className="text-primary-600 dark:text-primary-400 font-semibold">{post.author}</span>
+                        <span>&bull;</span>
+                      </>
+                    )}
                     <span>{post.date}</span>
                     <span>&bull;</span>
                     <span>{post.readTime}</span>

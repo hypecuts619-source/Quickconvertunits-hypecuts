@@ -1,8 +1,8 @@
 import React from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, Calendar } from 'lucide-react';
+import { Link, useParams, useNavigate, MemoryRouter } from 'react-router-dom';
+import { ArrowLeft, Clock, Calendar, User } from 'lucide-react';
 import { blogPosts } from './lib/blogPosts';
-
+import App from './App';
 import { Helmet } from 'react-helmet-async';
 
 export default function BlogPost() {
@@ -59,7 +59,7 @@ export default function BlogPost() {
                   "headline": post.title,
                   "description": post.excerpt,
                   "datePublished": post.date,
-                  "author": { "@type": "Organization", "name": "QuickConvert" }
+                  "author": post.author ? { "@type": "Person", "name": post.author } : { "@type": "Organization", "name": "QuickConvert" }
                 }
               ]
             })}
@@ -77,6 +77,12 @@ export default function BlogPost() {
               {title || 'How to Convert Units Programmatically'}
             </h1>
             <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-neutral-500 dark:text-neutral-400">
+              {post.author && (
+                <div className="flex items-center gap-1.5 border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-[#1a1a1a] px-3 py-1.5 rounded-full">
+                  <User className="w-4 h-4" />
+                  {post.author}
+                </div>
+              )}
               <div className="flex items-center gap-1.5 border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-[#1a1a1a] px-3 py-1.5 rounded-full">
                 <Calendar className="w-4 h-4" />
                 {post.date}
@@ -88,11 +94,28 @@ export default function BlogPost() {
             </div>
           </header>
 
-          <div 
-            className="prose prose-neutral dark:prose-invert prose-lg max-w-none font-light leading-relaxed prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-primary-600 dark:prose-a:text-primary-400"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-            onClick={handleContentClick}
-          />
+          <div className="content-wrapper">
+            {post.content.split(/(\{\{WIDGET:[^}]+\}\})/g).map((part, index) => {
+              if (part.startsWith('{{WIDGET:')) {
+                const route = part.replace('{{WIDGET:', '').replace('}}', '');
+                return (
+                  <div key={index} className="my-10 rounded-[2.5rem] overflow-hidden -mx-4 md:mx-0 relative">
+                    <MemoryRouter initialEntries={[`/${route}?embed=true`]}>
+                      <App />
+                    </MemoryRouter>
+                  </div>
+                );
+              }
+              return (
+                <div 
+                  key={index}
+                  className="prose prose-neutral dark:prose-invert prose-lg max-w-none font-light leading-relaxed prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-primary-600 dark:prose-a:text-primary-400"
+                  dangerouslySetInnerHTML={{ __html: part }}
+                  onClick={handleContentClick}
+                />
+              );
+            })}
+          </div>
             
           <div className="mt-12 p-8 bg-primary-50 dark:bg-primary-900/10 rounded-3xl border border-primary-100 dark:border-primary-900/30 text-center">
             <h3 className="text-xl font-semibold mb-3 text-primary-900 dark:text-primary-100 mt-0">Ready to convert?</h3>

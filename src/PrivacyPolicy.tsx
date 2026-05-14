@@ -45,13 +45,26 @@ export default function PrivacyPolicy() {
             <p className="mb-3">
               We use third-party advertising companies to serve ads when you visit our website. These companies may use information (not including your name, address, email address, or telephone number) about your visits to this and other websites in order to provide advertisements about goods and services of interest to you.
             </p>
+            <p className="mb-3">
+              <strong className="font-medium text-neutral-900 dark:text-neutral-200">Google AdSense and DoubleClick Cookie:</strong> Google, as a third-party vendor, uses cookies to serve ads on quickconvertunits.com. Google's use of advertising cookies enables it and its partners to serve ads to our users based on their visit to our site and/or other sites on the Internet. Third-party vendors, including Google, use cookies to serve ads based on a user's prior visits to your website or other websites.
+            </p>
             <p>
-              <strong className="font-medium text-neutral-900 dark:text-neutral-200">Google AdSense:</strong> Google, as a third-party vendor, uses cookies to serve ads on quickconvertunits.com. Google's use of advertising cookies enables it and its partners to serve ads to our users based on their visit to our site and/or other sites on the Internet. You may opt out of personalized advertising by visiting the <a href="https://adssettings.google.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors">Google Ads Settings</a>.
+              You may opt out of personalized advertising by visiting the <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" className="text-primary-600 dark:text-primary-400 hover:underline transition-colors">Google Ads Settings</a>. Alternatively, you can opt out of a third-party vendor's use of cookies for personalized advertising by visiting <a href="https://www.aboutads.info" target="_blank" rel="noopener noreferrer" className="text-primary-600 dark:text-primary-400 hover:underline transition-colors">www.aboutads.info</a>.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-medium mb-4 text-neutral-800 dark:text-neutral-200">4. Data Security</h2>
+            <h2 className="text-xl font-medium mb-4 text-neutral-800 dark:text-neutral-200">4. Log Files & Local Storage</h2>
+            <p className="mb-3">
+              Because QuickConvert features a local-first architecture built as a Progressive Web App (PWA), the vast majority of your calculation data never leaves your device. Numerical inputs, conversion histories, and local preferences are stored locally in your browser's LocalStorage and are completely private to you.
+            </p>
+            <p>
+              Separate from your private calculating activities, we utilize Google Analytics 4 (GA4) to understand high-level traffic behavior (such as which conversion page is the most popular). This analytics tracking assigns an anonymous identifier and tracks aggregate page views but does not have access to your exact calculator inputs.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-medium mb-4 text-neutral-800 dark:text-neutral-200">5. Data Security</h2>
             <p>
               We take appropriate security measures to protect against unauthorized access, alteration, disclosure, or destruction of your personal information. However, please be aware that no storage or transmission mechanism on the internet is 100% secure.
             </p>

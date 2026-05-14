@@ -1,4 +1,5 @@
 User-agent: *
+Disallow: /convert-*
 Allow: /
 
 # AI crawlers for AEO/GEO - CRITICAL for 2026

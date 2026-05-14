@@ -7,6 +7,7 @@ import categoryHubsData from "./lib/categoryHubs.json";
 import { trackConversionEvent, trackFunnelStep, trackPageView, initGA, trackPWAInstall, trackNullState } from "./lib/analytics";
 import { LanguageSelector } from "./components/LanguageSelector";
 import { FormulaBlock } from "./components/FormulaBlock";
+import { HomepageBlogHub } from "./components/HomepageBlogHub";
 import { useTranslation } from "react-i18next";
 import { POPULAR_CONVERSIONS } from "./lib/constants";
 import {
@@ -1439,6 +1440,10 @@ export default function App() {
               </a>
 
               <div className="flex items-center gap-1 sm:gap-2 md:gap-4 flex-1 justify-end shrink-0">
+                <Link to="/blog" className="hidden sm:block text-sm font-medium text-neutral-600 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-500 transition-colors">
+                  Guides & Blog
+                </Link>
+                
                 {/* Desktop Search */}
                 <div className="relative hidden md:block max-w-sm w-full">
                   <div className="relative">
@@ -2743,8 +2748,10 @@ export default function App() {
             />
 
             {isHomepage && (
-              <div className="mt-16 bg-white dark:bg-[#111111] rounded-3xl p-8 md:p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-neutral-100 dark:border-neutral-800 prose prose-neutral dark:prose-invert max-w-none">
-                <h2 className="mb-4 text-2xl font-semibold tracking-tight">Why Use QuickConvert Units?</h2>
+              <>
+                <HomepageBlogHub />
+                <div className="mt-16 bg-white dark:bg-[#111111] rounded-3xl p-8 md:p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-neutral-100 dark:border-neutral-800 prose prose-neutral dark:prose-invert max-w-none">
+                  <h2 className="mb-4 text-2xl font-semibold tracking-tight">Why Use QuickConvert Units?</h2>
                 <p className="font-light text-neutral-600 dark:text-neutral-400">Our free online unit converter provides instant, accurate conversions across 14 measurement categories. Whether you're converting kilograms to pounds for international shipping, Celsius to Fahrenheit for travel weather, or cups to milliliters for cooking recipes, QuickConvert delivers precise results in real-time.</p>
                 
                 <h2 className="mb-4 mt-8 text-2xl font-semibold tracking-tight">Most Popular Conversions</h2>
@@ -2918,6 +2925,7 @@ export default function App() {
                   </div>
                 </div>
               </div>
+              </>
             )}
           </section>
         )}

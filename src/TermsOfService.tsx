@@ -29,36 +29,39 @@ export default function TermsOfService() {
 
           <section>
             <h2 className="text-xl font-medium mb-4 text-neutral-800 dark:text-neutral-200">2. Description of Service</h2>
-            <p>
+            <p className="mb-3">
               QuickConvert is a free online unit conversion tool. We provide various calculators and unit conversion utilities. We do not guarantee the accuracy of any conversions and are not responsible for any issues arising from their use.
+            </p>
+            <p>
+              While we strive for absolute accuracy, QuickConvertUnits is provided 'as is'. We are not liable for any miscalculations used in high-stakes engineering, financial, or medical scenarios. Users should independently verify critical calculations using certified professional tools before acting on them.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-medium mb-4 text-neutral-800 dark:text-neutral-200">3. Disclaimer of Warranties</h2>
             <p>
-              All materials and services on this website are provided "as is" and "as available" without warranty of any kind, whether express or implied.
+              All materials and services on this website are provided "as is" and "as available" without warranty of any kind, whether express or implied. QuickConvert makes no representations or warranties in relation to the accuracy, completeness, or reliability of the conversion tools software.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-medium mb-4 text-neutral-800 dark:text-neutral-200">4. Limitation of Liability</h2>
             <p>
-              In no event shall QuickConvert or its affiliates be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with your use of the website.
+              In no event shall QuickConvert or its affiliates be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with your use of the website or the numerical outcomes provided by our software calculators.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-medium mb-4 text-neutral-800 dark:text-neutral-200">5. User Conduct</h2>
             <p>
-              You agree to use our website only for lawful purposes. You are prohibited from using the site to engage in any activity that could damage, disable, or impair our servers or networks.
+              You agree to use our website only for lawful purposes. You are prohibited from using the site to engage in any activity that could damage, disable, or impair our servers or networks. You may not scrape our conversion engine or reproduce its functionality without express written permission.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-medium mb-4 text-neutral-800 dark:text-neutral-200">6. Intellectual Property</h2>
             <p>
-              The content, features, and functionality of this website are owned by QuickConvert and are protected by international copyright, trademark, and other intellectual property laws.
+              The content, features, and functionality of this website—including all codebase, visual design, interactive layouts, algorithms, original editorial content, and documentation—are exclusively owned by QuickConvert and are protected by international copyright, trademark, and other intellectual property laws.
             </p>
           </section>
 

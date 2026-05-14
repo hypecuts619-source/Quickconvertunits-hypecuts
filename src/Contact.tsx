@@ -30,8 +30,11 @@ export default function Contact() {
               <p>
                 For general inquiries, support, or partnership opportunities, you can use the form or email us directly at:
               </p>
-              <p className="mt-4 mb-8">
+              <p className="mt-4 mb-4">
                 <a href="mailto:support@quickconvertunits.com" className="font-medium text-primary-600 dark:text-primary-400 hover:underline">support@quickconvertunits.com</a>
+              </p>
+              <p className="mb-8 font-medium">
+                We aim to respond to all bug reports and inquiries within 48 hours.
               </p>
               
               <h2 className="text-xl font-medium mb-4 text-neutral-800 dark:text-neutral-200">Technical Support</h2>

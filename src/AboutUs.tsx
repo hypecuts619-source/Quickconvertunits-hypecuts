@@ -15,6 +15,16 @@ export default function AboutUs() {
           <p className="text-xl leading-normal font-medium text-neutral-800 dark:text-neutral-200">
             QuickConvert (<strong className="font-semibold text-primary-600 dark:text-primary-400">quickconvertunits.com</strong>) is an independent engineering project dedicated to providing the internet's fastest, most accurate, and accessible unit conversion platform.
           </p>
+          
+          <section>
+            <h2 className="text-2xl font-semibold mb-4 text-neutral-900 dark:text-neutral-100">Our Mission</h2>
+            <p className="mb-4">
+              QuickConvertUnits was built to provide lightning-fast, local-first math conversions for travelers and students without the bloat of traditional ad-heavy calculators. We noticed that existing standard calculators on the web were increasingly becoming bloated with autoplay videos, sluggish load times, and invasive tracking scripts. Our goal was simple: build a mathematically precise tool that works instantly, even offline, and respects the user's intelligence.
+            </p>
+            <p>
+              Developed by an independent web engineering team based in India, our project focuses on global utility. We are deeply committed to ensuring that everyday mathematical tools are accessible to anyone, anywhere in the world, regardless of their device's processing power or internet connection speed.
+            </p>
+          </section>
 
           <div className="grid md:grid-cols-2 gap-8 my-10">
             <div className="bg-neutral-50 dark:bg-neutral-800/50 p-6 rounded-2xl border border-neutral-100 dark:border-neutral-800/80">
@@ -42,7 +52,7 @@ export default function AboutUs() {
           <section>
             <h2 className="text-2xl font-semibold mb-4 text-neutral-900 dark:text-neutral-100">Editorial & Data Guidelines</h2>
             <p className="mb-4">
-              Providing accurate conversions requires stringent data policies. Our editorial process for writing articles and guides involves rigorous fact-checking against academic and mathematical records.
+              Providing accurate conversions requires stringent data policies. Our editorial process for writing articles and guides involves rigorous fact-checking against academic and mathematical records. Every unit conversion is cross-referenced to ensure international applicability.
             </p>
             <ul className="list-disc pl-5 space-y-3">
               <li><strong className="font-medium text-neutral-900 dark:text-neutral-200">Currency Data:</strong> Live foreign exchange rates are pulled dynamically via verified, institutional financial APIs (like the European Central Bank standard) ensuring mid-market accuracy.</li>
@@ -54,12 +64,28 @@ export default function AboutUs() {
           <section>
             <h2 className="text-2xl font-semibold mb-4 text-neutral-900 dark:text-neutral-100">Our Story</h2>
             <p>
-              The project was started after we grew endlessly frustrated with existing unit converters that were bogged down by intrusive splash pages, hidden paywalls, and confusing navigation. QuickConvert was born out of a desire for a clean, distraction-free environment that prioritizes user experience above all else. Today, we support millions of rapid calculations globally.
+              The project was started after we grew endlessly frustrated with existing unit converters that were bogged down by intrusive splash pages, hidden paywalls, and confusing navigation. QuickConvert was born out of a desire for a clean, distraction-free environment that prioritizes user experience above all else. Today, we support thousands of rapid calculations globally per day, empowering a community of professionals and enthusiasts.
             </p>
           </section>
 
+          <section>
+            <h2 className="text-2xl font-semibold mb-6 text-neutral-900 dark:text-neutral-100">Our Team</h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="p-5 border border-neutral-200 dark:border-neutral-800 rounded-xl bg-neutral-50 dark:bg-neutral-800/30">
+                <h3 className="font-semibold text-lg text-neutral-900 dark:text-neutral-100">Harish Mohammed</h3>
+                <p className="text-primary-600 dark:text-primary-400 font-medium text-sm mb-2">IT Head</p>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">Leading the technical architecture and ensuring our local-first rendering engine delivers instantaneous, precise calculations.</p>
+              </div>
+              <div className="p-5 border border-neutral-200 dark:border-neutral-800 rounded-xl bg-neutral-50 dark:bg-neutral-800/30">
+                <h3 className="font-semibold text-lg text-neutral-900 dark:text-neutral-100">Rojin Jacob</h3>
+                <p className="text-primary-600 dark:text-primary-400 font-medium text-sm mb-2">Content & Marketing Head</p>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">Driving our editorial strategy and guaranteeing that our math guides remain accessible, globally relevant, and strictly accurate.</p>
+              </div>
+            </div>
+          </section>
+
           <footer className="mt-12 pt-8 border-t border-neutral-200 dark:border-neutral-800 text-sm flex flex-col md:flex-row gap-4 justify-between items-center">
-            <span className="font-medium">Need to get in touch?</span>
+            <span className="font-medium">Need to get in touch? We typically respond within 48 hours.</span>
             <Link to="/contact" className="px-6 py-2.5 bg-primary-600 text-white rounded-full font-medium hover:bg-primary-700 transition-colors">
               Contact Support
             </Link>
