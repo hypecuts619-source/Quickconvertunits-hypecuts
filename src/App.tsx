@@ -1664,9 +1664,13 @@ export default function App() {
 
           {/* Converter Card */}
           {category === 'time_zone' ? (
-            <TimeZoneConverter />
+            <Suspense fallback={<div className="h-[400px] flex items-center justify-center bg-white dark:bg-[#111111] rounded-[2.5rem]">Loading converter...</div>}>
+              <TimeZoneConverter />
+            </Suspense>
           ) : category === 'bmi' ? (
-            <BMICalculator />
+            <Suspense fallback={<div className="h-[400px] flex items-center justify-center bg-white dark:bg-[#111111] rounded-[2.5rem]">Loading calculator...</div>}>
+              <BMICalculator />
+            </Suspense>
           ) : (
           <motion.div
             layout
@@ -2316,22 +2320,26 @@ export default function App() {
             </Suspense>
           )}
           
-          {!isEmbed && !isHomepage && (
-            <HowToConvertSection
-              category={category}
-              activeFromUnit={activeFromUnit as any}
-              activeToUnit={activeToUnit as any}
-            />
+          {!isEmbed && !isHomepage && category !== 'time_zone' && activeFromUnit && activeToUnit && (
+            <Suspense fallback={null}>
+              <HowToConvertSection
+                category={category}
+                activeFromUnit={activeFromUnit as any}
+                activeToUnit={activeToUnit as any}
+              />
+            </Suspense>
           )}
           
-          {!isEmbed && !isHomepage && (
-            <RelatedToolsSection
-              categoryName={categories.find(c => c.id === category)?.name || category}
-              category={category}
-              activeFromUnit={activeFromUnit as any}
-              activeToUnit={activeToUnit as any}
-              units={categories.find(c => c.id === category)?.units || []}
-            />
+          {!isEmbed && !isHomepage && category !== 'time_zone' && activeFromUnit && activeToUnit && (
+            <Suspense fallback={null}>
+              <RelatedToolsSection
+                categoryName={categories.find(c => c.id === category)?.name || category}
+                category={category}
+                activeFromUnit={activeFromUnit as any}
+                activeToUnit={activeToUnit as any}
+                units={categories.find(c => c.id === category)?.units || []}
+              />
+            </Suspense>
           )}
 
           {!isHomepage && category !== 'time_zone' && activeFromUnit && activeToUnit && (
@@ -2646,23 +2654,27 @@ export default function App() {
               </Suspense>
             )}
 
-            <SeoContent 
-              unitFrom={unitFrom} 
-              unitTo={unitTo} 
-              category={category} 
-              categories={categories} 
-            />
+            <Suspense fallback={null}>
+              <SeoContent 
+                unitFrom={unitFrom} 
+                unitTo={unitTo} 
+                category={category} 
+                categories={categories} 
+              />
+            </Suspense>
             
-            <PopularConversions 
-              onSelect={(cat, from, to) => {
-                handleCategoryChange(cat);
-                setTimeout(() => {
-                  setUnitFrom(from);
-                  setUnitTo(to);
-                  setValFrom("1");
-                }, 10);
-              }} 
-            />
+            <Suspense fallback={null}>
+              <PopularConversions 
+                onSelect={(cat, from, to) => {
+                  handleCategoryChange(cat);
+                  setTimeout(() => {
+                    setUnitFrom(from);
+                    setUnitTo(to);
+                    setValFrom("1");
+                  }, 10);
+                }} 
+              />
+            </Suspense>
 
             {isHomepage && (
               <>

@@ -108,9 +108,11 @@ export default function BlogPost() {
                 return (
                   <div key={uniqueKey} className="my-10 rounded-[2.5rem] overflow-hidden -mx-4 md:mx-0 relative">
                     <MemoryRouter initialEntries={[`/${route}?embed=true`]}>
-                      <Routes>
-                        <Route path="/:conversion" element={<App />} />
-                      </Routes>
+                      <React.Suspense fallback={<div className="h-[400px] flex items-center justify-center bg-neutral-50 dark:bg-neutral-900 rounded-[2.5rem]">Loading tool...</div>}>
+                        <Routes>
+                          <Route path="/:conversion" element={<App />} />
+                        </Routes>
+                      </React.Suspense>
                     </MemoryRouter>
                   </div>
                 );
