@@ -11,6 +11,12 @@ export default function BlogPost() {
 
   const post = blogPosts.find(p => p.slug === slug);
   const title = post?.title || slug?.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  const currentIndex = blogPosts.findIndex(p => p.slug === slug);
+  
+  const suggestions = blogPosts.length > 2 ? [
+    blogPosts[(currentIndex + 1) % blogPosts.length],
+    blogPosts[(currentIndex + 2) % blogPosts.length]
+  ].filter(Boolean) : [];
 
   if (!post) {
     return (
@@ -125,6 +131,39 @@ export default function BlogPost() {
             </Link>
           </div>
         </article>
+
+        {suggestions.length > 0 && (
+          <div className="mt-16">
+            <h3 className="text-2xl font-semibold tracking-tight mb-8 text-neutral-900 dark:text-white">Related Articles</h3>
+            <div className="grid gap-6 md:grid-cols-2">
+              {suggestions.map((suggestion, index) => (
+                <Link
+                  key={index}
+                  to={`/blog/${suggestion.slug}`}
+                  className="group flex flex-col p-8 bg-white dark:bg-[#111111] rounded-[2.5rem] shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 hover:border-primary-200 dark:hover:border-primary-900/50 transition-all duration-300"
+                >
+                  <div className="flex items-center gap-2 text-xs font-medium text-neutral-400 dark:text-neutral-500 mb-4 uppercase tracking-wider">
+                    {suggestion.author && (
+                      <>
+                        <span className="text-primary-600 dark:text-primary-400 font-semibold">{suggestion.author}</span>
+                        <span>&bull;</span>
+                      </>
+                    )}
+                    <span>{suggestion.date}</span>
+                    <span>&bull;</span>
+                    <span>{suggestion.readTime}</span>
+                  </div>
+                  <h4 className="text-xl font-semibold tracking-tight text-neutral-900 dark:text-white mb-3 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                    {suggestion.title}
+                  </h4>
+                  <p className="text-neutral-500 dark:text-neutral-400 text-sm line-clamp-2 leading-relaxed">
+                    {suggestion.excerpt}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
