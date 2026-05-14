@@ -1,6 +1,6 @@
+import React, { useState } from 'react';
 import { ArrowLeft, Send } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
 
 export default function Contact() {
   const [isSubmitted, setIsSubmitted] = useState(false);
