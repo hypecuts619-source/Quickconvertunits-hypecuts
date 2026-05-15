@@ -9,14 +9,15 @@
     <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
     <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
     <link rel="dns-prefetch" href="https://api.frankfurter.app" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" /></noscript>
     <title data-react-helmet="true">Quick Unit Converter | Free Online Tool</title>
     <meta data-react-helmet="true" name="description" content="Instantly convert units like meters to feet, kg to lbs, or cups to grams. Fast, accurate, no ads interrupting. Try now—no sign-up needed." />
     <meta name="keywords" content="unit converter, convert units, length conversion, weight converter, temperature conversion, currency converter" />
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
     <link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/" />
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7380090598384677" crossorigin="anonymous"></script>
+
     <!-- Open Graph/Twitter Default Meta -->
     <meta property="og:site_name" content="QuickConvert Units" />
     <meta data-react-helmet="true" property="og:title" content="Quick Unit Converter | Free Online Tool" />
@@ -44,7 +45,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <link rel="apple-touch-icon" href="https://quickconvertunits.com/favicon.svg" />
     <meta name="google-adsense-account" content="ca-pub-7380090598384677" />
-
     <script id="seo-schema" type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -80,46 +80,52 @@
   </head>
   <body>
     <div id="root">
-      <div id="initial-loader" style="min-height: 100vh; background-color: #f7f7f7; font-family: 'Inter', sans-serif; display: flex; flex-direction: column;">
+      <div id="initial-loader" style="min-height: 100vh; background-color: #fbfbfb; font-family: 'Inter', sans-serif; display: flex; flex-direction: column;">
         <!-- Header -->
-        <div style="height: 64px; background: rgba(255,255,255,0.8); border-bottom: 1px solid transparent; display: flex; align-items: center; justify-content: space-between; padding: 0 16px;">
+        <div style="height: 64px; background: #ffffff; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; position: sticky; top: 0; z-index: 50;">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="width: 32px; height: 32px; border-radius: 12px; background: linear-gradient(to bottom right, #3b82f6, #2563eb);"></div>
-            <div style="font-weight: bold; font-size: 18px; color: #171717;">QuickConvert</div>
+            <div style="width: 28px; height: 28px; border-radius: 8px; background: #3b82f6;"></div>
+            <div style="font-weight: 700; font-size: 18px; color: #111111;">QuickConvert</div>
           </div>
-          <div style="display: flex; gap: 16px; align-items: center;">
-            <div style="width: 24px; height: 24px; border-radius: 12px; background: #e5e5e5;"></div>
-            <div style="width: 24px; height: 24px; border-radius: 12px; background: #e5e5e5;"></div>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <div style="width: 36px; height: 36px; border-radius: 12px; background: #f3f4f6;"></div>
+            <div style="width: 36px; height: 36px; border-radius: 12px; background: #f3f4f6;"></div>
           </div>
         </div>
-        <!-- Mobile Search -->
-        <div style="padding: 12px 16px; background: #ffffff; border-bottom: 1px solid #e5e5e5;">
-          <div style="height: 40px; border-radius: 12px; background: #f3f4f6; width: 100%;"></div>
+        <!-- Mobile Search - visible only on mobile-like widths in actual app -->
+        <div style="padding: 12px 16px; background: #ffffff; border-bottom: 1px solid #f3f4f6;">
+          <div style="height: 44px; border-radius: 12px; background: #f3f4f6; width: 100%; border: 1px solid #e5e5e5;"></div>
         </div>
         <!-- Main Content Skeleton -->
         <div style="max-width: 800px; margin: 0 auto; width: 100%; padding: 40px 16px; flex: 1;">
-           <div style="height: 36px; width: 50%; background: #e5e5e5; border-radius: 8px; margin: 0 auto 12px auto; animation: pulse 2s infinite;"></div>
-           <div style="height: 20px; width: 30%; background: #e5e5e5; border-radius: 6px; margin: 0 auto 32px auto; animation: pulse 2s infinite;"></div>
-           <div style="height: 280px; width: 100%; background: white; border-radius: 20px; border: 1px solid #e5e5e5; box-shadow: 0 4px 10px rgba(0,0,0,0.02); animation: pulse 2s infinite; padding: 24px;">
-             <div style="height: 48px; border-radius: 8px; background: #f3f4f6; width: 100%; margin-bottom: 24px;"></div>
-             <div style="height: 48px; border-radius: 8px; background: #f3f4f6; width: 100%;"></div>
+           <div style="height: 48px; width: 60%; background: #e5e5e5; border-radius: 12px; margin: 0 auto 16px auto; animation: qcu-pulse 2s infinite;"></div>
+           <div style="height: 24px; width: 40%; background: #e5e5e5; border-radius: 8px; margin: 0 auto 40px auto; animation: qcu-pulse 2s infinite;"></div>
+           
+           <div style="height: 380px; width: 100%; background: white; border-radius: 32px; border: 1px solid #f3f4f6; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.02); animation: qcu-pulse 2s infinite; padding: 32px;">
+             <div style="height: 56px; border-radius: 16px; background: #f9fafb; width: 100%; margin-bottom: 24px;"></div>
+             <div style="height: 56px; border-radius: 16px; background: #f9fafb; width: 100%; margin-bottom: 24px;"></div>
+             <div style="display: flex; gap: 12px; margin-top: 32px;">
+               <div style="height: 40px; width: 100px; background: #f3f4f6; border-radius: 12px;"></div>
+               <div style="height: 40px; width: 100px; background: #f3f4f6; border-radius: 12px;"></div>
+             </div>
            </div>
         </div>
         <style>
-          @keyframes pulse {
+          @keyframes qcu-pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: .5; }
+            50% { opacity: .6; }
           }
           @media (prefers-color-scheme: dark) {
             #initial-loader { background-color: #0d0d0d !important; }
-            #initial-loader > div:first-child { background: rgba(26,26,26,0.8) !important; border-bottom-color: transparent !important; }
-            #initial-loader > div:first-child > div:first-child > div:nth-child(2) { color: #f5f5f5 !important; }
-            #initial-loader > div:first-child > div:nth-child(2) > div { background: #333 !important; }
-            #initial-loader > div:nth-child(2) { background: #171717 !important; border-bottom-color: #262626 !important; }
-            #initial-loader > div:nth-child(2) > div { background: #262626 !important; }
+            #initial-loader > div:first-child { background: #0d0d0d !important; border-bottom-color: #1a1a1a !important; }
+            #initial-loader > div:first-child > div:first-child > div:nth-child(2) { color: #ffffff !important; }
+            #initial-loader > div:first-child > div:nth-child(2) > div { background: #1a1a1a !important; }
+            #initial-loader > div:nth-child(2) { background: #0d0d0d !important; border-bottom-color: #1a1a1a !important; }
+            #initial-loader > div:nth-child(2) > div { background: #1a1a1a !important; border-color: #262626 !important; }
             #initial-loader > div:nth-child(3) > div:nth-child(1), #initial-loader > div:nth-child(3) > div:nth-child(2) { background: #262626 !important; }
-            #initial-loader > div:nth-child(3) > div:nth-child(3) { background: #171717 !important; border-color: #262626 !important; }
-            #initial-loader > div:nth-child(3) > div:nth-child(3) > div { background: #262626 !important; }
+            #initial-loader > div:nth-child(3) > div:nth-child(3) { background: #111111 !important; border-color: #1a1a1a !important; }
+            #initial-loader > div:nth-child(3) > div:nth-child(3) > div { background: #1a1a1a !important; }
+            #initial-loader > div:nth-child(3) > div:nth-child(3) > div:last-child > div { background: #1a1a1a !important; }
           }
         </style>
       </div>
@@ -160,7 +166,12 @@
           if (loaded) return;
           loaded = true;
 
-          // GA
+        // Adsense
+          var ads = document.createElement('script');
+          ads.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7380090598384677';
+          ads.async = true;
+          ads.crossOrigin = 'anonymous';
+          document.body.appendChild(ads);
           var ga = document.createElement('script');
           ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-Z7W1M7R0YB';
           ga.async = true;

@@ -31,6 +31,31 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://quickconvertunits.com/blog/international-driving-kph-to-mph</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quickconvertunits.com/blog/the-global-athlete-kilometers-vs-miles</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quickconvertunits.com/blog/airport-luggage-weights-avoiding-overweight-fees</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quickconvertunits.com/blog/baking-across-borders-grams-vs-cups</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quickconvertunits.com/blog/the-billion-dollar-math-mistake</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://quickconvertunits.com/blog/the-fascinating-origins-of-the-metric-system</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -142,6 +167,16 @@
   </url>
   <url>
     <loc>https://quickconvertunits.com/blog/coffee-ratios-grams-to-ounces</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quickconvertunits.com/blog/the-comprehensive-guide-to-time-from-ancient-sundials-to-quantum-clocks</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quickconvertunits.com/blog/the-evolution-of-global-measurement-systems-standardization</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

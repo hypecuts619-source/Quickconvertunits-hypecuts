@@ -9,7 +9,7 @@ import { LanguageSelector } from "./components/LanguageSelector";
 import { FormulaBlock } from "./components/FormulaBlock";
 import { HomepageBlogHub } from "./components/HomepageBlogHub";
 import { useTranslation } from "react-i18next";
-import { POPULAR_CONVERSIONS } from "./lib/constants";
+import { POPULAR_CONVERSIONS, POPULAR, FORMULAS } from "./lib/constants";
 import {
   ArrowRightLeft,
   Sun,
@@ -51,6 +51,14 @@ const CategoryHubContent = lazy(() => import("./components/CategoryHubContent").
 const TimeZoneConverter = lazy(() => import("./components/TimeZoneConverter").then(module => ({ default: module.TimeZoneConverter })));
 const BMICalculator = lazy(() => import("./components/BMICalculator").then(module => ({ default: module.BMICalculator })));
 
+
+
+const SpecificConversionSEOComp = lazy(() => import("./components/SpecificConversionSEO").then(m => ({ default: m.SpecificConversionSEO })));
+const CurrencyPairsTableComp = lazy(() => import("./components/CurrencyPairsTable").then(m => ({ default: m.CurrencyPairsTable })));
+const QuickLinksSectionComp = lazy(() => import("./components/QuickLinksSection").then(m => ({ default: m.QuickLinksSection })));
+const TrustSignalsComp = lazy(() => import("./components/TrustSignals").then(m => ({ default: m.TrustSignals })));
+const HomepageInfoComp = lazy(() => import("./components/HomepageInfo"));
+
 const categoryHubs = categoryHubsData as Record<string, {
   hub_title: string;
   authority_intro: string;
@@ -59,222 +67,11 @@ const categoryHubs = categoryHubsData as Record<string, {
   common_pitfalls: string[];
 }>;
 
-const SpecificConversionSEO = ({ fromUnit, toUnit, category }: { fromUnit: any; toUnit: any; category: string }) => {
-  let nums = [1, 2, 3, 4, 5, 10, 25, 50, 100, 200, 250, 500, 1000];
-  if (category === 'currency') nums = [1, 5, 10, 20, 50, 100, 250, 500, 1000, 5000, 10000];
 
-  let formulaStr = "";
-  if (category !== 'temperature' && category !== 'time_zone' && category !== 'bmi') {
-    formulaStr = `1 ${fromUnit.symbol} = ${convert(1, fromUnit.id, toUnit.id, category)} ${toUnit.symbol}`;
-  }
 
-  return (
-    <div className="mt-8 mb-12">
-      {formulaStr && (
-        <div className="bg-primary-50 dark:bg-primary-900/10 rounded-2xl p-6 border border-primary-100 dark:border-primary-900/30 mb-8 w-full block">
-          <h3 className="text-lg font-bold text-primary-900 dark:text-primary-100 mb-2">Conversion Formula</h3>
-          <p className="font-mono text-lg md:text-xl text-primary-800 dark:text-primary-200 font-bold bg-white dark:bg-neutral-900 p-3 rounded-xl border border-primary-200 dark:border-primary-800/50 inline-block overflow-x-auto max-w-full">
-            {formulaStr}
-          </p>
-          <p className="text-primary-700 dark:text-primary-300 mt-3 text-sm flex items-start gap-2">
-            <span className="shrink-0 w-5 h-5 rounded-full bg-primary-200 dark:bg-primary-800 flex items-center justify-center text-xs font-bold mt-0.5">i</span>
-            <span>Multiply the value in {fromUnit.name} by the conversion factor to get the result in {toUnit.name}.</span>
-          </p>
-        </div>
-      )}
 
-      <h3 className="text-xl font-semibold tracking-tight mb-4">{fromUnit.name} to {toUnit.name} Reference Table</h3>
-      <div className="overflow-x-auto rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#111111] shadow-sm">
-        <table className="w-full text-left min-w-[300px]">
-          <thead className="bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800">
-            <tr>
-              <th className="py-3 px-4 text-sm font-semibold text-neutral-600 dark:text-neutral-400">{fromUnit.name} ({fromUnit.symbol})</th>
-              <th className="py-3 px-4 text-sm font-semibold text-neutral-600 dark:text-neutral-400">{toUnit.name} ({toUnit.symbol})</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800 text-sm">
-            {nums.map(n => {
-              const res = convert(n, fromUnit.id, toUnit.id, category);
-              const resStr = Number.isInteger(res) ? res.toString() : parseFloat(res.toFixed(6)).toString();
-              return (
-                <tr key={n} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-900/50 transition-colors">
-                  <td className="py-2.5 px-4 font-medium">{n}</td>
-                  <td className="py-2.5 px-4 font-mono text-neutral-600 dark:text-neutral-300">{resStr}</td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  )
-}
 
-const CurrencyPairsTable = () => {
-  const majorPairs = [
-    { from: 'usd', to: 'eur' },
-    { from: 'usd', to: 'gbp' },
-    { from: 'usd', to: 'jpy' },
-    { from: 'usd', to: 'cad' },
-    { from: 'usd', to: 'aud' },
-    { from: 'usd', to: 'inr' },
-    { from: 'eur', to: 'gbp' },
-    { from: 'eur', to: 'chf' },
-  ];
 
-  return (
-    <div className="mt-8 mb-12">
-      <h3 className="text-xl font-semibold tracking-tight mb-4 flex items-center gap-2">
-        <TrendingUp className="w-5 h-5 text-emerald-500" />
-        Live Major Exchange Rates
-      </h3>
-      <div className="overflow-x-auto rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#111111] shadow-sm">
-        <table className="w-full text-left min-w-[400px]">
-          <thead className="bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800">
-            <tr>
-              <th className="py-3 px-4 text-sm font-semibold text-neutral-600 dark:text-neutral-400">Currency Pair</th>
-              <th className="py-3 px-4 text-sm font-semibold text-neutral-600 dark:text-neutral-400">Current Rate</th>
-              <th className="py-3 px-4 text-sm font-semibold text-neutral-600 dark:text-neutral-400 text-right">Convert</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800 text-sm">
-            {majorPairs.map((pair, idx) => {
-              const res = convert(1, pair.from, pair.to, 'currency');
-              // Find full symbol
-              const units = categories.find(c => c.id === 'currency')?.units;
-              const unitFrom = units?.find(u => u.id === pair.from);
-              const unitTo = units?.find(u => u.id === pair.to);
-              
-              return (
-                <tr key={idx} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-900/50 transition-colors">
-                  <td className="py-2.5 px-4 font-medium flex items-center gap-1.5">
-                    <span className="font-semibold">{unitFrom?.symbol}</span> 
-                    <span className="text-neutral-400">to</span>
-                    <span className="font-semibold">{unitTo?.symbol}</span>
-                    <span className="text-neutral-500 text-xs ml-2 uppercase">({pair.from}/{pair.to})</span>
-                  </td>
-                  <td className="py-2.5 px-4 font-mono text-neutral-600 dark:text-neutral-300">
-                    {res.toFixed(4)}
-                  </td>
-                  <td className="py-2.5 px-4 text-right">
-                    <Link to={`/${getSEOUrlPath(pair.from, pair.to)}`} className="text-primary-600 dark:text-primary-400 hover:underline font-medium text-xs">View Rate <ArrowRight className="w-3 h-3 inline pb-0.5" /></Link>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  )
-}
-
-const QuickLinksSection = ({ fromUnit, toUnit, category, baseVal }: { fromUnit: any; toUnit: any; category: string; baseVal: string }) => {
-  const currentVal = parseInput(baseVal) || 1;
-  const numsStr = new Set([1, 5, 10, 20, 25, 50, 100, 150, 180, 200, 250, 500, 1000, 1500, 2000, 3000, 5000]);
-  
-  if (currentVal > 0) {
-    if (currentVal > 1) numsStr.add(Math.floor(currentVal - 1));
-    numsStr.add(currentVal);
-    numsStr.add(Math.ceil(currentVal + 1));
-    numsStr.add(Math.ceil(currentVal + 5));
-    numsStr.add(Math.ceil(currentVal + 10));
-    numsStr.add(Math.ceil(currentVal * 2));
-    numsStr.add(Math.ceil(currentVal * 10));
-  }
-
-  const nums = Array.from(numsStr).filter(n => n > 0 && n <= 10000).sort((a, b) => a - b).slice(0, 30);
-  const uPath = getSEOUrlPath(fromUnit.id, toUnit.id);
-  
-  return (
-    <div className="mt-12 mb-12">
-      <div className="flex items-center gap-2 mb-6">
-        <TrendingUp className="w-5 h-5 text-primary-500" />
-        <h3 className="text-xl font-semibold tracking-tight">Common {fromUnit.name} to {toUnit.name} Conversions</h3>
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-        {nums.map(n => (
-          <Link
-            key={n}
-            to={`/convert-${n}-${uPath}`}
-            className="flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-[#111111] border border-neutral-100 dark:border-neutral-800 hover:border-primary-200 dark:hover:border-primary-900/40 hover:bg-primary-50/10 transition-all group"
-          >
-            <span className="text-sm font-medium text-neutral-600 dark:text-neutral-300 group-hover:text-primary-600 dark:group-hover:text-primary-400">
-              {n} {fromUnit.symbol} to {toUnit.symbol}
-            </span>
-            <ArrowRight className="w-3.5 h-3.5 text-neutral-300 group-hover:text-primary-500 transition-all group-hover:translate-x-0.5" />
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const POPULAR = [
-  { label: "kg to lbs", cat: "weight", fu: "kilogram", tu: "pound" },
-  { label: "inches to cm", cat: "length", fu: "inch", tu: "centimeter" },
-  { label: "Time Zone Converter", cat: "time_zone", fu: "time_zone", tu: "time_zone" },
-  { label: "cm to inches", cat: "length", fu: "centimeter", tu: "inch" },
-  { label: "lbs to kg", cat: "weight", fu: "pound", tu: "kilogram" },
-  { label: "feet to meters", cat: "length", fu: "foot", tu: "meter" },
-  { label: "miles to km", cat: "length", fu: "mile", tu: "kilometer" },
-  { label: "mm to inches", cat: "length", fu: "millimeter", tu: "inch" },
-  { label: "Celsius to Fahrenheit", cat: "temperature", fu: "celsius", tu: "fahrenheit" },
-  { label: "Fahrenheit to Celsius", cat: "temperature", fu: "fahrenheit", tu: "celsius" },
-  { label: "Liters to Gallons", cat: "volume", fu: "liter", tu: "us_gallon" },
-  { label: "km/h to mph", cat: "speed", fu: "kilometer_per_hour", tu: "mile_per_hour" },
-];
-
-const FORMULAS = [
-  {
-    title: "Celsius → Fahrenheit",
-    code: "°F = (°C × 9/5) + 32",
-    note: "Water boils at 100°C / 212°F",
-    link: { cat: "temperature", from: "celsius", to: "fahrenheit" },
-  },
-  {
-    title: "Fahrenheit → Celsius",
-    code: "°C = (°F − 32) × 5/9",
-    note: "Water freezes at 0°C / 32°F",
-    link: { cat: "temperature", from: "fahrenheit", to: "celsius" },
-  },
-  {
-    title: "Kilometers → Miles",
-    code: "mi = km × 0.621371",
-    note: "1 km ≈ 0.621 miles",
-    link: { cat: "length", from: "kilometer", to: "mile" },
-  },
-  {
-    title: "Miles → Kilometers",
-    code: "km = mi × 1.60934",
-    note: "1 mile ≈ 1.609 km",
-    link: { cat: "length", from: "mile", to: "kilometer" },
-  },
-  {
-    title: "Kilograms → Pounds",
-    code: "lb = kg × 2.20462",
-    note: "1 kg ≈ 2.205 pounds",
-    link: { cat: "weight", from: "kilogram", to: "pound" },
-  },
-  {
-    title: "Meters → Feet",
-    code: "ft = m × 3.28084",
-    note: "1 meter ≈ 3.281 feet",
-    link: { cat: "length", from: "meter", to: "foot" },
-  },
-  {
-    title: "Hectares → Acres",
-    code: "ac = ha × 2.47105",
-    note: "1 hectare ≈ 2.471 acres",
-    link: { cat: "area", from: "hectare", to: "acre" },
-  },
-  {
-    title: "Liters → US Gallons",
-    code: "gal = L × 0.264172",
-    note: "1 liter ≈ 0.264 gallons",
-    link: { cat: "volume", from: "liter", to: "us_gallon" },
-  },
-];
 
 interface HistoryItem {
   fv: string;
@@ -426,11 +223,18 @@ export default function App() {
   const { conversion } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const isEmbed = new URLSearchParams(location.search).get("embed") === "true";
+  const isHomepage = (location.pathname === "/" || location.pathname === "/en" || location.pathname === "/en/") && !location.search.includes("val=");
+  const isCategoryPage = location.pathname.endsWith("-converter") && !location.pathname.includes("-to-") && location.pathname !== "/time-zone-converter";
+  const isSpecificConverter = location.pathname !== "/" && !isCategoryPage && location.pathname !== "/time-zone-converter" && location.pathname !== "/bmi-calculator";
   
   // Track analytics
   useEffect(() => {
-    trackPageView(location.pathname + location.search);
-  }, [location]);
+    if (!isEmbed) {
+      trackPageView(location.pathname + location.search);
+    }
+  }, [location, isEmbed]);
 
   // Sync state with URL params
   useEffect(() => {
@@ -553,6 +357,7 @@ export default function App() {
 
   // Analytics initialization and PWA tracking
   useEffect(() => {
+    if (isEmbed) return;
     initGA();
     
     const handleBeforeInstallPrompt = (e: any) => {
@@ -739,7 +544,7 @@ export default function App() {
           }),
         };
 
-        trackConversionEvent(category, unitFrom, unitTo, valFrom);
+        trackConversionEvent(category, unitFrom, unitTo, parseFloat(valFrom));
 
         setHistoryItems((prev) => {
           // Remove exact duplicates (same from-unit, to-unit, and from-value)
@@ -977,16 +782,16 @@ export default function App() {
   }, [category, unitFrom, unitTo]);
 
   // --- Lift SEO State --- //
-  const isHomepage = location.pathname === "/" && !location.search.includes("val=");
-  const isCategoryPage = location.pathname.endsWith("-converter") && !location.pathname.includes("-to-") && location.pathname !== "/time-zone-converter";
-  const isSpecificConverter = location.pathname !== "/" && !isCategoryPage;
-  const isEmbed = new URLSearchParams(location.search).get("embed") === "true";
-
   let titleStr = "";
   let metaDescStr = "";
   let canonicalUrlStr = "";
   let ogTitleStr = "";
   let isNumericPath = location.pathname.startsWith('/convert-');
+  
+  const currentLang = i18n.language || 'en';
+  const getLangPrefix = (l: string) => l === 'en' ? '' : `/${l}`;
+  const supportedLangs = ['en', 'es', 'fr', 'de', 'hi', 'zh', 'ar', 'pt', 'ru', 'ja', 'it'];
+  
   let schema: any[] = [
     {
       "@type": "Organization",
@@ -1017,7 +822,7 @@ export default function App() {
   if (category === 'time_zone') {
     titleStr = 'Time Zone Converter: Convert UTC, EST, PST, CET | QuickConvert';
     metaDescStr = 'Instantly convert between time zones to schedule global meetings easily. Supports UTC, EST, PST, standard and daylight time conversions.';
-    canonicalUrlStr = "https://quickconvertunits.com/time-zone-converter";
+    canonicalUrlStr = `https://quickconvertunits.com${getLangPrefix(currentLang)}/time-zone-converter`;
     ogTitleStr = titleStr;
     schema = [{
       "@type": "WebApplication",
@@ -1032,7 +837,7 @@ export default function App() {
   } else if (category === 'bmi') {
     titleStr = 'BMI Calculator: Calculate Body Mass Index Online Free';
     metaDescStr = 'Free, fast, and easy-to-use BMI calculator. Check your Body Mass Index using metric or imperial units to see if you are at a healthy weight.';
-    canonicalUrlStr = "https://quickconvertunits.com/bmi-calculator";
+    canonicalUrlStr = `https://quickconvertunits.com${getLangPrefix(currentLang)}/bmi-calculator`;
     ogTitleStr = titleStr;
     schema = [{
       "@type": "WebApplication",
@@ -1052,7 +857,7 @@ export default function App() {
     if (isHomepage) {
       titleStr = "Quick Unit Converter | Free Online Translation Tool for Measurements";
       metaDescStr = "Instantly convert units like meters to feet, kg to lbs, or cups to grams. Fast, accurate, no ads interrupting. Try now—no sign-up needed.";
-      canonicalUrlStr = "https://quickconvertunits.com/";
+      canonicalUrlStr = `https://quickconvertunits.com${getLangPrefix(currentLang)}/`;
       ogTitleStr = titleStr;
       customFAQs = [
         { question: "Is this unit converter free?", answer: "Yes, QuickConvert is 100% free to use. There are no registration requirements and no limits on the number of conversions you can perform." },
@@ -1090,7 +895,7 @@ export default function App() {
       
       metaDescStr = hub ? hub.authority_intro : (specificDescriptions[category] || `Free ${catName.toLowerCase()} unit converter for ${allTopUnits}. ${seoSnippet || "Precise calculations with real-time results. Convert measurements instantly."}`);
       
-      canonicalUrlStr = `https://quickconvertunits.com/${category.replace(/_/g, '-')}-converter`;
+      canonicalUrlStr = `https://quickconvertunits.com${getLangPrefix(currentLang)}/${category.replace(/_/g, '-')}-converter`;
       ogTitleStr = titleStr;
     } else {
       const valPrefix = valFrom && valFrom !== "1" && valFrom !== "0" ? `${valFrom} ` : "";
@@ -1115,7 +920,16 @@ export default function App() {
           metaDescStr = `Convert ${valPrefix}${pluralFrom.toLowerCase()} to ${pluralTo.toLowerCase()} instantly. 1 ${symFrom} = ${convert(1, unitFrom, unitTo, category).toPrecision(6)} ${symTo}. Offline capable, free calculator with conversion table, formula, and examples. Fast and accurate.`;
         }
       }
-      canonicalUrlStr = `https://quickconvertunits.com/${getSEOUrlPath(unitFrom, unitTo)}`;
+      
+      // Handle canonical for value-based paths to allow indexing of specific value conversions if they are in the URL path
+      if (isNumericPath && valFrom && valFrom !== "1") {
+          canonicalUrlStr = `https://quickconvertunits.com${getLangPrefix(currentLang)}/convert-${valFrom}-${getSEOUrlPath(unitFrom, unitTo)}`;
+      } else if (location.search.includes('val=') && valFrom && valFrom !== "1") {
+          // If query param is used, we still canonicalize to the query param URL to avoid duplicate issues
+          canonicalUrlStr = `https://quickconvertunits.com${getLangPrefix(currentLang)}/${getSEOUrlPath(unitFrom, unitTo)}?val=${valFrom}`;
+      } else {
+          canonicalUrlStr = `https://quickconvertunits.com${getLangPrefix(currentLang)}/${getSEOUrlPath(unitFrom, unitTo)}`;
+      }
       ogTitleStr = titleStr;
     }
 
@@ -1283,32 +1097,34 @@ export default function App() {
 
   // Handle auto-routing logic that was in useEffect safely
   useEffect(() => {
+    if (isEmbed) return; // Never auto-navigate when embedded in a widget
+
     if (category === 'time_zone' && location.pathname !== '/time-zone-converter') {
       navigate('/time-zone-converter', { replace: true });
     } else if (category !== 'time_zone' && activeFromUnit && activeToUnit) {
-      const targetPath = `/${getSEOUrlPath(unitFrom, unitTo)}${valFrom && valFrom !== "1" ? `?val=${valFrom}` : ""}`;
+      // Use getSEOUrlPath logic to determine canonical path
+      const seoPath = getSEOUrlPath(unitFrom, unitTo);
+      const langPrefix = i18n.language !== "en" && i18n.language ? `/${i18n.language}` : "";
+      
+      const targetPath = `${langPrefix}/${seoPath}${valFrom && valFrom !== "1" ? `?val=${valFrom}` : ""}`;
       const currentFullPath = location.pathname + location.search;
       
-      if (isHomepage) {
-         const defaultFrom = activeCategory.units[0]?.id;
-         const defaultTo = activeCategory.units[1]?.id || defaultFrom;
-         if ((unitFrom !== defaultFrom || unitTo !== defaultTo) && currentFullPath !== targetPath) {
-           navigate(targetPath);
-         }
-      } else if (isCategoryPage) {
-         const defaults = getDefaultUnits(category);
-         const defaultFrom = defaults.from;
-         const defaultTo = defaults.to;
-         if ((unitFrom !== defaultFrom || unitTo !== defaultTo) && currentFullPath !== targetPath) {
-           navigate(targetPath, { replace: true });
-         }
-      } else {
-         if (currentFullPath !== targetPath) {
-           navigate(targetPath, { replace: true });
-         }
+      // IMPORTANT: Only navigate if the path is genuinely different.
+      const parsed = getParsedParamsFromPath(conversion || "");
+      const isAlreadyResolved = parsed.from === unitFrom && parsed.to === unitTo;
+
+      // Fix redirects that affect SEO indexing
+      if (isHomepage || isCategoryPage) {
+          // Stable entry points should not auto-redirect on load
+          return;
+      }
+      
+      // Only redirect specific converter pages if they aren't on their canonical URL
+      if (isSpecificConverter && currentFullPath !== targetPath && !isAlreadyResolved) {
+          navigate(targetPath, { replace: true });
       }
     }
-  }, [category, unitFrom, unitTo, valFrom]); // Minimal dependencies to just handle routing
+  }, [category, unitFrom, unitTo, valFrom, isEmbed, i18n.language]);
 
   return (
     <div
@@ -1317,8 +1133,40 @@ export default function App() {
       <Helmet>
         <title>{titleStr}</title>
         <meta name="description" content={metaDescStr} />
-        {isNumericPath && <meta name="robots" content="noindex" />}
         <link rel="canonical" href={canonicalUrlStr} />
+        {supportedLangs.map(l => {
+          let alternateUrl = "";
+          const prefix = getLangPrefix(l);
+          if (category === 'time_zone') {
+            alternateUrl = `https://quickconvertunits.com${prefix}/time-zone-converter`;
+          } else if (category === 'bmi') {
+            alternateUrl = `https://quickconvertunits.com${prefix}/bmi-calculator`;
+          } else if (isHomepage) {
+            alternateUrl = `https://quickconvertunits.com${prefix}/`;
+          } else if (isCategoryPage) {
+            alternateUrl = `https://quickconvertunits.com${prefix}/${category.replace(/_/g, '-')}-converter`;
+          } else {
+            const path = getSEOUrlPath(unitFrom, unitTo);
+            if (isNumericPath && valFrom && valFrom !== "1") {
+               alternateUrl = `https://quickconvertunits.com${prefix}/convert-${valFrom}-${path}`;
+            } else if (location.search.includes('val=') && valFrom && valFrom !== "1") {
+               alternateUrl = `https://quickconvertunits.com${prefix}/${path}?val=${valFrom}`;
+            } else {
+               alternateUrl = `https://quickconvertunits.com${prefix}/${path}`;
+            }
+          }
+          return <link key={l} rel="alternate" hrefLang={l} href={alternateUrl} />;
+        })}
+        <link rel="alternate" hrefLang="x-default" href={(() => {
+          if (category === 'time_zone') return "https://quickconvertunits.com/time-zone-converter";
+          if (category === 'bmi') return "https://quickconvertunits.com/bmi-calculator";
+          if (isHomepage) return "https://quickconvertunits.com/";
+          if (isCategoryPage) return `https://quickconvertunits.com/${category.replace(/_/g, '-')}-converter`;
+          const path = getSEOUrlPath(unitFrom, unitTo);
+          if (isNumericPath && valFrom && valFrom !== "1") return `https://quickconvertunits.com/convert-${valFrom}-${path}`;
+          if (location.search.includes('val=') && valFrom && valFrom !== "1") return `https://quickconvertunits.com/${path}?val=${valFrom}`;
+          return `https://quickconvertunits.com/${path}`;
+        })()} />
         <meta property="og:title" content={ogTitleStr} />
         <meta property="og:description" content={metaDescStr} />
         <meta property="og:url" content={canonicalUrlStr} />
@@ -2166,6 +2014,7 @@ export default function App() {
           </motion.div>
           )}
 
+
           {/* SEO Content Article */}
           {!isEmbed && !isHomepage && category !== 'time_zone' && activeFromUnit && activeToUnit && valFrom !== "" && (
             <article className="mt-8 bg-white dark:bg-[#111111] rounded-3xl p-8 md:p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-neutral-100 dark:border-neutral-800">
@@ -2223,9 +2072,10 @@ export default function App() {
             </article>
           )}
 
+
           {/* Categories */}
           {!isEmbed && (
-            <div className="flex overflow-x-auto md:flex-wrap no-scrollbar gap-3 mt-8 mb-8 pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:justify-center items-center text-center">
+            <div className="flex overflow-x-auto md:flex-wrap no-scrollbar gap-3 mt-8 mb-8 pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:justify-center items-center text-center min-h-[60px]">
               {categories.map((c) => (
                 <button
                   key={c.id}
@@ -2343,93 +2193,40 @@ export default function App() {
           )}
 
           {!isHomepage && category !== 'time_zone' && activeFromUnit && activeToUnit && (
-            <QuickLinksSection 
-              fromUnit={activeFromUnit} 
-              toUnit={activeToUnit} 
-              category={category} 
-              baseVal={valFrom}
-            />
+            <Suspense fallback={<div className="h-[200px]" />}>
+              <QuickLinksSectionComp 
+                fromUnit={activeFromUnit} 
+                toUnit={activeToUnit} 
+                category={category} 
+                baseVal={valFrom}
+              />
+            </Suspense>
           )}
 
           {!isHomepage && isSpecificConverter && category !== 'time_zone' && activeFromUnit && activeToUnit && (
-            <SpecificConversionSEO
-              fromUnit={activeFromUnit}
-              toUnit={activeToUnit}
-              category={category}
-            />
+            <Suspense fallback={<div className="h-[400px]" />}>
+              <SpecificConversionSEOComp
+                fromUnit={activeFromUnit as any}
+                toUnit={activeToUnit as any}
+                category={category}
+              />
+            </Suspense>
           )}
 
           {!isHomepage && isCategoryPage && category === 'currency' && (
-            <CurrencyPairsTable />
+            <Suspense fallback={<div className="h-[300px]" />}>
+              <CurrencyPairsTableComp />
+            </Suspense>
           )}
 
           
+
           {/* Trust Signals / User Reviews */}
           {!isEmbed && (
-            <div className="mt-16 mb-12 px-4 md:px-0">
-            <div className="flex flex-col items-center text-center mb-8">
-              <h3 className="text-3xl font-semibold tracking-tight mb-3">Trusted by Professionals</h3>
-              <p className="text-neutral-500 dark:text-neutral-400 text-lg">Join thousands of users relying on our fast, accurate conversions everyday.</p>
-              <div className="flex items-center justify-center gap-1 mt-4">
-                {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 text-amber-500 fill-amber-500" />)}
-              </div>
-            </div>
-            {/* Horizontal scrolling reviews container */}
-            <div className="w-[100vw] relative left-[50%] -translate-x-1/2 overflow-hidden pb-8 pt-4" style={{ maskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)' }}>
-              <div className="flex gap-6 w-max animate-scroll-x hover:[animation-play-state:paused]">
-                {[...[
-                  { quote: "The fastest converter I've ever used. The live validation saves me so much time trying to figure out if I typed the right unit.", name: "Sarah K.", role: "Architect", rating: 5 },
-                  { quote: "Finally, a converter that actually works offline on my phone. The PWA is a lifesaver when I'm out on a construction site with no signal.", name: "Mike T.", role: "Civil Engineer", rating: 5 },
-                  { quote: "No confusing ads covering the buttons, straight to the point. The compare feature is exactly what I needed for my physics homework.", name: "Emily R.", role: "Student", rating: 5 },
-                  { quote: "It’s so accurate and simple. I use it constantly for recipes when converting volumes and weights from global cooking sites.", name: "James L.", role: "Chef", rating: 5 },
-                  { quote: "I love that when I share the URL with colleagues, it keeps the exact units we're talking about. Extremely useful for quick engineering chats.", name: "David P.", role: "Mechanical Engineer", rating: 5 },
-                  { quote: "The dark mode is beautiful and doesn't hurt my eyes during late-night study sessions. A fantastic little conversion tool.", name: "Alicia C.", role: "Undergraduate", rating: 5 },
-                  { quote: "It remembers what I used last so I don't have to keep selecting 'Kilometers to Miles' every single time I open the app.", name: "Robert J.", role: "Logistics Manager", rating: 5 },
-                  { quote: "No fluff, just works. Extremely responsive and the UI is incredibly intuitive. The best unit converter I've found so far.", name: "Maria V.", role: "UX Designer", rating: 5 }
-                ], ...[
-                  { quote: "The fastest converter I've ever used. The live validation saves me so much time trying to figure out if I typed the right unit.", name: "Sarah K.", role: "Architect", rating: 5 },
-                  { quote: "Finally, a converter that actually works offline on my phone. The PWA is a lifesaver when I'm out on a construction site with no signal.", name: "Mike T.", role: "Civil Engineer", rating: 5 },
-                  { quote: "No confusing ads covering the buttons, straight to the point. The compare feature is exactly what I needed for my physics homework.", name: "Emily R.", role: "Student", rating: 5 },
-                  { quote: "It’s so accurate and simple. I use it constantly for recipes when converting volumes and weights from global cooking sites.", name: "James L.", role: "Chef", rating: 5 },
-                  { quote: "I love that when I share the URL with colleagues, it keeps the exact units we're talking about. Extremely useful for quick engineering chats.", name: "David P.", role: "Mechanical Engineer", rating: 5 },
-                  { quote: "The dark mode is beautiful and doesn't hurt my eyes during late-night study sessions. A fantastic little conversion tool.", name: "Alicia C.", role: "Undergraduate", rating: 5 },
-                  { quote: "It remembers what I used last so I don't have to keep selecting 'Kilometers to Miles' every single time I open the app.", name: "Robert J.", role: "Logistics Manager", rating: 5 },
-                  { quote: "No fluff, just works. Extremely responsive and the UI is incredibly intuitive. The best unit converter I've found so far.", name: "Maria V.", role: "UX Designer", rating: 5 }
-                ]].map((review, i) => (
-                  <div key={i} className="shrink-0 w-[85vw] md:w-[350px] flex flex-col p-8 rounded-3xl bg-white dark:bg-[#111111] shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-neutral-100 dark:border-neutral-800 dark:shadow-none h-auto transition-transform hover:-translate-y-1 duration-300">
-                    <div className="flex items-center gap-1 mb-4">
-                      {[...Array(review.rating)].map((_, j) => <Star key={j} className="w-4 h-4 text-amber-500 fill-amber-500" />)}
-                    </div>
-                    <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed font-light mb-6 flex-grow">"{review.quote}"</p>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 font-semibold uppercase text-sm border-2 border-white dark:border-neutral-800 shadow-sm">{review.name.charAt(0)}</div>
-                      <div>
-                        <div className="font-semibold text-sm text-neutral-900 dark:text-white leading-tight mb-0.5">{review.name}</div>
-                        <div className="text-xs text-neutral-500 font-medium">{review.role}</div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <style>{`
-              @keyframes bounce-short {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-10px); }
-              }
-              .animate-bounce-short {
-                animation: bounce-short 2s ease-in-out infinite;
-              }
-              @keyframes scroll-x {
-                0% { transform: translateX(0); }
-                100% { transform: translateX(calc(-50% - 12px)); }
-              }
-              .animate-scroll-x {
-                animation: scroll-x 40s linear infinite;
-              }
-            `}</style>
-          </div>
-        )}
+            <Suspense fallback={<div className="mt-16 h-[500px]" />}>
+              <TrustSignalsComp />
+            </Suspense>
+          )}
 
           {/* SEO Content Sections with Popular & History */}
           {!isEmbed && (
@@ -2573,7 +2370,7 @@ export default function App() {
                             {h.timestamp}
                           </span>
                           <button
-                            aria-label={`Remove history item ${h.label}`}
+                            aria-label={`Remove history item ${h.fv} ${h.fu} to ${h.tv} ${h.tu}`}
                             onClick={(e) => {
                               e.stopPropagation();
                               setHistoryItems((prev) => {
@@ -2677,184 +2474,10 @@ export default function App() {
             </Suspense>
 
             {isHomepage && (
-              <>
+              <Suspense fallback={null}>
                 <HomepageBlogHub />
-                <div className="mt-16 bg-white dark:bg-[#111111] rounded-3xl p-8 md:p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-neutral-100 dark:border-neutral-800 prose prose-neutral dark:prose-invert max-w-none">
-                  <h2 className="mb-4 text-2xl font-semibold tracking-tight">Why Use QuickConvert Units?</h2>
-                <p className="font-light text-neutral-600 dark:text-neutral-400">Our free online unit converter provides instant, accurate conversions across 14 measurement categories. Whether you're converting kilograms to pounds for international shipping, Celsius to Fahrenheit for travel weather, or cups to milliliters for cooking recipes, QuickConvert delivers precise results in real-time.</p>
-                
-                <h2 className="mb-4 mt-8 text-2xl font-semibold tracking-tight">Most Popular Conversions</h2>
-                <p className="font-light text-neutral-600 dark:text-neutral-400">Millions of people search for unit conversions every day:</p>
-                <ul className="font-light text-neutral-600 dark:text-neutral-400">
-                  <li><strong>Weight conversions</strong>: Convert kg to lbs, pounds to kilograms, grams to ounces</li>
-                  <li><strong>Temperature conversions</strong>: Celsius to Fahrenheit, Fahrenheit to Celsius, Kelvin conversions</li>
-                  <li><strong>Length conversions</strong>: Miles to kilometers, feet to meters, inches to centimeters</li>
-                  <li><strong>Volume conversions</strong>: Liters to gallons, cups to ml, tablespoons to teaspoons</li>
-                  <li><strong>Cooking conversions</strong>: Recipe measurements for baking and cooking</li>
-                </ul>
-                
-                <h2 className="mb-4 mt-8 text-2xl font-semibold tracking-tight">How to Use QuickConvert</h2>
-                <ol className="font-light text-neutral-600 dark:text-neutral-400 space-y-1">
-                  <li>Select your measurement category (length, weight, temperature, etc.)</li>
-                  <li>Choose the units you want to convert from and to</li>
-                  <li>Enter your value</li>
-                  <li>Get instant, accurate results with formulas and explanations</li>
-                </ol>
-                <p className="font-light text-neutral-600 dark:text-neutral-400">All conversions are free, work offline, and provide real-time calculations without page reloads.</p>
-                
-                <h2 className="mb-4 mt-10 text-2xl font-semibold tracking-tight">Conversion Categories</h2>
-                
-                <h3 className="text-xl font-medium mt-6 mb-2">Length & Distance</h3>
-                <p className="font-light text-neutral-600 dark:text-neutral-400">Convert units like meters, feet, kilometers, miles, inches, and smaller scientific units. Essential for travel, DIY projects, and reading international specifications.</p>
-                <div className="flex flex-wrap gap-2 text-sm mt-3">
-                  <Link to="/meters-to-feet" className="text-primary-600 dark:text-primary-400 hover:underline">Meters to Feet</Link> | 
-                  <Link to="/feet-to-meters" className="text-primary-600 dark:text-primary-400 hover:underline">Feet to Meters</Link> | 
-                  <Link to="/km-to-miles" className="text-primary-600 dark:text-primary-400 hover:underline">Kilometers to Miles</Link> | 
-                  <Link to="/miles-to-km" className="text-primary-600 dark:text-primary-400 hover:underline">Miles to Kilometers</Link> | 
-                  <Link to="/inches-to-cm" className="text-primary-600 dark:text-primary-400 hover:underline">Inches to CM</Link> | 
-                  <Link to="/cm-to-inches" className="text-primary-600 dark:text-primary-400 hover:underline">CM to Inches</Link>
-                </div>
-                
-                <h3 className="text-xl font-medium mt-8 mb-2">Weight & Mass</h3>
-                <p className="font-light text-neutral-600 dark:text-neutral-400">Easily calculate kg to lbs, completely removing the headache from checking baggage allowances. Support for ounces, grams, and stone makes cooking and health tracking much easier.</p>
-                <div className="flex flex-wrap gap-2 text-sm mt-3">
-                  <Link to="/kg-to-lbs" className="text-primary-600 dark:text-primary-400 hover:underline">Kg to Lbs</Link> | 
-                  <Link to="/lbs-to-kg" className="text-primary-600 dark:text-primary-400 hover:underline">Lbs to Kg</Link> | 
-                  <Link to="/grams-to-ounces" className="text-primary-600 dark:text-primary-400 hover:underline">Grams to Ounces</Link> | 
-                  <Link to="/ounces-to-grams" className="text-primary-600 dark:text-primary-400 hover:underline">Ounces to Grams</Link>
-                </div>
-                
-                <h3 className="text-xl font-medium mt-8 mb-2">Temperature</h3>
-                <p className="font-light text-neutral-600 dark:text-neutral-400">Cross-reference Celsius and Fahrenheit effortlessly. Whether you are traveling abroad or working on scientific tasks with Kelvin, our tool handles offset formulas properly.</p>
-                <div className="flex flex-wrap gap-2 text-sm mt-3">
-                  <Link to="/celsius-to-fahrenheit" className="text-primary-600 dark:text-primary-400 hover:underline">Celsius to Fahrenheit</Link> | 
-                  <Link to="/fahrenheit-to-celsius" className="text-primary-600 dark:text-primary-400 hover:underline">Fahrenheit to Celsius</Link> | 
-                  <Link to="/celsius-to-kelvin" className="text-primary-600 dark:text-primary-400 hover:underline">Celsius to Kelvin</Link>
-                </div>
-                
-                <h3 className="text-xl font-medium mt-8 mb-2">Volume</h3>
-                <p className="font-light text-neutral-600 dark:text-neutral-400">Convert cups to milliliters or gallons to liters instantly. Highly useful for adjusting global cooking recipes or checking fluid container volumes.</p>
-                <div className="flex flex-wrap gap-2 text-sm mt-3">
-                  <Link to="/liters-to-gallons" className="text-primary-600 dark:text-primary-400 hover:underline">Liters to Gallons</Link> | 
-                  <Link to="/gallons-to-liters" className="text-primary-600 dark:text-primary-400 hover:underline">Gallons to Liters</Link> | 
-                  <Link to="/cups-to-ml" className="text-primary-600 dark:text-primary-400 hover:underline">Cups to ML</Link> | 
-                  <Link to="/ml-to-cups" className="text-primary-600 dark:text-primary-400 hover:underline">ML to Cups</Link>
-                </div>
-
-                <h3 className="text-xl font-medium mt-8 mb-2">Speed</h3>
-                <p className="font-light text-neutral-600 dark:text-neutral-400">Check the speed limit accurately by converting kilometers per hour to miles per hour. Includes meters per second and knots for aviation or maritime use.</p>
-                <div className="flex flex-wrap gap-2 text-sm mt-3">
-                  <Link to="/mph-to-kph" className="text-primary-600 dark:text-primary-400 hover:underline">MPH to KPH</Link> | 
-                  <Link to="/kph-to-mph" className="text-primary-600 dark:text-primary-400 hover:underline">KPH to MPH</Link> | 
-                  <Link to="/knots-to-mph" className="text-primary-600 dark:text-primary-400 hover:underline">Knots to MPH</Link>
-                </div>
-                
-                <h3 className="text-xl font-medium mt-8 mb-2">Area</h3>
-                <p className="font-light text-neutral-600 dark:text-neutral-400">Quickly measure land and property sizes by switching between acres, hectares, square meters, and square feet. Invaluable for real estate and surveying.</p>
-                <div className="flex flex-wrap gap-2 text-sm mt-3">
-                  <Link to="/acres-to-square-meters" className="text-primary-600 dark:text-primary-400 hover:underline">Acres to Square Meters</Link> | 
-                  <Link to="/square-feet-to-square-meters" className="text-primary-600 dark:text-primary-400 hover:underline">Square Feet to Square Meters</Link> | 
-                  <Link to="/hectares-to-acres" className="text-primary-600 dark:text-primary-400 hover:underline">Hectares to Acres</Link>
-                </div>
-
-                <h3 className="text-xl font-medium mt-8 mb-2">Time</h3>
-                <p className="font-light text-neutral-600 dark:text-neutral-400">Convert between seconds, minutes, hours, days, and larger timeframes. Track durations logically across different time scales.</p>
-                <div className="flex flex-wrap gap-2 text-sm mt-3">
-                  <Link to="/hours-to-minutes" className="text-primary-600 dark:text-primary-400 hover:underline">Hours to Minutes</Link> | 
-                  <Link to="/minutes-to-seconds" className="text-primary-600 dark:text-primary-400 hover:underline">Minutes to Seconds</Link> | 
-                  <Link to="/days-to-hours" className="text-primary-600 dark:text-primary-400 hover:underline">Days to Hours</Link>
-                </div>
-                
-                <h3 className="text-xl font-medium mt-8 mb-2">Data Storage</h3>
-                <p className="font-light text-neutral-600 dark:text-neutral-400">Compare bytes, megabytes, gigabytes, and terabytes to know exactly how much file storage is necessary for your electronic devices.</p>
-                <div className="flex flex-wrap gap-2 text-sm mt-3">
-                  <Link to="/mb-to-gb" className="text-primary-600 dark:text-primary-400 hover:underline">MB to GB</Link> | 
-                  <Link to="/gb-to-tb" className="text-primary-600 dark:text-primary-400 hover:underline">GB to TB</Link> | 
-                  <Link to="/bits-to-bytes" className="text-primary-600 dark:text-primary-400 hover:underline">Bits to Bytes</Link>
-                </div>
-                
-                <h3 className="text-xl font-medium mt-8 mb-2">Fuel Economy</h3>
-                <p className="font-light text-neutral-600 dark:text-neutral-400">Measure your vehicle's efficiency by comparing miles per gallon (MPG) to liters per 100 kilometers. Helps you budget travel costs globally.</p>
-                <div className="flex flex-wrap gap-2 text-sm mt-3">
-                  <Link to="/mpg-to-kml" className="text-primary-600 dark:text-primary-400 hover:underline">MPG to KM/L</Link> | 
-                  <Link to="/kml-to-mpg" className="text-primary-600 dark:text-primary-400 hover:underline">KM/L to MPG</Link>
-                </div>
-
-                <h3 className="text-xl font-medium mt-8 mb-2">Energy</h3>
-                <p className="font-light text-neutral-600 dark:text-neutral-400">Determine energy values between Joules, calories, and kilowatt-hours. Perfect for utility bill math and physics problems.</p>
-                <div className="flex flex-wrap gap-2 text-sm mt-3">
-                  <Link to="/joules-to-calories" className="text-primary-600 dark:text-primary-400 hover:underline">Joules to Calories</Link> | 
-                  <Link to="/calories-to-joules" className="text-primary-600 dark:text-primary-400 hover:underline">Calories to Joules</Link> | 
-                  <Link to="/kwh-to-joules" className="text-primary-600 dark:text-primary-400 hover:underline">kWh to Joules</Link>
-                </div>
-
-                <h3 className="text-xl font-medium mt-8 mb-2">Pressure</h3>
-                <p className="font-light text-neutral-600 dark:text-neutral-400">Check tire pressure or atmospheric specs by converting bar to PSI, pascal, and atmospheres. Crucial for engineering and daily maintenance.</p>
-                <div className="flex flex-wrap gap-2 text-sm mt-3">
-                  <Link to="/bar-to-psi" className="text-primary-600 dark:text-primary-400 hover:underline">Bar to PSI</Link> | 
-                  <Link to="/psi-to-bar" className="text-primary-600 dark:text-primary-400 hover:underline">PSI to Bar</Link> | 
-                  <Link to="/atmospheres-to-psi" className="text-primary-600 dark:text-primary-400 hover:underline">Atmospheres to PSI</Link>
-                </div>
-
-                <h3 className="text-xl font-medium mt-8 mb-2">Angle</h3>
-                <p className="font-light text-neutral-600 dark:text-neutral-400">Switch between degrees and radians instantly. Very helpful for mathematics, geometry, and engineering graphics calculations.</p>
-                <div className="flex flex-wrap gap-2 text-sm mt-3">
-                  <Link to="/degrees-to-radians" className="text-primary-600 dark:text-primary-400 hover:underline">Degrees to Radians</Link> | 
-                  <Link to="/radians-to-degrees" className="text-primary-600 dark:text-primary-400 hover:underline">Radians to Degrees</Link>
-                </div>
-
-                <h3 className="text-xl font-medium mt-8 mb-2">Torque</h3>
-                <p className="font-light text-neutral-600 dark:text-neutral-400">Convert torquing forces between Newton-meters, pound-feet, and pound-inches for mechanical engineering and automotive applications.</p>
-                <div className="flex flex-wrap gap-2 text-sm mt-3">
-                  <Link to="/newton_meter-to-pound_foot" className="text-primary-600 dark:text-primary-400 hover:underline">Newton-meter to Pound-foot</Link> | 
-                  <Link to="/pound_foot-to-newton_meter" className="text-primary-600 dark:text-primary-400 hover:underline">Pound-foot to Newton-meter</Link>
-                </div>
-
-                <h3 className="text-xl font-medium mt-8 mb-2">Data Transfer Rate</h3>
-                <p className="font-light text-neutral-600 dark:text-neutral-400">Calculate speeds for downloading, streaming, and network infrastructure. Seamlessly convert Mbps to MB/s and Gbps to GB/s to understand true bandwidth capabilities.</p>
-                <div className="flex flex-wrap gap-2 text-sm mt-3">
-                  <Link to="/mbps-to-MBps" className="text-primary-600 dark:text-primary-400 hover:underline">Mbps to MB/s</Link> | 
-                  <Link to="/gbps-to-GBps" className="text-primary-600 dark:text-primary-400 hover:underline">Gbps to GB/s</Link>
-                </div>
-
-                <h3 className="text-xl font-medium mt-8 mb-2">Currency</h3>
-                <p className="font-light text-neutral-600 dark:text-neutral-400">Translate value between major world fiat currencies like USD, EUR, and GBP. Uses realistic exchange rate estimations for budgeting trips and international purchases.</p>
-                <div className="flex flex-wrap gap-2 text-sm mt-3">
-                  <Link to="/usd-to-eur" className="text-primary-600 dark:text-primary-400 hover:underline">USD to EUR</Link> | 
-                  <Link to="/eur-to-usd" className="text-primary-600 dark:text-primary-400 hover:underline">EUR to USD</Link> | 
-                  <Link to="/usd-to-gbp" className="text-primary-600 dark:text-primary-400 hover:underline">USD to GBP</Link> | 
-                  <Link to="/usd-to-inr" className="text-primary-600 dark:text-primary-400 hover:underline">USD to INR</Link>
-                </div>
-                
-                <h3 className="text-xl font-medium mt-8 mb-2">Time Zone</h3>
-                <p className="font-light text-neutral-600 dark:text-neutral-400">Sync global meetings appropriately. Translate local time into UTC, EST, PST, or CET directly considering standard daylight factors.</p>
-                <div className="flex flex-wrap gap-2 text-sm mt-3">
-                  <Link to="/time-zone-converter" className="text-primary-600 dark:text-primary-400 hover:underline">Time Zone Converter</Link> | 
-                  <Link to="/est-to-utc" className="text-primary-600 dark:text-primary-400 hover:underline">EST to UTC</Link> | 
-                  <Link to="/pst-to-est" className="text-primary-600 dark:text-primary-400 hover:underline">PST to EST</Link>
-                </div>
-
-                <h2 className="mb-4 mt-12 text-2xl font-semibold tracking-tight">Frequently Asked Questions</h2>
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-medium mb-1">Is this unit converter free?</h3>
-                    <p className="font-light text-neutral-600 dark:text-neutral-400">Yes, QuickConvert is 100% free to use. There are no registration requirements and no limits on the number of conversions you can perform.</p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium mb-1">How accurate are the results?</h3>
-                    <p className="font-light text-neutral-600 dark:text-neutral-400">Our calculator uses industry-standard conversion factors and provides results accurate up to 6 decimal places for most measurements.</p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium mb-1">Does it work on mobile devices?</h3>
-                    <p className="font-light text-neutral-600 dark:text-neutral-400">Yes, the website is fully responsive and works perfectly on smartphones, tablets, and desktop computers.</p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium mb-1">Do I need an internet connection?</h3>
-                    <p className="font-light text-neutral-600 dark:text-neutral-400">Once the page is loaded, the core conversion engine works offline in your browser, making it extremely fast and accessible anywhere.</p>
-                  </div>
-                </div>
-              </div>
-              </>
+                <HomepageInfoComp />
+              </Suspense>
             )}
           </section>
         )}
@@ -2968,56 +2591,11 @@ export default function App() {
         </div>
 
         {/* Right Column (Sidebar Ads Desktop) */}
-        {!isEmbed && (
-          <aside className="hidden lg:block w-[300px] shrink-0">
-            <div className="sticky top-24 space-y-6">
-              {/* Quick Reference Table */}
-              <div className="bg-white dark:bg-[#111111] border border-neutral-100 dark:border-neutral-800 rounded-2xl p-5 shadow-sm overflow-hidden">
-                <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 mb-4 tracking-tight flex items-center gap-2">
-                  <Star className="w-4 h-4 text-amber-500" />
-                  {t("popular", "Popular Conversions")}
-                </h3>
-                <div className="flex flex-col gap-1">
-                  {POPULAR_CONVERSIONS.slice(0, 12).map((conv, i) => (
-                    <a
-                      key={i}
-                      href={conv.cat === 'time_zone' ? '/time-zone-converter' : `/${getSEOUrlPath(conv.from, conv.to)}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleCategoryChange(conv.cat);
-                        setTimeout(() => {
-                          setUnitFrom(conv.from);
-                          setUnitTo(conv.to);
-                          setValFrom("1");
-                        }, 10);
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-neutral-50 dark:bg-neutral-800/20 dark:hover:bg-neutral-800/50 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 group transition-colors"
-                    >
-                      <span>
-                        {conv.cat === 'time_zone' ? (
-                          t(`units.time_zone_converter`, 'Time Zone Converter')
-                        ) : conv.label.includes(' to ') ? (
-                          <>{t(`units.${conv.from}`, conv.label.split(' to ')[0])} {t("to", "to")} {t(`units.${conv.to}`, conv.label.split(' to ')[1])}</>
-                        ) : (
-                          t(`units.${conv.cat}`, conv.label)
-                        )}
-                      </span>
-                      <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                    </a>
-                  ))}
-                </div>
-              </div>
-
-                                        </div>
-          </aside>
-        )}
       </div>
+      
+      {/* {!isEmbed && <CookieConsent />} */}
+      {/* {!isEmbed && <PwaPrompt />} */}
 
-      
-      {!isEmbed && <CookieConsent />}
-      {!isEmbed && <PwaPrompt />}
-      
       {/* Error Toast */}
       <div id="error-toast" className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 bg-red-500 text-white rounded-full font-medium text-sm shadow-xl opacity-0 translate-y-4 pointer-events-none transition-all duration-300">
         Error message

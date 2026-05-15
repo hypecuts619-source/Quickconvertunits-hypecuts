@@ -38,3 +38,66 @@ export const POPULAR_CONVERSIONS = [
   { from: 'kilocalorie', to: 'kilojoule', label: 'Calories to kJ', cat: 'energy' },
   { from: 'kilogram', to: 'metric_ton', label: 'KG to Tons', cat: 'weight' },
 ];
+
+export const POPULAR = [
+  { label: "kg to lbs", cat: "weight", fu: "kilogram", tu: "pound" },
+  { label: "lbs to kg", cat: "weight", fu: "pound", tu: "kilogram" },
+  { label: "feet to meters", cat: "length", fu: "foot", tu: "meter" },
+  { label: "miles to km", cat: "length", fu: "mile", tu: "kilometer" },
+  { label: "mm to inches", cat: "length", fu: "millimeter", tu: "inch" },
+  { label: "Celsius to Fahrenheit", cat: "temperature", fu: "celsius", tu: "fahrenheit" },
+  { label: "Fahrenheit to Celsius", cat: "temperature", fu: "fahrenheit", tu: "celsius" },
+  { label: "Liters to Gallons", cat: "volume", fu: "liter", tu: "us_gallon" },
+  { label: "km/h to mph", cat: "speed", fu: "kilometer_per_hour", tu: "mile_per_hour" },
+];
+
+export const FORMULAS = [
+  {
+    title: "Celsius → Fahrenheit",
+    code: "°F = (°C × 9/5) + 32",
+    note: "Water boils at 100°C / 212°F",
+    link: { cat: "temperature", from: "celsius", to: "fahrenheit" },
+  },
+  {
+    title: "Fahrenheit → Celsius",
+    code: "°C = (°F − 32) × 5/9",
+    note: "Water freezes at 0°C / 32°F",
+    link: { cat: "temperature", from: "fahrenheit", to: "celsius" },
+  },
+  {
+    title: "Kilometers → Miles",
+    code: "mi = km × 0.621371",
+    note: "1 km ≈ 0.621 miles",
+    link: { cat: "length", from: "kilometer", to: "mile" },
+  },
+  {
+    title: "Miles → Kilometers",
+    code: "km = mi × 1.60934",
+    note: "1 mile ≈ 1.609 km",
+    link: { cat: "length", from: "mile", to: "kilometer" },
+  },
+  {
+    title: "Kilograms → Pounds",
+    code: "lb = kg × 2.20462",
+    note: "1 kg ≈ 2.205 pounds",
+    link: { cat: "weight", from: "kilogram", to: "pound" },
+  },
+  {
+    title: "Meters → Feet",
+    code: "ft = m × 3.28084",
+    note: "1 meter ≈ 3.281 feet",
+    link: { cat: "length", from: "meter", to: "foot" },
+  },
+  {
+    title: "Hectares → Acres",
+    code: "ac = ha × 2.47105",
+    note: "1 hectare ≈ 2.471 acres",
+    link: { cat: "area", from: "hectare", to: "acre" },
+  },
+  {
+    title: "Liters → US Gallons",
+    code: "gal = L × 0.264172",
+    note: "1 liter ≈ 0.264 gallons",
+    link: { cat: "volume", from: "liter", to: "us_gallon" },
+  },
+];

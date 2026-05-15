@@ -1,9 +1,30 @@
 import { ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 export default function PrivacyPolicy() {
+  const { lang } = useParams();
+  const currentLang = lang || 'en';
+  const getLangPrefix = (l: string) => l === 'en' ? '' : `/${l}`;
+  const supportedLangs = ['en', 'es', 'fr', 'de', 'hi', 'zh', 'ar', 'pt', 'ru', 'ja', 'it'];
+  const canonicalUrl = `https://quickconvertunits.com${getLangPrefix(currentLang)}/privacy-policy`;
+
   return (
     <div className="min-h-screen text-neutral-900 dark:text-neutral-100 font-sans p-6 md:p-12">
+      <Helmet>
+        <title>Privacy Policy | QuickConvert</title>
+        <meta name="description" content="Read the QuickConvert Privacy Policy to understand how we handle your data and respect your privacy while using our unit conversion tools." />
+        <link rel="canonical" href={canonicalUrl} />
+        {supportedLangs.map(l => (
+          <link 
+            key={l}
+            rel="alternate" 
+            hrefLang={l} 
+            href={`https://quickconvertunits.com${getLangPrefix(l)}/privacy-policy`} 
+          />
+        ))}
+        <link rel="alternate" hrefLang="x-default" href="https://quickconvertunits.com/privacy-policy" />
+      </Helmet>
       <div className="max-w-3xl mx-auto bg-white dark:bg-[#111111] rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 p-8 md:p-16">
         <Link to="/" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 font-medium text-sm transition-colors mb-10 text-neutral-800 dark:text-neutral-200">
           <ArrowLeft className="w-4 h-4" /> Back to Converter

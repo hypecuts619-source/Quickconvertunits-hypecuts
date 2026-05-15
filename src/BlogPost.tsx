@@ -1,12 +1,44 @@
-import React from 'react';
-import { Link, useParams, useNavigate, MemoryRouter, Routes, Route } from 'react-router-dom';
-import { ArrowLeft, Clock, Calendar, User } from 'lucide-react';
+import React, { Component, ReactNode } from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Clock, Calendar, User, AlertTriangle } from 'lucide-react';
 import { blogPosts } from './lib/blogPosts';
-import App from './App';
 import { Helmet } from 'react-helmet-async';
 
+interface WidgetProps {
+  children: ReactNode;
+}
+
+interface WidgetState {
+  hasError: boolean;
+}
+
+// Simple ErrorBoundary for individual widgets
+class WidgetErrorBoundary extends Component<WidgetProps, WidgetState> {
+  constructor(props: WidgetProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-8 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-[2.5rem] text-center my-6">
+          <AlertTriangle className="w-8 h-8 text-red-500 mx-auto mb-3" />
+          <p className="text-red-700 dark:text-red-400 font-medium">Failed to load tool</p>
+          <p className="text-red-600/70 dark:text-red-400/70 text-sm mt-1">Please refresh or try another article</p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function BlogPost() {
-  const { slug } = useParams();
+  const { slug, lang } = useParams();
   const navigate = useNavigate();
 
   const post = blogPosts.find(p => p.slug === slug);
@@ -42,7 +74,10 @@ export default function BlogPost() {
     }
   };
 
-  const canonicalUrl = `https://quickconvertunits.com/blog/${post.slug}`;
+  const currentLang = lang || 'en';
+  const getLangPrefix = (l: string) => l === 'en' ? '' : `/${l}`;
+  const canonicalUrl = `https://quickconvertunits.com${getLangPrefix(currentLang)}/blog/${post.slug}`;
+  const supportedLangs = ['en', 'es', 'fr', 'de', 'hi', 'zh', 'ar', 'pt', 'ru', 'ja', 'it'];
 
   return (
     <div className="min-h-screen text-neutral-900 dark:text-neutral-100 font-sans p-6 md:p-12">
@@ -50,6 +85,15 @@ export default function BlogPost() {
         <title>{post.title} | QuickConvert Blog</title>
         <meta name="description" content={post.excerpt} />
         <link rel="canonical" href={canonicalUrl} />
+        {supportedLangs.map(l => (
+          <link 
+            key={l}
+            rel="alternate" 
+            hrefLang={l} 
+            href={`https://quickconvertunits.com${getLangPrefix(l)}/blog/${post.slug}`} 
+          />
+        ))}
+        <link rel="alternate" hrefLang="x-default" href={`https://quickconvertunits.com/blog/${post.slug}`} />
         {post.faqSchema && (
           <script type="application/ld+json" data-rh="true">
             {JSON.stringify({
@@ -104,16 +148,17 @@ export default function BlogPost() {
             {post.content.split(/(\{\{WIDGET:[^}]+\}\})/g).map((part, index) => {
               const uniqueKey = `${post.slug}-${index}`;
               if (part.startsWith('{{WIDGET:')) {
-                const route = part.replace('{{WIDGET:', '').replace('}}', '');
+                const route = part.replace('{{WIDGET:', '').replace('}}', '').trim();
                 return (
-                  <div key={uniqueKey} className="my-10 rounded-[2.5rem] overflow-hidden -mx-4 md:mx-0 relative">
-                    <MemoryRouter initialEntries={[`/${route}?embed=true`]}>
-                      <React.Suspense fallback={<div className="h-[400px] flex items-center justify-center bg-neutral-50 dark:bg-neutral-900 rounded-[2.5rem]">Loading tool...</div>}>
-                        <Routes>
-                          <Route path="/:conversion" element={<App />} />
-                        </Routes>
-                      </React.Suspense>
-                    </MemoryRouter>
+                  <div key={uniqueKey} className="my-10 rounded-[2.5rem] overflow-hidden -mx-4 md:mx-0 relative border border-neutral-100 dark:border-neutral-800 shadow-sm h-[600px] bg-white dark:bg-[#111111]">
+                    <WidgetErrorBoundary>
+                      <iframe 
+                        src={`/${route}?embed=true`} 
+                        className="w-full h-full border-none"
+                        title="QuickConvert Interactive Widget"
+                        loading="lazy"
+                      />
+                    </WidgetErrorBoundary>
                   </div>
                 );
               }

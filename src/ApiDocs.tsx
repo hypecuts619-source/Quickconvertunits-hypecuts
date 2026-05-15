@@ -1,14 +1,30 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Code, Link as LinkIcon, Database, Zap } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 export default function ApiDocs() {
+  const { lang } = useParams();
+  const currentLang = lang || 'en';
+  const getLangPrefix = (l: string) => l === 'en' ? '' : `/${l}`;
+  const supportedLangs = ['en', 'es', 'fr', 'de', 'hi', 'zh', 'ar', 'pt', 'ru', 'ja', 'it'];
+  const canonicalUrl = `https://quickconvertunits.com${getLangPrefix(currentLang)}/api-docs`;
+
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 font-sans">
       <Helmet>
         <title>Unit Conversion API | Free Developer API by QuickConvert</title>
         <meta name="description" content="Free REST API for unit conversions. Convert weight, length, temperature, and more instantly with our fast, highly rate-limited JSON API." />
+        <link rel="canonical" href={canonicalUrl} />
+        {supportedLangs.map(l => (
+          <link 
+            key={l}
+            rel="alternate" 
+            hrefLang={l} 
+            href={`https://quickconvertunits.com${getLangPrefix(l)}/api-docs`} 
+          />
+        ))}
+        <link rel="alternate" hrefLang="x-default" href="https://quickconvertunits.com/api-docs" />
       </Helmet>
 
       <div className="max-w-4xl mx-auto px-4 py-12 md:py-20">

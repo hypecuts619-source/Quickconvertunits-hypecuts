@@ -26,10 +26,22 @@ if ('serviceWorker' in navigator) {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <HelmetProvider>
-      <ErrorBoundary fallback={<div className="min-h-screen flex items-center justify-center p-10"><div className="text-center bg-red-50 text-red-600 p-8 rounded-2xl max-w-xl"><h1>App Crashed</h1><p>The application encountered an error while rendering.</p></div></div>}>
+      <ErrorBoundary>
         <BrowserRouter>
           <ScrollToTop />
-          <Suspense fallback={<div style={{height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>Loading...</div>}>
+          <Suspense fallback={
+            <div style={{minHeight: '100vh', backgroundColor: '#fbfbfb', display: 'flex', flexDirection: 'column'}}>
+              <div style={{height: '64px', background: '#ffffff', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px'}}>
+                <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                  <div style={{width: '28px', height: '28px', borderRadius: '8px', background: '#3b82f6'}}></div>
+                  <div style={{fontWeight: '700', fontSize: '18px', color: '#111111'}}>QuickConvert</div>
+                </div>
+              </div>
+              <div style={{maxWidth: '800px', margin: '0 auto', width: '100%', padding: '40px 16px'}}>
+                 <div style={{height: '400px', width: '100%', background: 'white', borderRadius: '32px', border: '1px solid #f3f4f6'}}></div>
+              </div>
+            </div>
+          }>
             <Routes>
               {/* Routes without language prefix */}
               <Route path="/" element={<App />} />

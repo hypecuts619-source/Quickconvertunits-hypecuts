@@ -1,9 +1,30 @@
 import { ArrowLeft, CheckCircle2, Shield, Users, Zap } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 export default function AboutUs() {
+  const { lang } = useParams();
+  const currentLang = lang || 'en';
+  const getLangPrefix = (l: string) => l === 'en' ? '' : `/${l}`;
+  const supportedLangs = ['en', 'es', 'fr', 'de', 'hi', 'zh', 'ar', 'pt', 'ru', 'ja', 'it'];
+  const canonicalUrl = `https://quickconvertunits.com${getLangPrefix(currentLang)}/about`;
+
   return (
     <div className="min-h-screen text-neutral-900 dark:text-neutral-100 font-sans p-6 md:p-12">
+      <Helmet>
+        <title>About QuickConvert | Our Mission and Team</title>
+        <meta name="description" content="Learn about QuickConvert, our mission to provide the internet's fastest unit conversion platform, and the independent team behind the project." />
+        <link rel="canonical" href={canonicalUrl} />
+        {supportedLangs.map(l => (
+          <link 
+            key={l}
+            rel="alternate" 
+            hrefLang={l} 
+            href={`https://quickconvertunits.com${getLangPrefix(l)}/about`} 
+          />
+        ))}
+        <link rel="alternate" hrefLang="x-default" href="https://quickconvertunits.com/about" />
+      </Helmet>
       <div className="max-w-4xl mx-auto bg-white dark:bg-[#111111] rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 p-8 md:p-16">
         <Link to="/" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 font-medium text-sm transition-colors mb-10 text-neutral-800 dark:text-neutral-200">
           <ArrowLeft className="w-4 h-4" /> Back to Converter

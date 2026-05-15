@@ -5,7 +5,16 @@ import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
 
 export default function Directory() {
-  const { category, pair } = useParams();
+  const { category, pair, lang } = useParams();
+  const currentLang = lang || 'en';
+  const getLangPrefix = (l: string) => l === 'en' ? '' : `/${l}`;
+  const supportedLangs = ['en', 'es', 'fr', 'de', 'hi', 'zh', 'ar', 'pt', 'ru', 'ja', 'it'];
+  
+  let currentBasePath = "/conversions";
+  if (category && pair) currentBasePath = `/conversions/${category}/${pair}`;
+  else if (category) currentBasePath = `/conversions/${category}`;
+  
+  const canonicalUrl = `https://quickconvertunits.com${getLangPrefix(currentLang)}${currentBasePath}`;
 
   // Route: /conversions/:category/:pair
   if (category && pair) {
@@ -27,6 +36,16 @@ export default function Directory() {
         <Helmet>
           <title>{`${validPair.replace(/-/g, ' ')} Conversions Directory | QuickConvert`}</title>
           <meta name="description" content={`List of common ${validPair.replace(/-/g, ' ')} conversions.`} />
+          <link rel="canonical" href={canonicalUrl} />
+          {supportedLangs.map(l => (
+            <link 
+              key={l}
+              rel="alternate" 
+              hrefLang={l} 
+              href={`https://quickconvertunits.com${getLangPrefix(l)}${currentBasePath}`} 
+            />
+          ))}
+          <link rel="alternate" hrefLang="x-default" href={`https://quickconvertunits.com${currentBasePath}`} />
         </Helmet>
         
         <div className="mb-8">
@@ -74,6 +93,16 @@ export default function Directory() {
         <Helmet>
           <title>{`${catData.name} Conversions Directory | QuickConvert`}</title>
           <meta name="description" content={`Comprehensive list of all ${catData.name.toLowerCase()} conversion pairs.`} />
+          <link rel="canonical" href={canonicalUrl} />
+          {supportedLangs.map(l => (
+            <link 
+              key={l}
+              rel="alternate" 
+              hrefLang={l} 
+              href={`https://quickconvertunits.com${getLangPrefix(l)}${currentBasePath}`} 
+            />
+          ))}
+          <link rel="alternate" hrefLang="x-default" href={`https://quickconvertunits.com${currentBasePath}`} />
         </Helmet>
         
         <div className="mb-8">
@@ -106,6 +135,16 @@ export default function Directory() {
       <Helmet>
         <title>All Unit Conversions Directory Sitemap | QuickConvert</title>
         <meta name="description" content="View all conversion categories and tools available on QuickConvert." />
+        <link rel="canonical" href={canonicalUrl} />
+        {supportedLangs.map(l => (
+          <link 
+            key={l}
+            rel="alternate" 
+            hrefLang={l} 
+            href={`https://quickconvertunits.com${getLangPrefix(l)}${currentBasePath}`} 
+          />
+        ))}
+        <link rel="alternate" hrefLang="x-default" href={`https://quickconvertunits.com${currentBasePath}`} />
       </Helmet>
 
       <div className="mb-8">

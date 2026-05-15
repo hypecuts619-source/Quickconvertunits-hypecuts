@@ -1,10 +1,31 @@
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, BookOpen, ArrowRight } from 'lucide-react';
 import { blogPosts } from './lib/blogPosts';
+import { Helmet } from 'react-helmet-async';
 
 export default function Blog() {
+  const { lang } = useParams();
+  const currentLang = lang || 'en';
+  const getLangPrefix = (l: string) => l === 'en' ? '' : `/${l}`;
+  const supportedLangs = ['en', 'es', 'fr', 'de', 'hi', 'zh', 'ar', 'pt', 'ru', 'ja', 'it'];
+  const canonicalUrl = `https://quickconvertunits.com${getLangPrefix(currentLang)}/blog`;
+
   return (
     <div className="min-h-screen text-neutral-900 dark:text-neutral-100 font-sans p-6 md:p-12">
+      <Helmet>
+        <title>QuickConvert Blog | Guides, Tips & Tools for Unit Conversion</title>
+        <meta name="description" content="Explore our library of measurement guides, unit conversion formulas, and expert tips to make your calculations easier. Updated weekly with new tool insights." />
+        <link rel="canonical" href={canonicalUrl} />
+        {supportedLangs.map(l => (
+          <link 
+            key={l}
+            rel="alternate" 
+            hrefLang={l} 
+            href={`https://quickconvertunits.com${getLangPrefix(l)}/blog`} 
+          />
+        ))}
+        <link rel="alternate" hrefLang="x-default" href="https://quickconvertunits.com/blog" />
+      </Helmet>
       <div className="max-w-4xl mx-auto">
         <header className="mb-12 border-b border-neutral-200 dark:border-neutral-800 pb-10">
           <Link to="/" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-100 dark:bg-[#1a1a1a] hover:bg-neutral-200 dark:hover:bg-[#222] font-medium text-sm transition-colors mb-8 text-neutral-800 dark:text-neutral-200 border border-transparent dark:border-neutral-800">
