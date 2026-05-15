@@ -264,8 +264,11 @@ export default {
     const pathname = url.pathname.replace(/^\//, "");
 
     if (pathname === "sitemap-dynamic.xml") {
+      const languages = ["", "es/", "fr/", "de/", "hi/", "zh/", "ja/", "ru/", "pt/", "it/", "ar/"];
       const urls: string[] = [];
       const bases = ["weight", "length", "temperature", "volume", "area", "time", "speed", "power", "digital", "pressure", "frequency", "angle", "data_rate", "torque"];
+      
+      // Conversion pages
       bases.forEach(base => {
         const units = Object.entries(popularUnits).filter(([_, u]) => u.base === base);
         for (let i = 0; i < units.length; i++) {
@@ -275,17 +278,45 @@ export default {
               const toId = units[j][0];
               const canonicalFromId = getCanonicalUnitId(fromId);
               const canonicalToId = getCanonicalUnitId(toId);
-              const canonicalPath = getSEOUrlPath(canonicalFromId, canonicalToId);
-              urls.push(`https://quickconvertunits.com/${canonicalPath}`);
+              
+              if (fromId === canonicalFromId && toId === canonicalToId) {
+                const canonicalPath = getSEOUrlPath(canonicalFromId, canonicalToId);
+                languages.forEach(lang => {
+                  urls.push(`https://quickconvertunits.com/${lang}${canonicalPath}`);
+                });
+              }
             }
           }
         }
       });
-      // Deduplicate
-      const uniqueUrls = Array.from(new Set(urls)).slice(0, 10000); 
+
+      // Category pages
+      bases.forEach(base => {
+        languages.forEach(lang => {
+          urls.push(`https://quickconvertunits.com/${lang}${base}-converter`);
+        });
+      });
+
+      // Static pages
+      const staticPages = ["contact", "about", "privacy-policy", "terms", "api-docs", "bmi-calculator", "time-zone-converter", "blog"];
+      staticPages.forEach(p => {
+        languages.forEach(lang => {
+          urls.push(`https://quickconvertunits.com/${lang}${p}`);
+        });
+      });
+
+      // Blog posts
+      blogPosts.forEach(post => {
+        languages.forEach(lang => {
+          urls.push(`https://quickconvertunits.com/${lang}blog/${post.slug}`);
+        });
+      });
+
+      // Deduplicate and cap for performance
+      const uniqueUrls = Array.from(new Set(urls)).slice(0, 45000); 
 
       const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url><loc>https://quickconvertunits.com/</loc><changefreq>daily</changefreq></url>
   ${uniqueUrls.map(u => `<url><loc>${u}</loc><changefreq>weekly</changefreq></url>`).join('\n')}
 </urlset>`;
@@ -366,25 +397,7 @@ export default {
       });
     }
 
-    const response = await env.ASSETS.fetch(request);
-    
-    const contentType = response.headers.get("Content-Type") || "";
-    if (!contentType.includes("text/html")) {
-      if (pathname.includes("-to-")) {
-        const newHeaders = new Headers(response.headers);
-        newHeaders.set("Cache-Control", `public, max-age=31536000, immutable`);
-        return new Response(response.body, {
-          status: response.status,
-          statusText: response.statusText,
-          headers: newHeaders
-        });
-      }
-      return response;
-    }
-    
-    let template = await response.text();
-    
-    // Path-based i18n
+    // 1. Determine Language and Base Path
     const langMatch = pathname.match(/^(es|fr|de|hi|zh|ja|ru|pt|it|ar)\/(.*)$/);
     let lang = "en";
     let urlPath = pathname;
@@ -393,30 +406,53 @@ export default {
       urlPath = langMatch[2];
     }
     
-    const hreflangTags = ['en', 'es', 'fr', 'de', 'hi', 'zh', 'ja', 'ru', 'pt', 'it', 'ar']
-      .map(l => `<link rel="alternate" hreflang="${l}" href="https://quickconvertunits.com/${l === 'en' ? '' : l + '/'}${urlPath}" />`)
-      .join('\n    ');
-    
-    template = template.replace(/<head>/i, `<head>\n    ${hreflangTags}`);
-    template = template.replace(/<html lang="en">/i, `<html lang="${lang}">`);
+    // 2. Canonical Check & Permanent Redirect (SEO Fix for "Page with redirect")
+    const conversionMatch = urlPath.match(/^(?:convert-([\d.]+)-)?(.+?)-(?:to|a|en|zu)-(.+)$/i);
+    if (conversionMatch && !urlPath.includes("blog")) {
+      const val = conversionMatch[1] ? parseFloat(conversionMatch[1]) : 1;
+      const fromId = conversionMatch[2];
+      const toId = conversionMatch[3];
+      
+      const canonicalFromId = getCanonicalUnitId(fromId);
+      const canonicalToId = getCanonicalUnitId(toId);
+      const canonicalPathBase = getSEOUrlPath(canonicalFromId, canonicalToId);
+      
+      // Construct canonical path
+      const canonicalUrlPath = val === 1 ? canonicalPathBase : `convert-${val}-${canonicalPathBase}`;
+      const finalCanonicalPath = lang === 'en' ? canonicalUrlPath : `${lang}/${canonicalUrlPath}`;
+      
+      // If current path is not canonical, 301 redirect
+      if (pathname !== finalCanonicalPath) {
+        return new Response(null, {
+          status: 301,
+          headers: {
+            "Location": `https://quickconvertunits.com/${finalCanonicalPath}`,
+            "Cache-Control": "public, max-age=31536000, immutable"
+          }
+        });
+      }
+    }
 
-    // 11. Initialise defaults for SEO
+    const response = await env.ASSETS.fetch(request);
+    
+    const contentType = response.headers.get("Content-Type") || "";
+    if (!contentType.includes("text/html")) {
+      return response;
+    }
+    
+    let template = await response.text();
+    
+    // 3. SEO Meta Injection Logic
     let title = "QuickConvert - Smart Unit Converter";
     let description = "Fast, free, and accurate unit converter for weight, length, temperature, currency, and more. Works offline as a PWA.";
     let schema: any = null;
     let staticContent = "";
 
-    const matchParts = urlPath.match(/^(?:(.*\/)?)?(?:convert-([\d.]+)-)?(.+?)-(?:to|a|en|zu)-(.+)$/i);
-    
-    if (matchParts && !urlPath.includes("blog") && !urlPath.includes("api-docs")) {
-      let val = 1;
-      let fromId = matchParts[3];
-      const toId = matchParts[4];
+    if (conversionMatch && !urlPath.includes("blog") && !urlPath.includes("api-docs")) {
+      const val = conversionMatch[1] ? parseFloat(conversionMatch[1]) : 1;
+      const fromId = conversionMatch[2];
+      const toId = conversionMatch[3];
 
-      if (matchParts[2]) {
-        val = parseFloat(matchParts[2]);
-      }
-      
       const canonicalFromId = getCanonicalUnitId(fromId);
       const canonicalToId = getCanonicalUnitId(toId);
       const fromUnit = popularUnits[canonicalFromId] || { name: capitalize(canonicalFromId), symbol: capitalize(canonicalFromId) };
@@ -426,59 +462,36 @@ export default {
       const resVal = calculateConversion(val, canonicalFromId, canonicalToId);
       
       const canonicalPathBase = getSEOUrlPath(canonicalFromId, canonicalToId);
-      const canonicalPath = val === 1 ? canonicalPathBase : `convert-${val}-${canonicalPathBase}`;
-      const finalCanonicalPath = lang === 'en' ? canonicalPath : `${lang}/${canonicalPath}`;
+      const canonicalUrlPath = val === 1 ? canonicalPathBase : `convert-${val}-${canonicalPathBase}`;
+      const finalCanonicalPath = lang === 'en' ? canonicalUrlPath : `${lang}/${canonicalUrlPath}`;
         
-        let intentAction = "Converter";
-        if (fromUnit.base === "weight") intentAction = "Weight Calculator";
-        else if (fromUnit.base === "volume") intentAction = "Baking Converter";
-        else if (fromUnit.base === "length") intentAction = "Length Converter";
-        else if (fromUnit.base === "temperature") intentAction = "Temperature Calculator";
-        else if (fromUnit.base === "time") intentAction = "Time Calculator";
-        else if (fromUnit.base === "digital") intentAction = "Data Converter";
-        
-        let title = `${fromUnit.name} to ${toUnit.name} (${fromUnit.symbol} to ${toUnit.symbol}) ${intentAction}`;
-        if (val !== 1 && resVal !== "N/A") {
-          title = `${valText} ${fromUnit.name} to ${toUnit.name} (${fromUnit.symbol} to ${toUnit.symbol}) ${intentAction}`;
-        }
-        
-        const description = val === 1 
-          ? `Convert 1 ${fromUnit.name.toLowerCase()} to ${toUnit.name.toLowerCase()} instantly. Free online ${intentAction.toLowerCase()}. Enter value, select units—get precise results fast.`
-          : `What is ${valText} ${fromUnit.name} in ${toUnit.name}? ${valText} ${fromUnit.symbol} = ${resVal} ${toUnit.symbol}. Detailed conversion steps and formula included.`;
+      let intentAction = "Converter";
+      if (fromUnit.base === "weight") intentAction = "Weight Calculator";
+      else if (fromUnit.base === "volume") intentAction = "Baking Converter";
+      else if (fromUnit.base === "length") intentAction = "Length Converter";
+      else if (fromUnit.base === "temperature") intentAction = "Temperature Calculator";
+      else if (fromUnit.base === "time") intentAction = "Time Calculator";
+      else if (fromUnit.base === "digital") intentAction = "Data Converter";
+      
+      title = `${fromUnit.name} to ${toUnit.name} (${fromUnit.symbol} to ${toUnit.symbol}) ${intentAction}`;
+      if (val !== 1 && resVal !== "N/A") {
+        title = `${valText} ${fromUnit.name} to ${toUnit.name} (${fromUnit.symbol} to ${toUnit.symbol}) ${intentAction}`;
+      }
+      
+      description = val === 1 
+        ? `Convert 1 ${fromUnit.name.toLowerCase()} to ${toUnit.name.toLowerCase()} instantly. Free online ${intentAction.toLowerCase()}. Enter value, select units—get precise results fast.`
+        : `What is ${valText} ${fromUnit.name} in ${toUnit.name}? ${valText} ${fromUnit.symbol} = ${resVal} ${toUnit.symbol}. Detailed conversion steps and formula included.`;
 
-        template = template.replace(
-          /<title[^>]*>.*?<\/title>/,
-          `<title data-react-helmet="true">${title}</title>`
-        );
-      template = template.replace(
-        /<meta[^>]*name="description"[^>]*\/>/,
-        `<meta data-react-helmet="true" name="description" content="${description}" />`
-      );
-      template = template.replace(
-        /<meta[^>]*property="og:title"[^>]*\/>/,
-        `<meta data-react-helmet="true" property="og:title" content="${title} - QuickConvert" />`
-      );
-      template = template.replace(
-        /<meta[^>]*property="og:description"[^>]*\/>/,
-        `<meta data-react-helmet="true" property="og:description" content="${description}" />`
-      );
-      template = template.replace(
-        /<meta[^>]*name="twitter:title"[^>]*\/>/,
-        `<meta data-react-helmet="true" name="twitter:title" content="${title}" />`
-      );
-      template = template.replace(
-        /<meta[^>]*name="twitter:description"[^>]*\/>/,
-        `<meta data-react-helmet="true" name="twitter:description" content="${description}" />`
-      );
-      template = template.replace(
-        /<link[^>]*rel="canonical"[^>]*\/>/,
-        `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${finalCanonicalPath}" />`
-      );
 
-      template = template.replace(
-        /<meta[^>]*property="og:url"[^>]*\/>/,
-        `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${finalCanonicalPath}" />`
-      );
+      // Replace metadata in template
+      template = template.replace(/<title[^>]*>.*?<\/title>/i, `<title>${title}</title>`);
+      template = template.replace(/<meta[^>]*name="description"[^>]*\/>/i, `<meta name="description" content="${description}" />`);
+      template = template.replace(/<meta[^>]*property="og:title"[^>]*\/>/i, `<meta property="og:title" content="${title}" />`);
+      template = template.replace(/<meta[^>]*property="og:description"[^>]*\/>/i, `<meta property="og:description" content="${description}" />`);
+      template = template.replace(/<meta[^>]*name="twitter:title"[^>]*\/>/i, `<meta name="twitter:title" content="${title}" />`);
+      template = template.replace(/<meta[^>]*name="twitter:description"[^>]*\/>/i, `<meta name="twitter:description" content="${description}" />`);
+      template = template.replace(/<link[^>]*rel="canonical"[^>]*\/>/i, `<link rel="canonical" href="https://quickconvertunits.com/${finalCanonicalPath}" />`);
+      template = template.replace(/<meta[^>]*property="og:url"[^>]*\/>/i, `<meta property="og:url" content="https://quickconvertunits.com/${finalCanonicalPath}" />`);
       
       let formulaText = `To calculate, you multiply the ${fromUnit.name} value by the conversion factor.`;
       if (canonicalPathBase === 'lbs-to-kg') {
@@ -951,340 +964,249 @@ export default {
         description = "Read our latest articles about unit conversions, digital storage, culinary measurements, and international standards.";
       }
     } else if (urlPath === "bmi-calculator" || urlPath === "time-zone-converter") {
-    let title = "";
-    let description = "";
-    if (urlPath === "bmi-calculator") {
-      title = "BMI Calculator: Calculate Body Mass Index Online Free";
-      description = "Free, fast, and easy-to-use BMI calculator. Check your Body Mass Index using metric or imperial units to see if you are at a healthy weight.";
-    } else {
-      title = "Time Zone Converter: Convert UTC, EST, PST, CET | QuickConvert";
-      description = "Instantly convert between time zones to schedule global meetings easily. Supports UTC, EST, PST, standard and daylight time conversions.";
-    }
-    
-    template = template.replace(/<title[^>]*>.*?<\/title>/, `<title data-react-helmet="true">${title}</title>`);
-    template = template.replace(/<meta[^>]*name="description"[^>]*\/>/, `<meta data-react-helmet="true" name="description" content="${description}" />`);
-    template = template.replace(/<meta[^>]*property="og:title"[^>]*\/>/, `<meta data-react-helmet="true" property="og:title" content="${title}" />`);
-    template = template.replace(/<meta[^>]*property="og:description"[^>]*\/>/, `<meta data-react-helmet="true" property="og:description" content="${description}" />`);
-    template = template.replace(/<meta[^>]*name="twitter:title"[^>]*\/>/, `<meta data-react-helmet="true" name="twitter:title" content="${title}" />`);
-    template = template.replace(/<meta[^>]*name="twitter:description"[^>]*\/>/, `<meta data-react-helmet="true" name="twitter:description" content="${description}" />`);
-    template = template.replace(/<link[^>]*rel="canonical"[^>]*\/>/, `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${urlPath}" />`);
-    template = template.replace(/<meta[^>]*property="og:url"[^>]*\/>/, `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${urlPath}" />`);
-    
-    const staticContent = `
-      <div style="display:none;" aria-hidden="true">
-        <div>
-          <h1>${title}</h1>
-          <p>${description}</p>
-        </div>
-      </div>
-    `;
-    template = template.replace(/<div style="display:none;" aria-hidden="true">[\\s\\S]*?<\/div>/, staticContent);
-  } else if (urlPath && urlPath.endsWith("-converter") && !urlPath.includes("blog")) {
-    const catNameRaw = urlPath.replace("-converter", "");
-    const title = `Fast ${capitalize(catNameRaw)} Converter - Instant Conversions`;
-    
-    const categorySpecifics: Record<string, { desc: string, intro: string, faq2: string, faq2A: string, faq3: string, faq3A: string, faq4: string, faq4A: string, tableItem1: string, tableItem2: string, tableItem3: string, tableItem4: string }> = {
-      "length": {
-        desc: "Convert length and distance measurements from meters, feet, kilometers, and miles. Real-time formatting with high precision.",
-        intro: "Instantly convert between various length and distance units, including metric and imperial systems. The conversion formula relies on standard metric prefixes or exact statutory definitions (like 1 inch = 2.54 cm).",
-        faq2: "How do I convert between imperial and metric length?",
-        faq2A: "You can use this calculator. Simply enter your imperial value (e.g. inches) to instantly see the metric equivalent (e.g. centimeters).",
-        faq3: "How do I calculate length conversions?",
-        faq3A: "You generally multiply by a conversion factor. For example, to convert meters to feet, multiply by 3.28084.",
-        faq4: "Does this length converter work for very small units?",
-        faq4A: "Yes, you can convert micrometers, millimeters, and nanometers accurately.",
-        tableItem1: "1 Meter = 3.28084 Feet",
-        tableItem2: "1 Kilometer = 0.621371 Miles",
-        tableItem3: "1 Inch = 2.54 Centimeters",
-        tableItem4: "1 Mile = 1.60934 Kilometers"
-      },
-      "weight": {
-        desc: "Convert weight and mass units instantly. Easily calculate pounds to kilograms, ounces to grams, and stone.",
-        intro: "Convert between various mass and weight units smoothly. Computations use standard international agreements, making it easy for cooking, shipping, or scientific conversions.",
-        faq2: "What is the difference between mass and weight?",
-        faq2A: "While interchangeably used in everyday life, mass measures the amount of matter, whereas weight measures gravitational force. Our converter handles standard earth-equivalent mass conversions.",
-        faq3: "What is the formula for weight conversions?",
-        faq3A: "Simply multiply the source weight by its specific conversion factor relative to the target unit.",
-        faq4: "Can I convert small cooking units?",
-        faq4A: "Yes, converting between grams and ounces is fully supported for precise baking.",
-        tableItem1: "1 Kilogram = 2.20462 Pounds",
-        tableItem2: "1 Pound = 0.453592 Kilograms",
-        tableItem3: "1 Ounce = 28.3495 Grams",
-        tableItem4: "1 Gram = 0.035274 Ounces"
-      },
-      "temperature": {
-        desc: "Convert temperatures between Celsius, Fahrenheit, and Kelvin. Precise scientific and everyday weather conversions using official scaling formulas.",
-        intro: "Transform temperature readings between differing scales. Because temperature scales have varying zero points (like 32°F roughly equalling 0°C), temperature conversions use offset formulas rather than simple multiplication.",
-        faq2: "Why does temperature conversion use addition/subtraction?",
-        faq2A: "Unlike distance or weight, Celsius and Fahrenheit scales do not start at absolute zero. They require an offset operation before applying the scaling factor.",
-        faq3: "What is the formula for Celsius to Fahrenheit?",
-        faq3A: "Multiply the Celsius temperature by 9/5 and add 32.",
-        faq4: "Can I convert to Kelvin?",
-        faq4A: "Yes, Kelvin conversions are fully supported for scientific standard calculations.",
-        tableItem1: "0 °C = 32 °F",
-        tableItem2: "100 °C = 212 °F",
-        tableItem3: "0 °C = 273.15 K",
-        tableItem4: "-40 °C = -40 °F"
-      },
-      "currency": {
-        desc: "Live currency converter for USD, EUR, GBP, INR, and more. Global exchange rates updated frequently.",
-        intro: "Calculate current exchange rates between fiat currencies. Keep in mind that real-world trading markets fluctuate constantly, so live conversion rates may vary slightly from static references.",
-        faq2: "Are the exchange rates live?",
-        faq2A: "We strive to provide relatively recent estimation based on market data for reference purposes. However, always verify with your financial institution before making transactions.",
-        faq3: "Does this include cryptocurrency?",
-        faq3A: "Currently, we focus on major global fiat currencies compared against USD, EUR, and more.",
-        faq4: "What is currency spread?",
-        faq4A: "Spread is the difference between buy and sell rates. We utilize a mid-market rate estimate for standard conversion.",
-        tableItem1: "1 USD = Variable EUR",
-        tableItem2: "1 EUR = Variable USD",
-        tableItem3: "1 GBP = Variable USD",
-        tableItem4: "1 USD = Variable INR"
-      },
-      "time-zone": {
-        desc: "Time zone converter for UTC, EST, PST, CET. Schedule global meetings and convert standard and daylight time accurately.",
-        intro: "Seamlessly translate coordinates of time between global zones. Accounting for longitude offsets and Daylight Saving Time (DST) complexities, this tool produces accurate local times anywhere.",
-        faq2: "Does this tool account for Daylight Saving Time?",
-        faq2A: "Yes, our converter accounts for variations due to DST shifts automatically depending on the specific date you enter.",
-        faq3: "Can I convert directly from PST to EST?",
-        faq3A: "Absolutely, you can select any supported From and To time regions directly.",
-        faq4: "Is UTC the same as GMT?",
-        faq4A: "For most general timekeeping purposes, yes, UTC shares the same current time standard as GMT.",
-        tableItem1: "UTC + 0 = GMT",
-        tableItem2: "UTC - 5 = EST",
-        tableItem3: "UTC - 8 = PST",
-        tableItem4: "UTC + 1 = CET"
-      },
-      "volume": {
-        desc: "Accurate volume measurement converter. Convert cups to ml, teaspoons to tablespoons, and liters to gallons.",
-        intro: "Precision in capacity measurement requires converting between metric and imperial correctly. Our converter helps you scale perfect volumes easily.",
-        faq2: "How many teaspoons are in a tablespoon?",
-        faq2A: "There are exactly 3 US teaspoons in 1 US tablespoon.",
-        faq3: "Is a US cup different from a UK cup?",
-        faq3A: "Yes, a US cup is 236.59 ml, while a traditional UK cup is often defined as 250 ml.",
-        faq4: "How many teaspoons are in a fluid ounce?",
-        faq4A: "In the US customary system, there are 6 US teaspoons in 1 US fluid ounce.",
-        tableItem1: "1 Cup = 236.59 mL",
-        tableItem2: "1 Tbsp = 14.79 mL",
-        tableItem3: "1 Tsp = 4.93 mL",
-        tableItem4: "1 Fl Oz = 29.57 mL"
-      },
-      "speed": {
-        desc: "Fast speed unit converter. Convert MPH to KPH, Knots to MPH, and Meters per Second.",
-        intro: "Convert travel speeds across different systems instantly. Ideal for understanding global speed limits or aviation and maritime navigation values.",
-        faq2: "What is 100 km/h in mph?",
-        faq2A: "100 kilometers per hour is approximately 62.14 miles per hour.",
-        faq3: "What is a Knot?",
-        faq3A: "A knot is one nautical mile per hour, which is roughly 1.15 standard miles per hour.",
-        faq4: "Is speed different from velocity?",
-        faq4A: "Speed is a scalar quantity (just magnitude), while velocity is a vector (magnitude and direction).",
-        tableItem1: "100 km/h = 62.14 mph",
-        tableItem2: "1 knot = 1.15 mph",
-        tableItem3: "1 m/s = 3.6 km/h",
-        tableItem4: "60 mph = 96.56 km/h"
-      },
-      "area": {
-        desc: "Convert area units like square feet to square meters, acres to hectares, and square miles.",
-        intro: "Calculate land and property sizes accurately. Essential for real estate, construction, and global landscaping projects.",
-        faq2: "How many acres are in a hectare?",
-        faq2A: "There are approximately 2.471 acres in 1 hectare.",
-        faq3: "How many square feet are in a square meter?",
-        faq3A: "1 square meter equals approximately 10.764 square feet.",
-        faq4: "What is a square mile in kilometers?",
-        faq4A: "1 square mile is approximately 2.59 square kilometers.",
-        tableItem1: "1 Hectare = 2.47 Acres",
-        tableItem2: "1 Sq Meter = 10.76 Sq Ft",
-        tableItem3: "1 Acre = 43,560 Sq Ft",
-        tableItem4: "1 Sq Mile = 640 Acres"
-      },
-      "cooking": {
-        desc: "Convert cooking measurements and ingredient weights to volumes. Accurately translate cups to grams for flour, sugar, butter, and more.",
-        intro: "Transform standard baking weights into easily measurable cups and spoons based on ingredient density.",
-        faq2: "Why do cups to grams vary by ingredient?",
-        faq2A: "Because ingredients have different densities. A cup of fluffy flour weighs about 120 grams, while a cup of dense sugar weighs 200 grams.",
-        faq3: "How do I measure flour without a scale?",
-        faq3A: "Use the spoon and level method: lightly spoon the flour into your cup until it mounds over, then level it cleanly with a knife.",
-        faq4: "How many grams are in 1 US cup of water?",
-        faq4A: "One US liquid cup of water or milk weighs roughly 236 grams.",
-        tableItem1: "1 Cup All-Purpose Flour = 120g",
-        tableItem2: "1 Cup Granulated Sugar = 200g",
-        tableItem3: "1 Cup Butter (2 sticks) = 227g",
-        tableItem4: "1 Cup Cocoa Powder = 100g"
+      if (urlPath === "bmi-calculator") {
+        title = "BMI Calculator: Calculate Body Mass Index Online Free";
+        description = "Free, fast, and easy-to-use BMI calculator. Check your Body Mass Index using metric or imperial units to see if you are at a healthy weight.";
+      } else {
+        title = "Time Zone Converter: Convert UTC, EST, PST, CET | QuickConvert";
+        description = "Instantly convert between time zones to schedule global meetings easily. Supports UTC, EST, PST, standard and daylight time conversions.";
       }
-    };
-
-    const specifics = categorySpecifics[catNameRaw.toLowerCase()] || {
-      desc: `Free ${catNameRaw.toLowerCase()} unit converter. Precise calculations with real-time results. Convert measurements instantly.`,
-      intro: `Instantly convert between various ${catNameRaw.toLowerCase()} units. Our calculator is built for speed and precision, offering real-time conversions without page reloads.`,
-      faq2: `How is ${catNameRaw} conversion calculated?`,
-      faq2A: `Our tool uses officially recognized constants and factors to ensure excellent accuracy according to international standards.`,
-      faq3: `Is this a reliable tool?`,
-      faq3A: `Yes, we utilize standard mathematical formulas up to multiple decimal places for precision.`,
-      faq4: `Can I use this on mobile?`,
-      faq4A: `Yes, the interface is fully responsive and works perfectly on all modern smartphones and tablets.`,
-      tableItem1: `Popular ${catNameRaw} conversions supported`,
-      tableItem2: "Instant real-time execution",
-      tableItem3: "High decimal precision format",
-      tableItem4: "Cross-platform compatibility"
-    };
-
-    const description = specifics.desc;
-
-    template = template.replace(
-      /<title[^>]*>.*?<\/title>/,
-      `<title data-react-helmet="true">${title}</title>`
-    );
-    template = template.replace(
-      /<meta[^>]*name="description"[^>]*\/>/,
-      `<meta data-react-helmet="true" name="description" content="${description}" />`
-    );
-    template = template.replace(
-      /<meta[^>]*property="og:title"[^>]*\/>/,
-      `<meta data-react-helmet="true" property="og:title" content="${title}" />`
-    );
-    template = template.replace(
-      /<meta[^>]*property="og:description"[^>]*\/>/,
-      `<meta data-react-helmet="true" property="og:description" content="${description}" />`
-    );
-    template = template.replace(
-      /<meta[^>]*name="twitter:title"[^>]*\/>/,
-      `<meta data-react-helmet="true" name="twitter:title" content="${title}" />`
-    );
-    template = template.replace(
-      /<meta[^>]*name="twitter:description"[^>]*\/>/,
-      `<meta data-react-helmet="true" name="twitter:description" content="${description}" />`
-    );
-    const finalCanonicalPath = lang === 'en' ? urlPath : `${lang}/${urlPath}`;
-    
-    template = template.replace(
-      /<link[^>]*rel="canonical"[^>]*\/>/,
-      `<link data-react-helmet="true" rel="canonical" href="https://quickconvertunits.com/${finalCanonicalPath}" />`
-    );
-    template = template.replace(
-      /<meta[^>]*property="og:url"[^>]*\/>/,
-      `<meta data-react-helmet="true" property="og:url" content="https://quickconvertunits.com/${finalCanonicalPath}" />`
-    );
-    
-    const staticContent = `
-      <div style="display:none;" aria-hidden="true">
-        <div>
-          <h1>${title}</h1>
-          <p>${description}</p>
-          <section>
-            <h2>About ${capitalize(catNameRaw)} Conversion</h2>
-            <p>${specifics.intro}</p>
-            <p>Whether you're an engineering professional, architecture student, or just need a quick calculation for a recipe, our dynamic interface responds to inputs live.</p>
-            
-            <h3>Understanding Context & Applications</h3>
-            <p>Conversions in the ${capitalize(catNameRaw)} category are required across the world due to the fragmented nature of historical and geographic standards. While most of the planet operates strictly under the International System of Units (SI system), powerful economies like the US continue utilizing customary standard systems. Bridging this gap seamlessly is vital for manufacturing, scientific exchange, trade compliance, and daily travel.</p>
-            
-            <h3>How to Evaluate Conversion Rates</h3>
-            <p>Most modern conversions are exact and defined by strict international statutory acts. We execute these translations computationally with maximum permitted decimal precision, preventing floating point drifts and guaranteeing accuracy for enterprise, academic, and industrial scaling.</p>
-          </section>
-          
-          <section>
-            <h2>Popular ${capitalize(catNameRaw)} Reference Table</h2>
-            <p>For quick lookup, here are the core traits and features built into this dedicated conversion tool:</p>
-            <table border="1" cellpadding="8" style="border-collapse: collapse; margin-top: 10px; width: 100%;">
-              <thead>
-                <tr><th style="text-align:left;">Functional Advantages & Specifications</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>${specifics.tableItem1}</td></tr>
-                <tr><td>${specifics.tableItem2}</td></tr>
-                <tr><td>${specifics.tableItem3}</td></tr>
-                <tr><td>${specifics.tableItem4}</td></tr>
-                <tr><td>Works natively offline via Progressive Web Application support</td></tr>
-                <tr><td>No server roundtrips required for evaluating formulas</td></tr>
-              </tbody>
-            </table>
-          </section>
-          
-          <section>
-            <h2>Frequently Asked Questions</h2>
-            <h3>How do I use this ${capitalize(catNameRaw)} converter efficiently?</h3>
-            <p>Simply enter the value you wish to convert in the 'From' field, select or scroll to your desired units, and the exact result will materialize instantaneously. The platform operates offline on both desktop and high-end mobile browsers without ads disrupting your workflow.</p>
-            
-            <h3>Why are there so many different ${capitalize(catNameRaw)} units?</h3>
-            <p>Historically, units were tied to localized physical objects, human anatomy, or agricultural milestones. Before global communications forced international standardization bodies (like the BIPM) to invent exact SI definitions, nearly every country utilized localized measures. We support both archaic and modern units.</p>
-
-            <h3>${specifics.faq2}</h3>
-            <p>${specifics.faq2A}</p>
-            
-            <h3>${specifics.faq3}</h3>
-            <p>${specifics.faq3A}</p>
-            
-            <h3>${specifics.faq4}</h3>
-            <p>${specifics.faq4A}</p>
-          </section>
+      staticContent = `
+        <div style="display:none;" aria-hidden="true">
+          <div>
+            <h1>${title}</h1>
+            <p>${description}</p>
+          </div>
         </div>
-      </div>
-    `;
+      `;
+    } else if (urlPath && urlPath.endsWith("-converter") && !urlPath.includes("blog")) {
+      const catNameRaw = urlPath.replace("-converter", "");
+      title = `Fast ${capitalize(catNameRaw)} Converter - Instant Conversions`;
+      
+      const categorySpecifics: Record<string, { desc: string, intro: string, faq2: string, faq2A: string, faq3: string, faq3A: string, faq4: string, faq4A: string, tableItem1: string, tableItem2: string, tableItem3: string, tableItem4: string }> = {
+        "length": {
+          desc: "Convert length and distance measurements from meters, feet, kilometers, and miles. Real-time formatting with high precision.",
+          intro: "Instantly convert between various length and distance units, including metric and imperial systems. The conversion formula relies on standard metric prefixes or exact statutory definitions (like 1 inch = 2.54 cm).",
+          faq2: "How do I convert between imperial and metric length?",
+          faq2A: "You can use this calculator. Simply enter your imperial value (e.g. inches) to instantly see the metric equivalent (e.g. centimeters).",
+          faq3: "How do I calculate length conversions?",
+          faq3A: "You generally multiply by a conversion factor. For example, to convert meters to feet, multiply by 3.28084.",
+          faq4: "Does this length converter work for very small units?",
+          faq4A: "Yes, you can convert micrometers, millimeters, and nanometers accurately.",
+          tableItem1: "1 Meter = 3.28084 Feet",
+          tableItem2: "1 Kilometer = 0.621371 Miles",
+          tableItem3: "1 Inch = 2.54 Centimeters",
+          tableItem4: "1 Mile = 1.60934 Kilometers"
+        },
+        "weight": {
+          desc: "Convert weight and mass units instantly. Easily calculate pounds to kilograms, ounces to grams, and stone.",
+          intro: "Convert between various mass and weight units smoothly. Computations use standard international agreements, making it easy for cooking, shipping, or scientific conversions.",
+          faq2: "What is the difference between mass and weight?",
+          faq2A: "While interchangeably used in everyday life, mass measures the amount of matter, whereas weight measures gravitational force. Our converter handles standard earth-equivalent mass conversions.",
+          faq3: "What is the formula for weight conversions?",
+          faq3A: "Simply multiply the source weight by its specific conversion factor relative to the target unit.",
+          faq4: "Can I convert small cooking units?",
+          faq4A: "Yes, converting between grams and ounces is fully supported for precise baking.",
+          tableItem1: "1 Kilogram = 2.20462 Pounds",
+          tableItem2: "1 Pound = 0.453592 Kilograms",
+          tableItem3: "1 Ounce = 28.3495 Grams",
+          tableItem4: "1 Gram = 0.035274 Ounces"
+        },
+        "temperature": {
+          desc: "Convert temperatures between Celsius, Fahrenheit, and Kelvin. Precise scientific and everyday weather conversions using official scaling formulas.",
+          intro: "Transform temperature readings between differing scales. Because temperature scales have varying zero points (like 32°F roughly equalling 0°C), temperature conversions use offset formulas rather than simple multiplication.",
+          faq2: "Why does temperature conversion use addition/subtraction?",
+          faq2A: "Unlike distance or weight, Celsius and Fahrenheit scales do not start at absolute zero. They require an offset operation before applying the scaling factor.",
+          faq3: "What is the formula for Celsius to Fahrenheit?",
+          faq3A: "Multiply the Celsius temperature by 9/5 and add 32.",
+          faq4: "Can I convert to Kelvin?",
+          faq4A: "Yes, Kelvin conversions are fully supported for scientific standard calculations.",
+          tableItem1: "0 °C = 32 °F",
+          tableItem2: "100 °C = 212 °F",
+          tableItem3: "0 °C = 273.15 K",
+          tableItem4: "-40 °C = -40 °F"
+        },
+        "currency": {
+          desc: "Live currency converter for USD, EUR, GBP, INR, and more. Global exchange rates updated frequently.",
+          intro: "Calculate current exchange rates between fiat currencies. Keep in mind that real-world trading markets fluctuate constantly, so live conversion rates may vary slightly from static references.",
+          faq2: "Are the exchange rates live?",
+          faq2A: "We strive to provide relatively recent estimation based on market data for reference purposes. However, always verify with your financial institution before making transactions.",
+          faq3: "Does this include cryptocurrency?",
+          faq3A: "Currently, we focus on major global fiat currencies compared against USD, EUR, and more.",
+          faq4: "What is currency spread?",
+          faq4A: "Spread is the difference between buy and sell rates. We utilize a mid-market rate estimate for standard conversion.",
+          tableItem1: "1 USD = Variable EUR",
+          tableItem2: "1 EUR = Variable USD",
+          tableItem3: "1 GBP = Variable USD",
+          tableItem4: "1 USD = Variable INR"
+        },
+        "time-zone": {
+          desc: "Time zone converter for UTC, EST, PST, CET. Schedule global meetings and convert standard and daylight time accurately.",
+          intro: "Seamlessly translate coordinates of time between global zones. Accounting for longitude offsets and Daylight Saving Time (DST) complexities, this tool produces accurate local times anywhere.",
+          faq2: "Does this tool account for Daylight Saving Time?",
+          faq2A: "Yes, our converter accounts for variations due to DST shifts automatically depending on the specific date you enter.",
+          faq3: "Can I convert directly from PST to EST?",
+          faq3A: "Absolutely, you can select any supported From and To time regions directly.",
+          faq4: "Is UTC the same as GMT?",
+          faq4A: "For most general timekeeping purposes, yes, UTC shares the same current time standard as GMT.",
+          tableItem1: "UTC + 0 = GMT",
+          tableItem2: "UTC - 5 = EST",
+          tableItem3: "UTC - 8 = PST",
+          tableItem4: "UTC + 1 = CET"
+        },
+        "volume": {
+          desc: "Accurate volume measurement converter. Convert cups to ml, teaspoons to tablespoons, and liters to gallons.",
+          intro: "Precision in capacity measurement requires converting between metric and imperial correctly. Our converter helps you scale perfect volumes easily.",
+          faq2: "How many teaspoons are in a tablespoon?",
+          faq2A: "There are exactly 3 US teaspoons in 1 US tablespoon.",
+          faq3: "Is a US cup different from a UK cup?",
+          faq3A: "Yes, a US cup is 236.59 ml, while a traditional UK cup is often defined as 250 ml.",
+          faq4: "How many teaspoons are in a fluid ounce?",
+          faq4A: "In the US customary system, there are 6 US teaspoons in 1 US fluid ounce.",
+          tableItem1: "1 Cup = 236.59 mL",
+          tableItem2: "1 Tbsp = 14.79 mL",
+          tableItem3: "1 Tsp = 4.93 mL",
+          tableItem4: "1 Fl Oz = 29.57 mL"
+        },
+        "speed": {
+          desc: "Fast speed unit converter. Convert MPH to KPH, Knots to MPH, and Meters per Second.",
+          intro: "Convert travel speeds across different systems instantly. Ideal for understanding global speed limits or aviation and maritime navigation values.",
+          faq2: "What is 100 km/h in mph?",
+          faq2A: "100 kilometers per hour is approximately 62.14 miles per hour.",
+          faq3: "What is a Knot?",
+          faq3A: "A knot is one nautical mile per hour, which is roughly 1.15 standard miles per hour.",
+          faq4: "Is speed different from velocity?",
+          faq4A: "Speed is a scalar quantity (just magnitude), while velocity is a vector (magnitude and direction).",
+          tableItem1: "100 km/h = 62.14 mph",
+          tableItem2: "1 knot = 1.15 mph",
+          tableItem3: "1 m/s = 3.6 km/h",
+          tableItem4: "60 mph = 96.56 km/h"
+        },
+        "area": {
+          desc: "Convert area units like square feet to square meters, acres to hectares, and square miles.",
+          intro: "Calculate land and property sizes accurately. Essential for real estate, construction, and global landscaping projects.",
+          faq2: "How many acres are in a hectare?",
+          faq2A: "There are approximately 2.471 acres in 1 hectare.",
+          faq3: "How many square feet are in a square meter?",
+          faq3A: "1 square meter equals approximately 10.764 square feet.",
+          faq4: "What is a square mile in kilometers?",
+          faq4A: "1 square mile is approximately 2.59 square kilometers.",
+          tableItem1: "1 Hectare = 2.47 Acres",
+          tableItem2: "1 Sq Meter = 10.76 Sq Ft",
+          tableItem3: "1 Acre = 43,560 Sq Ft",
+          tableItem4: "1 Sq Mile = 640 Acres"
+        },
+        "cooking": {
+          desc: "Convert cooking measurements and ingredient weights to volumes. Accurately translate cups to grams for flour, sugar, butter, and more.",
+          intro: "Transform standard baking weights into easily measurable cups and spoons based on ingredient density.",
+          faq2: "Why do cups to grams vary by ingredient?",
+          faq2A: "Because ingredients have different densities. A cup of fluffy flour weighs about 120 grams, while a cup of dense sugar weighs 200 grams.",
+          faq3: "How do I measure flour without a scale?",
+          faq3A: "Use the spoon and level method: lightly spoon the flour into your cup until it mounds over, then level it cleanly with a knife.",
+          faq4: "How many grams are in 1 US cup of water?",
+          faq4A: "One US liquid cup of water or milk weighs roughly 236 grams.",
+          tableItem1: "1 Cup All-Purpose Flour = 120g",
+          tableItem2: "1 Cup Granulated Sugar = 200g",
+          tableItem3: "1 Cup Butter (2 sticks) = 227g",
+          tableItem4: "1 Cup Cocoa Powder = 100g"
+        }
+      };
+
+      const specs = categorySpecifics[catNameRaw.toLowerCase()] || {
+        desc: `Free ${catNameRaw.toLowerCase()} unit converter. Precise calculations with real-time results. Convert measurements instantly.`,
+        intro: `Instantly convert between various ${catNameRaw.toLowerCase()} units. Our calculator is built for speed and precision, offering real-time conversions without page reloads.`,
+        faq2: `How is ${catNameRaw} conversion calculated?`,
+        faq2A: `Our tool uses officially recognized constants and factors to ensure excellent accuracy according to international standards.`,
+        faq3: `Is this a reliable tool?`,
+        faq3A: `Yes, we utilize standard mathematical formulas up to multiple decimal places for precision.`,
+        faq4: `Can I use this on mobile?`,
+        faq4A: `Yes, the interface is fully responsive and works perfectly on all modern smartphones and tablets.`,
+        tableItem1: `Popular ${catNameRaw} conversions supported`,
+        tableItem2: "Instant real-time execution",
+        tableItem3: "High decimal precision format",
+        tableItem4: "Cross-platform compatibility"
+      };
+
+      description = specs.desc;
+      staticContent = `
+        <div style="display:none;" aria-hidden="true">
+          <div>
+            <h1>${title}</h1>
+            <p>${description}</p>
+            <section>
+              <h2>About ${capitalize(catNameRaw)} Conversion</h2>
+              <p>${specs.intro}</p>
+              <p>Whether you're an engineering professional, architecture student, or just need a quick calculation for a recipe, our dynamic interface responds to inputs live.</p>
+              <h3>Understanding Context & Applications</h3>
+              <p>Conversions in the ${capitalize(catNameRaw)} category are required across the world due to the fragmented nature of historical and geographic standards. While most of the planet operates strictly under the International System of Units (SI system), powerful economies like the US continue utilizing customary standard systems.</p>
+            </section>
+            <section>
+              <h2>Popular ${capitalize(catNameRaw)} Reference Table</h2>
+              <ul>
+                <li>${specs.tableItem1}</li>
+                <li>${specs.tableItem2}</li>
+                <li>${specs.tableItem3}</li>
+                <li>${specs.tableItem4}</li>
+              </ul>
+            </section>
+            <section>
+              <h2>Frequently Asked Questions</h2>
+              <h3>${specs.faq2}</h3><p>${specs.faq2A}</p>
+              <h3>${specs.faq3}</h3><p>${specs.faq3A}</p>
+              <h3>${specs.faq4}</h3><p>${specs.faq4A}</p>
+            </section>
+          </div>
+        </div>
+      `;
+    }
+
+    // 4. Final Metadata Replacement Block
+    try {
+      const canonicalPath = getSEOUrlPath(getCanonicalUnitId(urlPath.split('-to-')[0] || ""), getCanonicalUnitId(urlPath.split('-to-')[1] || ""));
+      const isConversion = urlPath.includes("-to-");
+      const finalUrlPath = isConversion ? (conversionMatch?.[1] ? `convert-${conversionMatch[1]}-${canonicalPath}` : canonicalPath) : urlPath;
+      const finalCanonicalUrl = `https://quickconvertunits.com/${lang === 'en' ? '' : lang + '/'}${finalUrlPath}`;
+
+      // Handle Hreflangs
+      const hreflangs = ['en', 'es', 'fr', 'de', 'hi', 'zh', 'ja', 'ru', 'pt', 'it', 'ar']
+        .map(l => `<link rel="alternate" hreflang="${l}" href="https://quickconvertunits.com/${l === 'en' ? '' : l + '/'}${finalUrlPath}" />`)
+        .join('\n    ');
+
+      template = template.replace(/<html lang="en">/i, `<html lang="${lang}">`);
+      template = template.replace(/<head>/i, `<head>\n    ${hreflangs}`);
+
+      // Consolidate Title & Description updates
+      template = template.replace(/<title[^>]*>.*?<\/title>/i, `<title>${title}</title>`);
+      template = template.replace(/<meta[^>]*name="description"[^>]*\/>/i, `<meta name="description" content="${description}" />`);
+      
+      // OG & Twitter tags
+      template = template.replace(/<meta[^>]*property="og:title"[^>]*\/>/i, `<meta property="og:title" content="${title}" />`);
+      template = template.replace(/<meta[^>]*property="og:description"[^>]*\/>/i, `<meta property="og:description" content="${description}" />`);
+      template = template.replace(/<meta[^>]*property="og:url"[^>]*\/>/i, `<meta property="og:url" content="${finalCanonicalUrl}" />`);
+      template = template.replace(/<meta[^>]*name="twitter:title"[^>]*\/>/i, `<meta name="twitter:title" content="${title}" />`);
+      template = template.replace(/<meta[^>]*name="twitter:description"[^>]*\/>/i, `<meta name="twitter:description" content="${description}" />`);
+      template = template.replace(/<link[^>]*rel="canonical"[^>]*\/>/i, `<link rel="canonical" href="${finalCanonicalUrl}" />`);
+
+      // Static Content Injection
+      if (staticContent) {
+        template = template.replace(/<div style="display:none;" aria-hidden="true">[\s\S]*?<\/div>/i, staticContent);
+      }
+
+      // Schema Injection
+      if (schema) {
+        template = template.replace(/<\/head>/i, `<script type="application/ld+json">${JSON.stringify(schema)}</script></head>`);
+      }
+
+      const newHeaders = new Headers(response.headers);
+      newHeaders.set("Content-Type", "text/html;charset=UTF-8");
+
+      return new Response(template, {
+        status: response.status,
+        headers: newHeaders
+      });
+    } catch (e) {
+      console.error("Worker SEO injection failed:", e);
+      return new Response(template, { status: response.status, headers: response.headers });
+    }
   }
-
-  // Final template injection and response
-  try {
-    // Language detection for meta tags
-    const langPrefix = urlPath.split('/')[0];
-    const isLang = ['es', 'fr', 'de', 'ja', 'it', 'pt', 'ru', 'zh', 'ar', 'hi'].includes(langPrefix);
-    const actualUrlPath = isLang ? urlPath.split('/').slice(1).join('/') : urlPath;
-
-    // 1. Title & Meta (if we have overrides)
-    if (title !== "QuickConvert - Smart Unit Converter") {
-      template = template.replace(
-        /<title[^>]*>.*?<\/title>/,
-        `<title>${title}</title>`
-      );
-    }
-
-    const hreflangs = ['en', 'es', 'fr', 'de', 'ja', 'it', 'pt', 'ru', 'zh', 'ar', 'hi']
-      .map(l => `<link rel="alternate" hreflang="${l}" href="https://quickconvertunits.com${l === 'en' ? '' : '/' + l}/${actualUrlPath}" />`)
-      .join('\n    ');
-
-    template = template.replace(
-      '<script id="seo-meta-injection"></script>',
-      `${hreflangs}
-    <meta name="description" content="${description}">
-    <meta property="og:title" content="${title}">
-    <meta property="og:description" content="${description}">
-    <meta property="og:url" content="${url.href}">
-    <meta property="og:type" content="website">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="${title}">
-    <meta name="twitter:description" content="${description}">
-    <link rel="canonical" href="${url.href.split('?')[0]}" />`
-    );
-
-    // 2. Body SEO Content (Hidden)
-    if (staticContent) {
-      template = template.replace(
-        /<div style="display:none;" aria-hidden="true">[\s\S]*?<\/div>/,
-        staticContent
-      );
-    }
-
-    // 3. Structured Data
-    if (schema) {
-      template = template.replace(
-        /<\/head>/i,
-        `<script data-rh="true" type="application/ld+json">${JSON.stringify(schema)}</script></head>`
-      );
-    }
-
-    const newHeaders = new Headers(response.headers);
-    newHeaders.set("Content-Type", "text/html;charset=UTF-8");
-
-    return new Response(template, {
-      status: response.status,
-      statusText: response.statusText,
-      headers: newHeaders
-    });
-  } catch (e) {
-    console.error("Worker injection failed:", e);
-    return new Response(template, {
-      status: response.status,
-      statusText: response.statusText,
-      headers: response.headers
-    });
-  }
-}
 };

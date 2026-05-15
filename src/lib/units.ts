@@ -866,6 +866,12 @@ export const getUnitIdsFromPath = (path: string) => {
 };
 
 export const getCanonicalUnitId = (alias: string): string => {
+  // Special case: Data Rate units where case matters (Megabit vs Megabyte)
+  if (alias === 'MBps' || alias === 'MB/s') return 'MBps';
+  if (alias === 'GBps' || alias === 'GB/s') return 'GBps';
+  if (alias === 'KBps' || alias === 'KB/s') return 'KBps';
+  if (alias === 'Bps' || alias === 'B/s') return 'Bps';
+
   const map: Record<string, string> = {
     'lbs': 'pound', 'lb': 'pound', 'pounds': 'pound', 'pound': 'pound',
     'libras': 'pound', 'libra': 'pound', 'livres': 'pound', 'livre': 'pound', 'pfund': 'pound',
