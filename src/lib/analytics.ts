@@ -3,27 +3,31 @@ import { onCLS, onINP, onLCP, onFCP, onTTFB } from 'web-vitals';
 
 const TRACKING_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
 
-export const initGA = () => {
-  if (TRACKING_ID && typeof window !== 'undefined') {
-    ReactGA.initialize(TRACKING_ID);
-    
-    // Core Web Vitals Tracking
-    const sendToGA = ({ name, value, id }: { name: string; value: number; id: string }) => {
-      ReactGA.event('web_vital', {
-        event_category: 'Web Vitals',
-        event_label: id,
-        value: Math.round(name === 'CLS' ? value * 1000 : value),
-        vital_name: name,
-        non_interaction: true,
-      });
-    };
+let isInitialized = false;
 
-    onCLS(sendToGA);
-    onINP(sendToGA);
-    onLCP(sendToGA);
-    onFCP(sendToGA);
-    onTTFB(sendToGA);
-  }
+export const initGA = () => {
+  if (isInitialized || !TRACKING_ID || typeof window === 'undefined') return;
+  
+  ReactGA.initialize(TRACKING_ID);
+  
+  // Core Web Vitals Tracking
+  const sendToGA = ({ name, value, id }: { name: string; value: number; id: string }) => {
+    ReactGA.event('web_vital', {
+      event_category: 'Web Vitals',
+      event_label: id,
+      value: Math.round(name === 'CLS' ? value * 1000 : value),
+      vital_name: name,
+      non_interaction: true,
+    });
+  };
+
+  onCLS(sendToGA);
+  onINP(sendToGA);
+  onLCP(sendToGA);
+  onFCP(sendToGA);
+  onTTFB(sendToGA);
+  
+  isInitialized = true;
 };
 
 export const trackPageView = (path: string, options?: {

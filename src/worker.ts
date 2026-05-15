@@ -1,4 +1,6 @@
 import { getCanonicalUnitId, getSEOUrlPath } from '../src/lib/units';
+import { blogPosts } from './lib/blogPosts';
+import { customSeoData } from './lib/customSeoData';
 
 // We define a small map of the most common units to serve rich SEO tags quickly.
 // If a unit is not in this map, we fallback to formatting the URL string.
@@ -108,6 +110,11 @@ const popularUnits: Record<string, { name: string; symbol: string; factor?: numb
   jpy: { name: "Japanese Yen", symbol: "¥", factor: 0.0067, base: "currency" },
   aud: { name: "Australian Dollar", symbol: "A$", factor: 0.65, base: "currency" },
   chf: { name: "Swiss Franc", symbol: "CHF", factor: 1.13, base: "currency" },
+  krw: { name: "South Korean Won", symbol: "₩", factor: 0.00075, base: "currency" },
+  aed: { name: "UAE Dirham", symbol: "د.إ", factor: 0.27, base: "currency" },
+  btc: { name: "Bitcoin", symbol: "BTC", factor: 65000, base: "currency" },
+  eth: { name: "Ethereum", symbol: "ETH", factor: 3500, base: "currency" },
+  sol: { name: "Solana", symbol: "SOL", factor: 150, base: "currency" },
   // Power
   watt: { name: "Watt", symbol: "W", factor: 1, base: "power" },
   watts: { name: "Watt", symbol: "W", factor: 1, base: "power" },
@@ -139,18 +146,26 @@ const popularUnits: Record<string, { name: string; symbol: string; factor?: numb
   bits: { name: "Bit", symbol: "b", factor: 0.125, base: "digital" },
   byte: { name: "Byte", symbol: "B", factor: 1, base: "digital" },
   bytes: { name: "Byte", symbol: "B", factor: 1, base: "digital" },
-  kilobyte: { name: "Kilobyte", symbol: "KB", factor: 1024, base: "digital" },
-  kilobytes: { name: "Kilobyte", symbol: "KB", factor: 1024, base: "digital" },
-  kb: { name: "Kilobyte", symbol: "KB", factor: 1024, base: "digital" },
-  megabyte: { name: "Megabyte", symbol: "MB", factor: 1048576, base: "digital" },
-  megabytes: { name: "Megabyte", symbol: "MB", factor: 1048576, base: "digital" },
-  mb: { name: "Megabyte", symbol: "MB", factor: 1048576, base: "digital" },
-  gigabyte: { name: "Gigabyte", symbol: "GB", factor: 1073741824, base: "digital" },
-  gigabytes: { name: "Gigabyte", symbol: "GB", factor: 1073741824, base: "digital" },
-  gb: { name: "Gigabyte", symbol: "GB", factor: 1073741824, base: "digital" },
-  terabyte: { name: "Terabyte", symbol: "TB", factor: 1099511627776, base: "digital" },
-  terabytes: { name: "Terabyte", symbol: "TB", factor: 1099511627776, base: "digital" },
-  tb: { name: "Terabyte", symbol: "TB", factor: 1099511627776, base: "digital" },
+  kilobyte: { name: "Kilobyte", symbol: "KB", factor: 1000, base: "digital" },
+  kilobytes: { name: "Kilobyte", symbol: "KB", factor: 1000, base: "digital" },
+  kb: { name: "Kilobyte", symbol: "KB", factor: 1000, base: "digital" },
+  megabyte: { name: "Megabyte", symbol: "MB", factor: 1000000, base: "digital" },
+  megabytes: { name: "Megabyte", symbol: "MB", factor: 1000000, base: "digital" },
+  mb: { name: "Megabyte", symbol: "MB", factor: 1000000, base: "digital" },
+  gigabyte: { name: "Gigabyte", symbol: "GB", factor: 1000000000, base: "digital" },
+  gigabytes: { name: "Gigabyte", symbol: "GB", factor: 1000000000, base: "digital" },
+  gb: { name: "Gigabyte", symbol: "GB", factor: 1000000000, base: "digital" },
+  terabyte: { name: "Terabyte", symbol: "TB", factor: 1000000000000, base: "digital" },
+  terabytes: { name: "Terabyte", symbol: "TB", factor: 1000000000000, base: "digital" },
+  tb: { name: "Terabyte", symbol: "TB", factor: 1000000000000, base: "digital" },
+  kibibyte: { name: "Kibibyte", symbol: "KiB", factor: 1024, base: "digital" },
+  kibibytes: { name: "Kibibyte", symbol: "KiB", factor: 1024, base: "digital" },
+  mebibyte: { name: "Mebibyte", symbol: "MiB", factor: 1048576, base: "digital" },
+  mebibytes: { name: "Mebibyte", symbol: "MiB", factor: 1048576, base: "digital" },
+  gibibyte: { name: "Gibibyte", symbol: "GiB", factor: 1073741824, base: "digital" },
+  gibibytes: { name: "Gibibyte", symbol: "GiB", factor: 1073741824, base: "digital" },
+  tebibyte: { name: "Tebibyte", symbol: "TiB", factor: 1099511627776, base: "digital" },
+  tebibytes: { name: "Tebibyte", symbol: "TiB", factor: 1099511627776, base: "digital" },
   // Pressure
   pascal: { name: "Pascal", symbol: "Pa", factor: 1, base: "pressure" },
   pascals: { name: "Pascal", symbol: "Pa", factor: 1, base: "pressure" },
@@ -181,16 +196,34 @@ const popularUnits: Record<string, { name: string; symbol: string; factor?: numb
   pound_foot: { name: "Pound-foot", symbol: "lb·ft", factor: 1.3558, base: "torque" },
   pound_inch: { name: "Pound-inch", symbol: "lb·in", factor: 0.113, base: "torque" },
   kilogram_meter: { name: "Kilogram-meter", symbol: "kg·m", factor: 9.807, base: "torque" },
+  // Cooking
+  cup_water: { name: "Cup (Water)", symbol: "c", factor: 236.59, base: "volume" },
+  cup_flour_ap: { name: "Cup (Flour)", symbol: "c", factor: 120, base: "cooking" },
+  cup_sugar_brown: { name: "Cup (Brown Sugar)", symbol: "c", factor: 213, base: "cooking" },
+  tbsp_butter: { name: "Tablespoon (Butter)", symbol: "tbsp", factor: 14.2, base: "cooking" },
+  cup_butter: { name: "Cup (Butter)", symbol: "c", factor: 227, base: "cooking" },
+  cup_cocoa: { name: "Cup (Cocoa)", symbol: "c", factor: 100, base: "cooking" },
+  cup_honey: { name: "Cup (Honey)", symbol: "c", factor: 340, base: "cooking" },
+  // Typography
+  pixel: { name: "Pixel", symbol: "px", factor: 1, base: "typography" },
+  px: { name: "Pixel", symbol: "px", factor: 1, base: "typography" },
+  point: { name: "Point", symbol: "pt", factor: 1.333, base: "typography" },
+  pt: { name: "Point", symbol: "pt", factor: 1.333, base: "typography" },
+  em: { name: "Em", symbol: "em", factor: 16, base: "typography" },
+  rem: { name: "Rem", symbol: "rem", factor: 16, base: "typography" },
 };
 
 function formatValue(val: number): string {
-  if (val >= 10000 || val < 0.0001) {
+  if (isNaN(val)) return "0";
+  if (val === 0) return "0";
+  if (val >= 10000 || (val > 0 && val < 0.0001)) {
     return val.toExponential(4);
   }
   return Number.isInteger(val) ? val.toString() : parseFloat(val.toFixed(6)).toString();
 }
 
 function calculateConversion(val: number, fromId: string, toId: string): string {
+  if (isNaN(val)) return "0";
   if (fromId === toId) return val.toString();
   const fromUnit = popularUnits[fromId];
   const toUnit = popularUnits[toId];
@@ -213,6 +246,7 @@ function calculateConversion(val: number, fromId: string, toId: string): string 
 }
 
 function capitalize(str: string) {
+  if (!str) return "";
   return str.charAt(0).toUpperCase() + str.slice(1).replace(/_/g, " ").replace(/-/g, " ");
 }
 
@@ -365,6 +399,12 @@ export default {
     
     template = template.replace(/<head>/i, `<head>\n    ${hreflangTags}`);
     template = template.replace(/<html lang="en">/i, `<html lang="${lang}">`);
+
+    // 11. Initialise defaults for SEO
+    let title = "QuickConvert - Smart Unit Converter";
+    let description = "Fast, free, and accurate unit converter for weight, length, temperature, currency, and more. Works offline as a PWA.";
+    let schema: any = null;
+    let staticContent = "";
 
     const matchParts = urlPath.match(/^(?:(.*\/)?)?(?:convert-([\d.]+)-)?(.+?)-(?:to|a|en|zu)-(.+)$/i);
     
@@ -889,12 +929,28 @@ export default {
           }])
         ].filter(Boolean)
       };
+    } else if (urlPath === "contact" || urlPath === "about" || urlPath === "privacy-policy" || urlPath === "terms" || urlPath === "api-docs") {
+      title = `${capitalize(urlPath.replace('-', ' '))} | QuickConvert`;
+      description = `Learn more about our tool, contact our support team, or review our policies. At QuickConvert, we prioritize accuracy and transparency.`;
+    } else if (urlPath.includes("blog")) {
+      const blogSlug = urlPath.split('/').pop() || "";
+      const post = blogPosts.find(p => p.slug === blogSlug);
       
-      template = template.replace(
-        /<\/head>/,
-        `<script data-rh="true" type="application/ld+json">${JSON.stringify(schema)}</script></head>`
-      );
-  } else if (urlPath === "bmi-calculator" || urlPath === "time-zone-converter") {
+      if (post) {
+        title = `${post.title} | QuickConvert Blog`;
+        description = post.excerpt;
+        schema = post.faqSchema;
+        staticContent = `
+          <div style="display:none;" aria-hidden="true">
+            <h1>${post.title}</h1>
+            <div>${post.content}</div>
+          </div>
+        `;
+      } else {
+        title = "QuickConvert Blog - Unit Conversion Tips & Guides";
+        description = "Read our latest articles about unit conversions, digital storage, culinary measurements, and international standards.";
+      }
+    } else if (urlPath === "bmi-calculator" || urlPath === "time-zone-converter") {
     let title = "";
     let description = "";
     if (urlPath === "bmi-calculator") {
@@ -1163,74 +1219,72 @@ export default {
         </div>
       </div>
     `;
-
-    template = template.replace(
-      /<div style="display:none;" aria-hidden="true">[\\s\\S]*?<\/div>/,
-      staticContent
-    );
-    
-    // Add BreadcrumbList schema for category pages
-    const categorySchema = {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "Organization",
-          "@id": "https://quickconvertunits.com/#organization",
-          "name": "QuickConvert",
-          "url": "https://quickconvertunits.com/",
-          "logo": {
-            "@type": "ImageObject",
-            "url": "https://quickconvertunits.com/favicon.svg"
-          }
-        },
-        {
-          "@type": "BreadcrumbList",
-          "@id": `https://quickconvertunits.com/${urlPath}#breadcrumb`,
-          "itemListElement": [
-            {
-              "@type": "ListItem",
-              "position": 1,
-              "name": "Home",
-              "item": "https://quickconvertunits.com/"
-            },
-            {
-              "@type": "ListItem",
-              "position": 2,
-              "name": title,
-              "item": `https://quickconvertunits.com/${urlPath}`
-            }
-          ]
-        },
-        {
-          "@type": "SoftwareApplication",
-          "@id": `https://quickconvertunits.com/${urlPath}#software`,
-          "name": title,
-          "applicationCategory": "UtilityApplication",
-          "operatingSystem": "Any",
-          "description": description,
-          "url": `https://quickconvertunits.com/${urlPath}`,
-          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
-        }
-      ]
-    };
-    template = template.replace(
-      /<\/head>/,
-      `<script data-rh="true" type="application/ld+json">${JSON.stringify(categorySchema)}</script></head>`
-    );
   }
 
-  const newHeaders = new Headers(response.headers);
-  if (urlPath && urlPath.includes("-to-")) {
-    newHeaders.set("Cache-Control", `public, max-age=31536000, immutable`);
-  } else {
-    // Basic caching for index and other non-programmatic pages via edge
-    newHeaders.set("Cache-Control", `public, max-age=3600`);
-  }
+  // Final template injection and response
+  try {
+    // Language detection for meta tags
+    const langPrefix = urlPath.split('/')[0];
+    const isLang = ['es', 'fr', 'de', 'ja', 'it', 'pt', 'ru', 'zh', 'ar', 'hi'].includes(langPrefix);
+    const actualUrlPath = isLang ? urlPath.split('/').slice(1).join('/') : urlPath;
 
-  return new Response(template, {
-    status: response.status,
-    statusText: response.statusText,
-    headers: newHeaders
-  });
+    // 1. Title & Meta (if we have overrides)
+    if (title !== "QuickConvert - Smart Unit Converter") {
+      template = template.replace(
+        /<title[^>]*>.*?<\/title>/,
+        `<title>${title}</title>`
+      );
+    }
+
+    const hreflangs = ['en', 'es', 'fr', 'de', 'ja', 'it', 'pt', 'ru', 'zh', 'ar', 'hi']
+      .map(l => `<link rel="alternate" hreflang="${l}" href="https://quickconvertunits.com${l === 'en' ? '' : '/' + l}/${actualUrlPath}" />`)
+      .join('\n    ');
+
+    template = template.replace(
+      '<script id="seo-meta-injection"></script>',
+      `${hreflangs}
+    <meta name="description" content="${description}">
+    <meta property="og:title" content="${title}">
+    <meta property="og:description" content="${description}">
+    <meta property="og:url" content="${url.href}">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="${title}">
+    <meta name="twitter:description" content="${description}">
+    <link rel="canonical" href="${url.href.split('?')[0]}" />`
+    );
+
+    // 2. Body SEO Content (Hidden)
+    if (staticContent) {
+      template = template.replace(
+        /<div style="display:none;" aria-hidden="true">[\s\S]*?<\/div>/,
+        staticContent
+      );
+    }
+
+    // 3. Structured Data
+    if (schema) {
+      template = template.replace(
+        /<\/head>/i,
+        `<script data-rh="true" type="application/ld+json">${JSON.stringify(schema)}</script></head>`
+      );
+    }
+
+    const newHeaders = new Headers(response.headers);
+    newHeaders.set("Content-Type", "text/html;charset=UTF-8");
+
+    return new Response(template, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: newHeaders
+    });
+  } catch (e) {
+    console.error("Worker injection failed:", e);
+    return new Response(template, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers
+    });
+  }
 }
-}
+};
