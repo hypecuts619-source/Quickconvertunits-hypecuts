@@ -10,6 +10,7 @@ import { FormulaBlock } from "./components/FormulaBlock";
 import { HomepageBlogHub } from "./components/HomepageBlogHub";
 import { useTranslation } from "react-i18next";
 import { POPULAR_CONVERSIONS, POPULAR, FORMULAS } from "./lib/constants";
+import { Footer } from "./components/Footer";
 import {
   ArrowRightLeft,
   Sun,
@@ -1253,8 +1254,8 @@ export default function App() {
                       <span className="text-[10px] font-medium text-neutral-400 px-1.5 py-0.5 rounded-md border border-neutral-200 dark:border-neutral-700 bg-white/50 dark:bg-neutral-900/50">⌘K</span>
                     </div>
                   </div>
-                  {isSearchFocused && (suggestions.length > 0 || (!searchQuery && favorites.length > 0) || (searchQuery && suggestions.length === 0)) && (
-                    <div className="absolute top-11 left-0 right-0 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-100 dark:border-neutral-700 overflow-hidden z-50">
+                  {isSearchFocused && (
+                    <div className="absolute top-11 left-0 right-0 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-100 dark:border-neutral-700 overflow-hidden z-50 max-h-[400px] overflow-y-auto">
                       {!searchQuery && favorites.length > 0 && (
                         <div className="px-4 py-2 text-xs font-semibold text-neutral-500 bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700">
                           Saved Conversions
@@ -1283,6 +1284,30 @@ export default function App() {
                           </button>
                         );
                       })}
+                      {!searchQuery && (
+                        <>
+                          <div className="px-4 py-2 text-xs font-semibold text-neutral-500 bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700 border-t">
+                            Top Searches
+                          </div>
+                          {POPULAR.slice(0, 5).map((p, i) => (
+                            <button
+                              key={`pop-${i}`}
+                              className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors flex items-center justify-between group"
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                selectSuggestion({
+                                  categoryId: p.cat,
+                                  fromId: p.fu,
+                                  toId: p.tu,
+                                });
+                              }}
+                            >
+                              <span>{p.label}</span>
+                              <TrendingUp className="w-3 h-3 text-primary-500 opacity-50 group-hover:opacity-100 transition-opacity" />
+                            </button>
+                          ))}
+                        </>
+                      )}
                       {searchQuery && suggestions.map((sug, i) => (
                         <button
                           key={i}
@@ -1391,8 +1416,8 @@ export default function App() {
               />
             </div>
             <AnimatePresence>
-              {isSearchFocused && (suggestions.length > 0 || (!searchQuery && favorites.length > 0) || (searchQuery && suggestions.length === 0)) && (
-                <div className="absolute top-14 left-0 right-0 bg-white dark:bg-neutral-800 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.25)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)] border border-neutral-100 dark:border-neutral-800 overflow-hidden z-[110] mx-4">
+              {isSearchFocused && (
+                <div className="absolute top-14 left-0 right-0 bg-white dark:bg-neutral-800 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.25)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)] border border-neutral-100 dark:border-neutral-800 overflow-hidden z-[110] mx-4 max-h-[60vh] overflow-y-auto">
                   {!searchQuery && favorites.length > 0 && (
                     <div className="px-4 py-2 text-xs font-semibold text-neutral-500 bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700">
                       Saved Conversions
@@ -1421,6 +1446,30 @@ export default function App() {
                       </button>
                     );
                   })}
+                  {!searchQuery && (
+                    <>
+                      <div className="px-4 py-2 text-xs font-semibold text-neutral-500 bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700 border-t">
+                        Top Searches
+                      </div>
+                      {POPULAR.slice(0, 5).map((p, i) => (
+                        <button
+                          key={`mobile-pop-${i}`}
+                          className="w-full text-left px-4 py-3 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors flex items-center justify-between group border-b border-neutral-100 dark:border-neutral-800 last:border-0"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            selectSuggestion({
+                              categoryId: p.cat,
+                              fromId: p.fu,
+                              toId: p.tu,
+                            });
+                          }}
+                        >
+                          <span>{p.label}</span>
+                          <TrendingUp className="w-4 h-4 text-primary-500 opacity-50 group-hover:opacity-100 transition-opacity" />
+                        </button>
+                      ))}
+                    </>
+                  )}
                   {searchQuery && suggestions.map((sug, i) => (
                     <button
                       key={i}
@@ -2499,95 +2548,7 @@ export default function App() {
         )}
 
           {/* SEO Optimized Footer */}
-          {!isEmbed && (
-            <footer 
-              className="mt-16 pt-12 border-t border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 text-sm"
-            >
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-12 text-left">
-                {/* Column 1: Calculators */}
-                <nav aria-label="Category Converters" className="space-y-4">
-                  <h4 className="font-semibold text-neutral-900 dark:text-neutral-100 uppercase tracking-wider text-xs">Categories</h4>
-                  <ul className="space-y-2">
-                    <li><Link to="/length-converter" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Length Converter</Link></li>
-                    <li><Link to="/weight-converter" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Weight Converter</Link></li>
-                    <li><Link to="/temperature-converter" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Temperature Converter</Link></li>
-                    <li><Link to="/cooking-converter" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Cooking/Baking Converter</Link></li>
-                    <li><Link to="/currency-converter" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Currency Converter</Link></li>
-                    <li><Link to="/time-zone-converter" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Time Zone Converter</Link></li>
-                    <li><Link to="/bmi-calculator" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">BMI Calculator</Link></li>
-                  </ul>
-                </nav>
-
-                {/* Column 2: Popular Conversions */}
-                <nav aria-label="Popular Conversions" className="space-y-4">
-                  <h4 className="font-semibold text-neutral-900 dark:text-neutral-100 uppercase tracking-wider text-xs">Popular Conversions</h4>
-                  <ul className="space-y-2">
-                    <li><Link to="/kg-to-lbs" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Kg to Lbs</Link></li>
-                    <li><Link to="/cm-to-inches" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">CM to Inches</Link></li>
-                    <li><Link to="/fahrenheit-to-celsius" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Fahrenheit to Celsius</Link></li>
-                    <li><Link to="/ounces-to-grams" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Ounces to Grams</Link></li>
-                    <li><Link to="/miles-to-km" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Miles to Km</Link></li>
-                    <li><Link to="/cups-to-ml" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Cups to mL</Link></li>
-                    <li><Link to="/meters-to-feet" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Meters to Feet</Link></li>
-                  </ul>
-                </nav>
-
-                {/* Column 3: Tools & Resources */}
-                <nav aria-label="Tools and Resources" className="space-y-4">
-                  <h4 className="font-semibold text-neutral-900 dark:text-neutral-100 uppercase tracking-wider text-xs">Tools & Resources</h4>
-                  <ul className="space-y-2">
-                    <li><Link to="/conversions" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">All Conversions Directory</Link></li>
-                    <li><Link to="/blog" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Measurement Blog</Link></li>
-                    <li><Link to="/api-docs" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Free Conversion API</Link></li>
-                  </ul>
-                </nav>
-
-                {/* Column 4: Global Editions */}
-                <nav aria-label="International Sites" className="space-y-4">
-                  <h4 className="font-semibold text-neutral-900 dark:text-neutral-100 uppercase tracking-wider text-xs">Global Editions</h4>
-                  <ul className="space-y-2">
-                    <li><a href="/es/" hrefLang="es" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Español (ES)</a></li>
-                    <li><a href="/fr/" hrefLang="fr" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Français (FR)</a></li>
-                    <li><a href="/de/" hrefLang="de" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Deutsch (DE)</a></li>
-                    <li><a href="/hi/" hrefLang="hi" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">हिन्दी (HI)</a></li>
-                    <li><a href="/pt/" hrefLang="pt" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Português (PT)</a></li>
-                    <li><a href="/zh/" hrefLang="zh" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">中文 (ZH)</a></li>
-                    <li><a href="/ja/" hrefLang="ja" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">日本語 (JA)</a></li>
-                  </ul>
-                </nav>
-
-                {/* Column 5: QuickConvert */}
-                <nav aria-label="Corporate Information" className="space-y-4">
-                  <h4 className="font-semibold text-neutral-900 dark:text-neutral-100 uppercase tracking-wider text-xs">QuickConvert</h4>
-                  <ul className="space-y-2">
-                    <li><Link to="/about" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">About Us</Link></li>
-                    <li><Link to="/contact" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Contact</Link></li>
-                    <li><Link to="/terms" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Terms of Service</Link></li>
-                    <li><Link to="/privacy-policy" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Privacy Policy</Link></li>
-                  </ul>
-                  <div className="pt-4 border-t border-neutral-100 dark:border-neutral-800">
-                    <p className="text-xs text-neutral-500 leading-relaxed mb-2">
-                      🛡️ <strong className="text-neutral-700 dark:text-neutral-300">Strictly Local:</strong> Your conversion data never leaves your device. Built as a PWA for offline use.
-                    </p>
-                  </div>
-                </nav>
-              </div>
-
-              <div className="border-t border-neutral-200 dark:border-neutral-800 pt-8 pb-4 flex flex-col items-center justify-center text-center text-xs text-neutral-500 gap-4">
-                <p>
-                  &copy; {new Date().getFullYear()} QuickConvert. {t("footerText", "Built for fast, accurate conversions.")}
-                </p>
-                <div className="flex gap-4 mt-1 mb-2">
-                  <a href="https://www.youtube.com/@Quickconvertunits" itemProp="sameAs" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-[#FF0000] transition-colors" aria-label="YouTube channel">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M19.812 5.418c.861.23 1.538.907 1.768 1.768C21.998 8.746 22 12 22 12s0 3.255-.418 4.814a2.504 2.504 0 0 1-1.768 1.768c-1.56.419-7.814.419-7.814.419s-6.255 0-7.814-.419a2.505 2.505 0 0 1-1.768-1.768C2 15.255 2 12 2 12s0-3.255.417-4.814a2.507 2.507 0 0 1 1.768-1.768C5.744 5 11.998 5 11.998 5s6.255 0 7.814.418ZM15.194 12 10 15V9l5.194 3Z" clipRule="evenodd"/></svg>
-                  </a>
-                </div>
-                <p className="leading-relaxed max-w-4xl">
-                  <strong>Disclaimer:</strong> While we strive to provide accurate information, QuickConvert makes no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability or availability of the conversion calculators. Any reliance you place on such information is therefore strictly at your own risk.
-                </p>
-              </div>
-            </footer>
-          )}
+          {!isEmbed && <Footer />}
         </div>
 
         {/* Right Column (Sidebar Ads Desktop) */}

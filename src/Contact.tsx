@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, Send } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { Footer } from './components/Footer';
 
 export default function Contact() {
   const { lang } = useParams();
@@ -124,6 +125,9 @@ export default function Contact() {
             </section>
           </div>
         </div>
+      </div>
+      <div className="max-w-4xl mx-auto">
+        <Footer />
       </div>
     </div>
   );

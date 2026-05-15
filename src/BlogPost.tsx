@@ -1,41 +1,9 @@
-import React, { Component, ReactNode } from 'react';
+import React from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, Calendar, User, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Clock, Calendar, User } from 'lucide-react';
 import { blogPosts } from './lib/blogPosts';
 import { Helmet } from 'react-helmet-async';
-
-interface WidgetProps {
-  children: ReactNode;
-}
-
-interface WidgetState {
-  hasError: boolean;
-}
-
-// Simple ErrorBoundary for individual widgets
-class WidgetErrorBoundary extends Component<WidgetProps, WidgetState> {
-  constructor(props: WidgetProps) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="p-8 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-[2.5rem] text-center my-6">
-          <AlertTriangle className="w-8 h-8 text-red-500 mx-auto mb-3" />
-          <p className="text-red-700 dark:text-red-400 font-medium">Failed to load tool</p>
-          <p className="text-red-600/70 dark:text-red-400/70 text-sm mt-1">Please refresh or try another article</p>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
+import { Footer } from './components/Footer';
 
 export default function BlogPost() {
   const { slug, lang } = useParams();
@@ -144,34 +112,11 @@ export default function BlogPost() {
             </div>
           </header>
 
-          <div className="content-wrapper">
-            {post.content.split(/(\{\{WIDGET:[^}]+\}\})/g).map((part, index) => {
-              const uniqueKey = `${post.slug}-${index}`;
-              if (part.startsWith('{{WIDGET:')) {
-                const route = part.replace('{{WIDGET:', '').replace('}}', '').trim();
-                return (
-                  <div key={uniqueKey} className="my-10 rounded-[2.5rem] overflow-hidden -mx-4 md:mx-0 relative border border-neutral-100 dark:border-neutral-800 shadow-sm h-[600px] bg-white dark:bg-[#111111]">
-                    <WidgetErrorBoundary>
-                      <iframe 
-                        src={`/${route}?embed=true`} 
-                        className="w-full h-full border-none"
-                        title="QuickConvert Interactive Widget"
-                        loading="lazy"
-                      />
-                    </WidgetErrorBoundary>
-                  </div>
-                );
-              }
-              return (
-                <div 
-                  key={uniqueKey}
-                  className="prose prose-neutral dark:prose-invert prose-lg max-w-none font-light leading-relaxed prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-primary-600 dark:prose-a:text-primary-400"
-                  dangerouslySetInnerHTML={{ __html: part }}
-                  onClick={handleContentClick}
-                />
-              );
-            })}
-          </div>
+          <div 
+            className="content-wrapper prose prose-neutral dark:prose-invert prose-lg max-w-none font-light leading-relaxed prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-primary-600 dark:prose-a:text-primary-400"
+            dangerouslySetInnerHTML={{ __html: post.content.replace(/\{\{WIDGET:[^}]+\}\}/g, '') }}
+            onClick={handleContentClick}
+          />
             
           <div className="mt-12 p-8 bg-primary-50 dark:bg-primary-900/10 rounded-3xl border border-primary-100 dark:border-primary-900/30 text-center">
             <h3 className="text-xl font-semibold mb-3 text-primary-900 dark:text-primary-100 mt-0">Ready to convert?</h3>
@@ -214,6 +159,7 @@ export default function BlogPost() {
             </div>
           </div>
         )}
+        <Footer />
       </div>
     </div>
   );

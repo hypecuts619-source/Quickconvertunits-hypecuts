@@ -3,6 +3,8 @@ import { ArrowLeft, BookOpen, ArrowRight } from 'lucide-react';
 import { blogPosts } from './lib/blogPosts';
 import { Helmet } from 'react-helmet-async';
 
+import { Footer } from './components/Footer';
+
 export default function Blog() {
   const { lang } = useParams();
   const currentLang = lang || 'en';
@@ -68,6 +70,7 @@ export default function Blog() {
             </Link>
           ))}
         </div>
+        <Footer />
       </div>
     </div>
   );

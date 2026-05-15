@@ -6,7 +6,7 @@ export default function HomepageInfo() {
       <h2 className="mb-4 text-2xl font-semibold tracking-tight">Why Use QuickConvert Units?</h2>
       <p className="font-light text-neutral-600 dark:text-neutral-400">Our free online unit converter provides instant, accurate conversions across 14 measurement categories. Whether you're converting kilograms to pounds for international shipping, Celsius to Fahrenheit for travel weather, or cups to milliliters for cooking recipes, QuickConvert delivers precise results in real-time.</p>
       
-      <h2 className="mb-4 mt-8 text-2xl font-semibold tracking-tight">Most Popular Conversions</h2>
+      <h2 className="mb-4 mt-8 text-2xl font-semibold tracking-tight">Top Searches</h2>
       <p className="font-light text-neutral-600 dark:text-neutral-400">Millions of people search for unit conversions every day:</p>
       <ul className="font-light text-neutral-600 dark:text-neutral-400">
         <li><strong>Weight conversions</strong>: Convert kg to lbs, pounds to kilograms, grams to ounces</li>

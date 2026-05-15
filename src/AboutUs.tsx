@@ -1,6 +1,7 @@
 import { ArrowLeft, CheckCircle2, Shield, Users, Zap } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { Footer } from './components/Footer';
 
 export default function AboutUs() {
   const { lang } = useParams();
@@ -112,6 +113,9 @@ export default function AboutUs() {
             </Link>
           </footer>
         </div>
+      </div>
+      <div className="max-w-4xl mx-auto">
+        <Footer />
       </div>
     </div>
   );

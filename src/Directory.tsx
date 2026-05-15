@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { categories, getSEOUrlPath } from './lib/units';
 import { Helmet } from 'react-helmet-async';
+import { Footer } from './components/Footer';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
 
 export default function Directory() {
@@ -167,6 +168,7 @@ export default function Directory() {
           </Link>
         ))}
       </div>
+      <Footer />
     </div>
   );
 }

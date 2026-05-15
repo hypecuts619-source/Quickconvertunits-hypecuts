@@ -11,8 +11,8 @@ export function PopularConversions({ onSelect }: { onSelect: (cat: string, from:
   return (
     <div className="mb-12 mt-16 pt-10 border-t border-neutral-200 dark:border-neutral-800">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-white">{t("popular", "Popular Conversions")}</h2>
-        <p className="text-neutral-500 mt-2 font-light">{t("popularSubtitle", "Quickly access our most frequently used tools.")}</p>
+        <h2 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-white">{t("topSearches", "Top Searches")}</h2>
+        <p className="text-neutral-500 mt-2 font-light">{t("topSearchesSubtitle", "Quickly access the most popular conversion tools.")}</p>
       </div>
       
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">

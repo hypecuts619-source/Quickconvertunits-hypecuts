@@ -1,6 +1,7 @@
 import { ArrowLeft } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { Footer } from './components/Footer';
 
 export default function PrivacyPolicy() {
   const { lang } = useParams();
@@ -112,6 +113,9 @@ export default function PrivacyPolicy() {
             </p>
           </section>
         </div>
+      </div>
+      <div className="max-w-3xl mx-auto">
+        <Footer />
       </div>
     </div>
   );

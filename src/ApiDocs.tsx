@@ -2,6 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Code, Link as LinkIcon, Database, Zap } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
+import { Footer } from './components/Footer';
 
 export default function ApiDocs() {
   const { lang } = useParams();
@@ -126,6 +127,9 @@ export default function ApiDocs() {
             </p>
           </div>
         </div>
+      </div>
+      <div className="max-w-4xl mx-auto">
+        <Footer />
       </div>
     </div>
   );
