@@ -221,9 +221,20 @@ function parseInput(val: string): number {
 
 export default function App() {
   const { t, i18n } = useTranslation();
-  const { conversion } = useParams();
+  const { conversion: paramConversion, lang } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Unified conversion path resolver to handle cases where :lang matches a single-segment conversion path
+  const conversion = useMemo(() => {
+    if (paramConversion) return paramConversion;
+    if (!lang) return undefined;
+    
+    const isActuallyConversion = lang.includes("-to-") || lang.endsWith("-converter") || lang === "bmi-calculator";
+    if (isActuallyConversion) return lang;
+    
+    return undefined;
+  }, [paramConversion, lang]);
 
   const isEmbed = new URLSearchParams(location.search).get("embed") === "true";
   const isHomepage = (location.pathname === "/" || location.pathname === "/en" || location.pathname === "/en/") && !location.search.includes("val=");
