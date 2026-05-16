@@ -1,8 +1,14 @@
 import { Link } from "react-router-dom";
 import { convert, getSEOUrlPath } from "../lib/units";
 import { formatNumber } from "../lib/units";
+import { AeoSpecificContent, aeoSupportedPairs } from "./AeoSpecificContent";
 
 export const SpecificConversionSEO = ({ fromUnit, toUnit, category }: { fromUnit: any; toUnit: any; category: string }) => {
+  const pairStr = `${fromUnit.id}-to-${toUnit.id}`;
+  if (aeoSupportedPairs.includes(pairStr)) {
+    return <AeoSpecificContent fromUnitId={fromUnit.id} toUnitId={toUnit.id} />;
+  }
+
   let nums = [1, 2, 3, 4, 5, 10, 25, 50, 100, 200, 250, 500, 1000];
   if (category === 'currency') nums = [1, 5, 10, 20, 50, 100, 250, 500, 1000, 5000, 10000];
 
