@@ -908,11 +908,8 @@ export default {
             },
             "potentialAction": {
               "@type": "SolveMathAction",
-              "target": {
-                "@type": "EntryPoint",
-                "urlTemplate": `https://quickconvertunits.com/convert-${valText}-${canonicalPathBase}`,
-                "description": `Solve conversion from ${fromUnit.name} to ${toUnit.name}`
-              },
+              "target": `https://quickconvertunits.com/convert-${valText}-${canonicalPathBase}?val={math_expression}`,
+              "mathExpression-input": "required name=math_expression",
               "eduQuestionType": "Arithmetic"
             }
           }] : [{
@@ -930,11 +927,8 @@ export default {
             },
             "potentialAction": {
               "@type": "SolveMathAction",
-              "target": {
-                "@type": "EntryPoint",
-                "urlTemplate": `https://quickconvertunits.com/${urlPath}?val={value}`,
-                "description": `Solve conversion from ${fromUnit.name} to ${toUnit.name}`
-              },
+              "target": `https://quickconvertunits.com/${urlPath}?val={math_expression}`,
+              "mathExpression-input": "required name=math_expression",
               "eduQuestionType": "Arithmetic"
             }
           }])

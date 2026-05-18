@@ -1053,12 +1053,9 @@ export default function App() {
         },
         "potentialAction": {
           "@type": "SolveMathAction",
-          "eduQuestionType": "Arithmetic",
-          "target": {
-            "@type": "EntryPoint",
-            "urlTemplate": `${canonicalUrlStr}?val={value}`,
-            "description": `Solve conversion from ${activeFromUnit.name} to ${activeToUnit.name}`
-          }
+          "target": `${canonicalUrlStr}?val={math_expression}`,
+          "mathExpression-input": "required name=math_expression",
+          "eduQuestionType": "Arithmetic"
         }
       });
     }
