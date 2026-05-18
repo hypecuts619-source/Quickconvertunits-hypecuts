@@ -82,17 +82,17 @@ export function Footer() {
           &copy; {new Date().getFullYear()} QuickConvert. {t("footerText", "Built for fast, accurate conversions.")}
         </p>
         <div className="flex gap-4 mt-1 mb-2">
-          <a href="https://in.pinterest.com/hypecuts619/quickconvertunits/" itemProp="sameAs" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-[#E60023] transition-colors" aria-label="Pinterest page">
+          <a href="https://in.pinterest.com/hypecuts619/quickconvertunits/" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-[#E60023] transition-colors" aria-label="Pinterest page">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M12 2C6.477 2 2 6.477 2 12c0 4.237 2.636 7.855 6.356 9.312-.088-.791-.167-2.005.035-2.868.181-.78 1.172-4.97 1.172-4.97s-.299-.6-.299-1.486c0-1.39.806-2.428 1.81-2.428.852 0 1.264.64 1.264 1.408 0 .858-.546 2.14-.828 3.33-.236.995.5 1.807 1.48 1.807 1.778 0 3.144-1.874 3.144-4.58 0-2.39-1.72-4.058-4.169-4.058-2.824 0-4.485 2.12-4.485 4.31 0 .856.329 1.77.739 2.271.081.099.092.185.068.286-.074.32-.245 1.002-.277 1.136-.043.18-.146.223-.336.134-1.25-.583-2.03-2.413-2.03-3.874 0-3.154 2.292-6.052 6.608-6.052 3.469 0 6.165 2.473 6.165 5.776 0 3.447-2.173 6.22-5.19 6.22-1.013 0-1.965-.525-2.291-1.148l-.623 2.378c-.226.861-.838 1.938-1.25 2.597A9.953 9.953 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2" />
             </svg>
           </a>
-          <a href="https://x.com/StephenSeb12450" itemProp="sameAs" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-[#000000] dark:hover:text-[#FFFFFF] transition-colors" aria-label="X (Twitter) profile">
+          <a href="https://x.com/StephenSeb12450" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-[#000000] dark:hover:text-[#FFFFFF] transition-colors" aria-label="X (Twitter) profile">
             <svg viewBox="0 0 24 24" aria-hidden="true" className="w-5 h-5" fill="currentColor">
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
             </svg>
           </a>
-          <a href="https://www.youtube.com/@Quickconvertunits" itemProp="sameAs" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-[#FF0000] transition-colors" aria-label="YouTube channel">
+          <a href="https://www.youtube.com/@Quickconvertunits" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-[#FF0000] transition-colors" aria-label="YouTube channel">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M19.812 5.418c.861.23 1.538.907 1.768 1.768C21.998 8.746 22 12 22 12s0 3.255-.418 4.814a2.504 2.504 0 0 1-1.768 1.768c-1.56.419-7.814.419-7.814.419s-6.255 0-7.814-.419a2.505 2.505 0 0 1-1.768-1.768C2 15.255 2 12 2 12s0-3.255.417-4.814a2.507 2.507 0 0 1 1.768-1.768C5.744 5 11.998 5 11.998 5s6.255 0 7.814.418ZM15.194 12 10 15V9l5.194 3Z" clipRule="evenodd"/></svg>
           </a>
         </div>

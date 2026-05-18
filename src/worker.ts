@@ -898,11 +898,7 @@ export default {
             "@id": `https://quickconvertunits.com/${urlPath}#mathsolver`,
             "name": `Conversion from ${valText} ${fromUnit.symbol} to ${toUnit.symbol}`,
             "url": `https://quickconvertunits.com/convert-${valText}-${canonicalPathBase}`,
-            "usageInfo": {
-              "@type": "CreativeWork",
-              "name": "QuickConvert Terms and Usage Information",
-              "url": `https://quickconvertunits.com/convert-${valText}-${canonicalPathBase}`
-            },
+            "usageInfo": `https://quickconvertunits.com/terms`,
             "inLanguage": "en",
             "learningResourceType": "Formula",
             "educationalAlignment": {
@@ -912,20 +908,19 @@ export default {
             },
             "potentialAction": {
               "@type": "SolveMathAction",
-              "target": `https://quickconvertunits.com/convert-${valText}-${canonicalPathBase}`,
-              "eduQuestionType": "Arithmetic",
-              "mathExpression": `${valText} ${fromUnit.name} = x ${toUnit.name}`
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": `https://quickconvertunits.com/convert-${valText}-${canonicalPathBase}`,
+                "description": `Solve conversion from ${fromUnit.name} to ${toUnit.name}`
+              },
+              "eduQuestionType": "Arithmetic"
             }
           }] : [{
             "@type": "MathSolver",
             "@id": `https://quickconvertunits.com/${urlPath}#mathsolver`,
             "name": `${fromUnit.name} to ${toUnit.name} Formula`,
             "url": `https://quickconvertunits.com/${urlPath}`,
-            "usageInfo": {
-              "@type": "CreativeWork",
-              "name": "QuickConvert Terms and Usage Information",
-              "url": `https://quickconvertunits.com/${urlPath}`
-            },
+            "usageInfo": "https://quickconvertunits.com/terms",
             "inLanguage": "en",
             "learningResourceType": "Formula",
             "educationalAlignment": {
@@ -935,9 +930,12 @@ export default {
             },
             "potentialAction": {
               "@type": "SolveMathAction",
-              "target": `https://quickconvertunits.com/${urlPath}?val={value}`,
-              "eduQuestionType": "Arithmetic",
-              "mathExpression": `1 ${fromUnit.name} = x ${toUnit.name}`
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": `https://quickconvertunits.com/${urlPath}?val={value}`,
+                "description": `Solve conversion from ${fromUnit.name} to ${toUnit.name}`
+              },
+              "eduQuestionType": "Arithmetic"
             }
           }])
         ].filter(Boolean)

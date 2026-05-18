@@ -1041,15 +1041,12 @@ export default function App() {
         "@id": `${canonicalUrlStr}#mathsolver`,
         "name": `${activeFromUnit.name} to ${activeToUnit.name} Calculation`,
         "url": canonicalUrlStr,
-        "usageInfo": {
-          "@type": "CreativeWork",
-          "name": "QuickConvert Terms and Usage Information",
-          "url": canonicalUrlStr
-        },
+        "usageInfo": "https://quickconvertunits.com/terms",
         "inLanguage": "en",
         "learningResourceType": "Formula",
         "educationalAlignment": {
           "@type": "AlignmentObject",
+          "alignmentType": "educationalSubject",
           "educationalFramework": "Educational",
           "targetName": "Unit Conversion",
           "targetUrl": canonicalUrlStr
@@ -1102,6 +1099,15 @@ export default function App() {
           { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quickconvertunits.com/" },
           { "@type": "ListItem", "position": 2, "name": activeCategory.name, "item": `https://quickconvertunits.com/${activeCategory.id.replace(/_/g, '-')}-converter` },
           { "@type": "ListItem", "position": 3, "name": `${activeFromUnit.name} to ${activeToUnit.name}`, "item": canonicalUrlStr }
+        ]
+      });
+    } else if (!isSpecificConverter && activeCategory && !isHomepage) {
+      schema.push({
+        "@type": "BreadcrumbList",
+        "@id": `${canonicalUrlStr}#breadcrumb`,
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quickconvertunits.com/" },
+          { "@type": "ListItem", "position": 2, "name": activeCategory.name, "item": canonicalUrlStr }
         ]
       });
     }
