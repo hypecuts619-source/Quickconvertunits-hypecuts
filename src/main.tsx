@@ -23,6 +23,12 @@ if ('serviceWorker' in navigator) {
   registerSW({ immediate: true });
 }
 
+// Remove the server-injected schema so it doesn't conflict with React Helmet's injected one
+const serverSchema = document.getElementById('server-schema');
+if (serverSchema) {
+  serverSchema.remove();
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <HelmetProvider>

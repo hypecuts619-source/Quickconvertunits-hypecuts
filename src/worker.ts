@@ -1203,7 +1203,7 @@ export default {
 
       // Schema Injection
       if (schema) {
-        template = template.replace(/<\/head>/i, `<script type="application/ld+json" data-rh="true">${JSON.stringify(schema)}</script></head>`);
+        template = template.replace(/<\/head>/i, `<script type="application/ld+json" id="server-schema">${JSON.stringify(schema)}</script></head>`);
       }
 
       const newHeaders = new Headers(response.headers);
