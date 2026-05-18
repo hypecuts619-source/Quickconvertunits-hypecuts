@@ -1162,14 +1162,25 @@ export default {
 
     // 4. Final Metadata Replacement Block
     try {
-      const canonicalPath = getSEOUrlPath(getCanonicalUnitId(urlPath.split('-to-')[0] || ""), getCanonicalUnitId(urlPath.split('-to-')[1] || ""));
-      const isConversion = urlPath.includes("-to-");
-      const finalUrlPath = isConversion ? (conversionMatch?.[1] ? `convert-${conversionMatch[1]}-${canonicalPath}` : canonicalPath) : urlPath;
-      const finalCanonicalUrl = `https://quickconvertunits.com/${lang === 'en' ? '' : lang + '/'}${finalUrlPath}`;
+      let finalUrlPath = urlPath;
+      if (conversionMatch && !urlPath.includes("blog") && !urlPath.includes("api-docs")) {
+        const canonicalFrom = getCanonicalUnitId(conversionMatch[2]);
+        const canonicalTo = getCanonicalUnitId(conversionMatch[3]);
+        const canonicalPath = getSEOUrlPath(canonicalFrom, canonicalTo);
+        finalUrlPath = conversionMatch[1] ? `convert-${conversionMatch[1]}-${canonicalPath}` : canonicalPath;
+      }
+      
+      const isBlog = urlPath.includes("blog/");
+      const isBlogPost = urlPath.match(/blog\/.+/);
+      
+      // If it's a blog post on a translated subfolder, canonical should point to standard English to avoid Duplicate Content flags since posts are english only right now.
+      const canonicalLangPrefix = (isBlogPost && lang !== 'en') ? '' : (lang === 'en' ? '' : lang + '/');
+      const finalCanonicalUrl = `https://quickconvertunits.com/${canonicalLangPrefix}${finalUrlPath}`;
 
       // Handle Hreflangs
       const hreflangs = ['en', 'es', 'fr', 'de', 'hi', 'zh', 'ja', 'ru', 'pt', 'it', 'ar']
         .map(l => `<link rel="alternate" hreflang="${l}" href="https://quickconvertunits.com/${l === 'en' ? '' : l + '/'}${finalUrlPath}" />`)
+        .concat([`<link rel="alternate" hreflang="x-default" href="https://quickconvertunits.com/${finalUrlPath}" />`])
         .join('\n    ');
 
       template = template.replace(/<html lang="en">/i, `<html lang="${lang}">`);

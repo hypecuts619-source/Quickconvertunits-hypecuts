@@ -1146,6 +1146,8 @@ export default function App() {
         <title>{titleStr}</title>
         <meta name="description" content={metaDescStr} />
         <link rel="canonical" href={canonicalUrlStr} />
+        {/* x-default alternate link for language fallback */}
+        <link rel="alternate" hrefLang="x-default" href={canonicalUrlStr.replace(/\.com\/(es|fr|de|hi|zh|ja|ru|pt|it|ar)\//, '.com/')} />
         {supportedLangs.map(l => {
           let alternateUrl = "";
           const prefix = getLangPrefix(l);

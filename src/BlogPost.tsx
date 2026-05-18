@@ -44,7 +44,7 @@ export default function BlogPost() {
 
   const currentLang = lang || 'en';
   const getLangPrefix = (l: string) => l === 'en' ? '' : `/${l}`;
-  const canonicalUrl = `https://quickconvertunits.com${getLangPrefix(currentLang)}/blog/${post.slug}`;
+  const canonicalUrl = `https://quickconvertunits.com/blog/${post.slug}`;
   const supportedLangs = ['en', 'es', 'fr', 'de', 'hi', 'zh', 'ar', 'pt', 'ru', 'ja', 'it'];
 
   return (
@@ -53,6 +53,7 @@ export default function BlogPost() {
         <title>{post.title} | QuickConvert Blog</title>
         <meta name="description" content={post.excerpt} />
         <link rel="canonical" href={canonicalUrl} />
+        <link rel="alternate" hrefLang="x-default" href={canonicalUrl} />
         {supportedLangs.map(l => (
           <link 
             key={l}
