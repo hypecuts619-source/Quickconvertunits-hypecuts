@@ -1668,7 +1668,7 @@ export const blogPosts: BlogPost[] = [
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "What is the difference between Terabyte and Tebibyte?",
+          "name": "Why is Terabyte and Tebibyte not the exact same?",
           "acceptedAnswer": { "@type": "Answer", "text": "A Terabyte (TB) is a decimal measurement (1,000,000,000,000 bytes) used by hardware manufacturers. A Tebibyte (TiB) is a binary measurement (1,099,511,627,776 bytes) used by computer operating systems." }
         }
       ]

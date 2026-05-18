@@ -900,6 +900,7 @@ export default {
             "url": `https://quickconvertunits.com/convert-${valText}-${canonicalPathBase}`,
             "usageInfo": `https://quickconvertunits.com/terms`,
             "inLanguage": "en",
+            "eduQuestionType": "Arithmetic",
             "learningResourceType": "Formula",
             "educationalAlignment": {
               "@type": "AlignmentObject",
@@ -908,9 +909,11 @@ export default {
             },
             "potentialAction": {
               "@type": "SolveMathAction",
-              "target": `https://quickconvertunits.com/convert-${valText}-${canonicalPathBase}?val={math_expression}`,
-              "mathExpression-input": "required name=math_expression",
-              "eduQuestionType": "Arithmetic"
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": `https://quickconvertunits.com/convert-${valText}-${canonicalPathBase}?val={math_expression}`
+              },
+              "mathExpression-input": "required name=math_expression"
             }
           }] : [{
             "@type": "MathSolver",
@@ -919,6 +922,7 @@ export default {
             "url": `https://quickconvertunits.com/${urlPath}`,
             "usageInfo": "https://quickconvertunits.com/terms",
             "inLanguage": "en",
+            "eduQuestionType": "Arithmetic",
             "learningResourceType": "Formula",
             "educationalAlignment": {
               "@type": "AlignmentObject",
@@ -927,9 +931,11 @@ export default {
             },
             "potentialAction": {
               "@type": "SolveMathAction",
-              "target": `https://quickconvertunits.com/${urlPath}?val={math_expression}`,
-              "mathExpression-input": "required name=math_expression",
-              "eduQuestionType": "Arithmetic"
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": `https://quickconvertunits.com/${urlPath}?val={math_expression}`
+              },
+              "mathExpression-input": "required name=math_expression"
             }
           }])
         ].filter(Boolean)
@@ -1197,7 +1203,7 @@ export default {
 
       // Schema Injection
       if (schema) {
-        template = template.replace(/<\/head>/i, `<script type="application/ld+json">${JSON.stringify(schema)}</script></head>`);
+        template = template.replace(/<\/head>/i, `<script type="application/ld+json" data-rh="true">${JSON.stringify(schema)}</script></head>`);
       }
 
       const newHeaders = new Headers(response.headers);

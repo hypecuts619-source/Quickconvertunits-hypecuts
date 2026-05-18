@@ -1043,6 +1043,7 @@ export default function App() {
         "url": canonicalUrlStr,
         "usageInfo": "https://quickconvertunits.com/terms",
         "inLanguage": "en",
+        "eduQuestionType": "Arithmetic",
         "learningResourceType": "Formula",
         "educationalAlignment": {
           "@type": "AlignmentObject",
@@ -1053,9 +1054,11 @@ export default function App() {
         },
         "potentialAction": {
           "@type": "SolveMathAction",
-          "target": `${canonicalUrlStr}?val={math_expression}`,
-          "mathExpression-input": "required name=math_expression",
-          "eduQuestionType": "Arithmetic"
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": `${canonicalUrlStr}?val={math_expression}`
+          },
+          "mathExpression-input": "required name=math_expression"
         }
       });
     }
