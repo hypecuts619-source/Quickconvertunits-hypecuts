@@ -263,6 +263,11 @@ export default {
     const url = new URL(request.url);
     const pathname = url.pathname.replace(/^\//, "");
 
+    // Allow static files to pass through untouched (essential for ads.txt)
+    if (pathname === "ads.txt") {
+      return env.ASSETS.fetch(request);
+    }
+
     if (pathname === "sitemap-dynamic.xml") {
       const languages = ["", "es/", "fr/", "de/", "hi/", "zh/", "ja/", "ru/", "pt/", "it/", "ar/"];
       const urls: string[] = [];

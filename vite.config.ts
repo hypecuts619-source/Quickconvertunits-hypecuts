@@ -37,6 +37,7 @@ export default defineConfig(({mode}) => {
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+          navigateFallbackDenylist: [/^\/ads\.txt$/],
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/api\.frankfurter\.app\/.*/i,
