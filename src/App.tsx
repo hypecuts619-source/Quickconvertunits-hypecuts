@@ -1036,6 +1036,7 @@ export default function App() {
       ];
 
       // Add MathSolver for AI Search / Knowledge base
+      const mathSolverTargetUrl = `https://quickconvertunits.com${getLangPrefix(currentLang)}/${getSEOUrlPath(unitFrom, unitTo)}`;
       schema.push({
         "@type": "MathSolver",
         "@id": `${canonicalUrlStr}#mathsolver`,
@@ -1043,10 +1044,10 @@ export default function App() {
         "url": canonicalUrlStr,
         "potentialAction": {
           "@type": "SolveMathAction",
-          "target": `${canonicalUrlStr}?val={math_expression}`,
-          "mathExpression-input": "required name=math_expression",
-          "eduQuestionType": "Arithmetic"
-        }
+          "target": `${mathSolverTargetUrl}?val={math_expression}`,
+          "mathExpression-input": "required name=math_expression"
+        },
+        "eduQuestionType": "Arithmetic"
       });
     }
 

@@ -905,10 +905,10 @@ export default {
             "url": `https://quickconvertunits.com/convert-${valText}-${canonicalPathBase}`,
             "potentialAction": {
               "@type": "SolveMathAction",
-              "target": `https://quickconvertunits.com/convert-${valText}-${canonicalPathBase}?val={math_expression}`,
-              "mathExpression-input": "required name=math_expression",
-              "eduQuestionType": "Arithmetic"
-            }
+              "target": `https://quickconvertunits.com/${canonicalPathBase}?val={math_expression}`,
+              "mathExpression-input": "required name=math_expression"
+            },
+            "eduQuestionType": "Arithmetic"
           }] : [{
             "@type": "MathSolver",
             "@id": `https://quickconvertunits.com/${urlPath}#mathsolver`,
@@ -917,9 +917,9 @@ export default {
             "potentialAction": {
               "@type": "SolveMathAction",
               "target": `https://quickconvertunits.com/${urlPath}?val={math_expression}`,
-              "mathExpression-input": "required name=math_expression",
-              "eduQuestionType": "Arithmetic"
-            }
+              "mathExpression-input": "required name=math_expression"
+            },
+            "eduQuestionType": "Arithmetic"
           }])
         ].filter(Boolean)
       };
