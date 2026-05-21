@@ -1038,11 +1038,14 @@ export default function App() {
       // Add MathSolver for AI Search / Knowledge base
       const mathSolverTargetUrl = `https://quickconvertunits.com${getLangPrefix(currentLang)}/${getSEOUrlPath(unitFrom, unitTo)}`;
       schema.push({
-        "@type": "MathSolver",
-        "@id": `${canonicalUrlStr}#mathsolver`,
-        "name": `${activeFromUnit.name} to ${activeToUnit.name} Calculation`,
-        "url": canonicalUrlStr,
-        "potentialAction": {
+              "@type": ["MathSolver", "LearningResource"],
+              "@id": `${canonicalUrlStr}#mathsolver`,
+              "name": `${activeFromUnit.name} to ${activeToUnit.name} Calculation`,
+              "url": canonicalUrlStr,
+              "learningResourceType": "Formula",
+              "inLanguage": "en",
+              "usageInfo": "https://quickconvertunits.com/terms",
+              "potentialAction": {
           "@type": "SolveMathAction",
           "target": `${mathSolverTargetUrl}?val={math_expression}`,
           "mathExpression-input": "required name=math_expression",

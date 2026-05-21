@@ -899,10 +899,13 @@ export default {
             }))
           } : null),
           ...(val !== 1 && resVal !== "N/A" ? [{
-            "@type": "MathSolver",
+            "@type": ["MathSolver", "LearningResource"],
             "@id": `https://quickconvertunits.com/${urlPath}#mathsolver`,
             "name": `Conversion from ${valText} ${fromUnit.symbol} to ${toUnit.symbol}`,
             "url": `https://quickconvertunits.com/convert-${valText}-${canonicalPathBase}`,
+            "learningResourceType": "Formula",
+            "inLanguage": "en",
+            "usageInfo": "https://quickconvertunits.com/terms",
             "potentialAction": {
               "@type": "SolveMathAction",
               "target": `https://quickconvertunits.com/${canonicalPathBase}?val={math_expression}`,
@@ -910,10 +913,13 @@ export default {
               "eduQuestionType": "Arithmetic"
             }
           }] : [{
-            "@type": "MathSolver",
+            "@type": ["MathSolver", "LearningResource"],
             "@id": `https://quickconvertunits.com/${urlPath}#mathsolver`,
             "name": `${fromUnit.name} to ${toUnit.name} Formula`,
             "url": `https://quickconvertunits.com/${urlPath}`,
+            "learningResourceType": "Formula",
+            "inLanguage": "en",
+            "usageInfo": "https://quickconvertunits.com/terms",
             "potentialAction": {
               "@type": "SolveMathAction",
               "target": `https://quickconvertunits.com/${canonicalPathBase}?val={math_expression}`,
