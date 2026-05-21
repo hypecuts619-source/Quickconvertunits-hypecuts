@@ -1041,24 +1041,11 @@ export default function App() {
         "@id": `${canonicalUrlStr}#mathsolver`,
         "name": `${activeFromUnit.name} to ${activeToUnit.name} Calculation`,
         "url": canonicalUrlStr,
-        "usageInfo": "https://quickconvertunits.com/terms",
-        "inLanguage": "en",
-        "eduQuestionType": "Arithmetic",
-        "learningResourceType": "Formula",
-        "educationalAlignment": {
-          "@type": "AlignmentObject",
-          "alignmentType": "educationalSubject",
-          "educationalFramework": "Educational",
-          "targetName": "Unit Conversion",
-          "targetUrl": canonicalUrlStr
-        },
         "potentialAction": {
           "@type": "SolveMathAction",
-          "target": {
-            "@type": "EntryPoint",
-            "urlTemplate": `${canonicalUrlStr}?val={math_expression}`
-          },
-          "mathExpression-input": "required name=math_expression"
+          "target": `${canonicalUrlStr}?val={math_expression}`,
+          "mathExpression-input": "required name=math_expression",
+          "eduQuestionType": "Arithmetic"
         }
       });
     }

@@ -903,44 +903,22 @@ export default {
             "@id": `https://quickconvertunits.com/${urlPath}#mathsolver`,
             "name": `Conversion from ${valText} ${fromUnit.symbol} to ${toUnit.symbol}`,
             "url": `https://quickconvertunits.com/convert-${valText}-${canonicalPathBase}`,
-            "usageInfo": `https://quickconvertunits.com/terms`,
-            "inLanguage": "en",
-            "eduQuestionType": "Arithmetic",
-            "learningResourceType": "Formula",
-            "educationalAlignment": {
-              "@type": "AlignmentObject",
-              "alignmentType": "educationalSubject",
-              "targetName": "Math"
-            },
             "potentialAction": {
               "@type": "SolveMathAction",
-              "target": {
-                "@type": "EntryPoint",
-                "urlTemplate": `https://quickconvertunits.com/convert-${valText}-${canonicalPathBase}?val={math_expression}`
-              },
-              "mathExpression-input": "required name=math_expression"
+              "target": `https://quickconvertunits.com/convert-${valText}-${canonicalPathBase}?val={math_expression}`,
+              "mathExpression-input": "required name=math_expression",
+              "eduQuestionType": "Arithmetic"
             }
           }] : [{
             "@type": "MathSolver",
             "@id": `https://quickconvertunits.com/${urlPath}#mathsolver`,
             "name": `${fromUnit.name} to ${toUnit.name} Formula`,
             "url": `https://quickconvertunits.com/${urlPath}`,
-            "usageInfo": "https://quickconvertunits.com/terms",
-            "inLanguage": "en",
-            "eduQuestionType": "Arithmetic",
-            "learningResourceType": "Formula",
-            "educationalAlignment": {
-              "@type": "AlignmentObject",
-              "alignmentType": "educationalSubject",
-              "targetName": "Math"
-            },
             "potentialAction": {
               "@type": "SolveMathAction",
-              "target": {
-                "@type": "EntryPoint",
-                "urlTemplate": `https://quickconvertunits.com/${urlPath}?val={math_expression}`
-              },
-              "mathExpression-input": "required name=math_expression"
+              "target": `https://quickconvertunits.com/${urlPath}?val={math_expression}`,
+              "mathExpression-input": "required name=math_expression",
+              "eduQuestionType": "Arithmetic"
             }
           }])
         ].filter(Boolean)
