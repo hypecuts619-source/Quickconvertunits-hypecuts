@@ -39,6 +39,7 @@ import { UnitSelector } from "./components/UnitSelector";
 import { Breadcrumbs } from "./components/Breadcrumbs";
 import { DynamicContext } from "./components/DynamicContext";
 import { EmbedWidget } from "./components/EmbedWidget";
+import { TopConvertersSidebar } from "./components/TopConvertersSidebar";
 import { RelatableComparison } from "./components/RelatableComparison";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "motion/react";
@@ -330,7 +331,11 @@ export default function App() {
       const parsed = getParsedParamsFromPath(conversion);
       const parts = parsed.from && parsed.to ? [parsed.from, parsed.to] : getUnitIdsFromPath(conversion);
       if (parts.length === 2) {
-        return parts[0].toLowerCase();
+        for (const cat of categories) {
+          if (cat.units.some(u => u.id === parts[0].toLowerCase()) && cat.units.some(u => u.id === parts[1].toLowerCase())) {
+            return parts[0].toLowerCase();
+          }
+        }
       }
     }
     const params = new URLSearchParams(window.location.search);
@@ -348,7 +353,11 @@ export default function App() {
       const parsed = getParsedParamsFromPath(conversion);
       const parts = parsed.from && parsed.to ? [parsed.from, parsed.to] : getUnitIdsFromPath(conversion);
       if (parts.length === 2) {
-        return parts[1].toLowerCase();
+        for (const cat of categories) {
+          if (cat.units.some(u => u.id === parts[0].toLowerCase()) && cat.units.some(u => u.id === parts[1].toLowerCase())) {
+            return parts[1].toLowerCase();
+          }
+        }
       }
     }
     const params = new URLSearchParams(window.location.search);
@@ -1045,12 +1054,12 @@ export default function App() {
               "learningResourceType": "Formula",
               "inLanguage": "en",
               "usageInfo": "https://quickconvertunits.com/terms",
-              "potentialAction": {
+              "potentialAction": [{
           "@type": "SolveMathAction",
-          "target": `${mathSolverTargetUrl}?val={math_expression}`,
-          "mathExpression-input": "required name=math_expression",
+          "target": `${mathSolverTargetUrl}?val={math_expression_string}`,
+          "mathExpression-input": "required name=math_expression_string",
           "eduQuestionType": "Arithmetic"
-        }
+        }]
       });
     }
 
@@ -2562,6 +2571,9 @@ export default function App() {
         </div>
 
         {/* Right Column (Sidebar Ads Desktop) */}
+        {!isEmbed && isHomepage && (
+          <TopConvertersSidebar />
+        )}
       </div>
       
       {/* {!isEmbed && <CookieConsent />} */}

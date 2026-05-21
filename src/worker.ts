@@ -1,4 +1,4 @@
-import { getCanonicalUnitId, getSEOUrlPath } from '../src/lib/units';
+import { getCanonicalUnitId, getSEOUrlPath, categories, getUnitIdsFromPath, getParsedParamsFromPath } from '../src/lib/units';
 import { blogPosts } from './lib/blogPosts';
 import { customSeoData } from './lib/customSeoData';
 
@@ -414,6 +414,24 @@ export default {
     // 2. Canonical Check & Permanent Redirect (SEO Fix for "Page with redirect")
     const conversionMatch = urlPath.match(/^(?:convert-([\d.]+)-)?(.+?)-(?:to|a|en|zu)-(.+)$/i);
     if (conversionMatch && !urlPath.includes("blog")) {
+      const fromIdStr = conversionMatch[2];
+      const toIdStr = conversionMatch[3];
+      const parsedPath = getParsedParamsFromPath(urlPath);
+      
+      let isValidFrom = false;
+      let isValidTo = false;
+      const checkFrom = parsedPath.from || fromIdStr;
+      const checkTo = parsedPath.to || toIdStr;
+
+      for (const cat of categories) {
+        if (cat.units.some(u => u.id === checkFrom.toLowerCase())) isValidFrom = true;
+        if (cat.units.some(u => u.id === checkTo.toLowerCase())) isValidTo = true;
+      }
+      
+      if (!isValidFrom || !isValidTo) {
+        return new Response("Not Found", { status: 404 });
+      }
+
       const val = conversionMatch[1] ? parseFloat(conversionMatch[1]) : 1;
       const fromId = conversionMatch[2];
       const toId = conversionMatch[3];
@@ -906,12 +924,12 @@ export default {
             "learningResourceType": "Formula",
             "inLanguage": "en",
             "usageInfo": "https://quickconvertunits.com/terms",
-            "potentialAction": {
+            "potentialAction": [{
               "@type": "SolveMathAction",
-              "target": `https://quickconvertunits.com/${canonicalPathBase}?val={math_expression}`,
-              "mathExpression-input": "required name=math_expression",
+              "target": `https://quickconvertunits.com/${canonicalPathBase}?val={math_expression_string}`,
+              "mathExpression-input": "required name=math_expression_string",
               "eduQuestionType": "Arithmetic"
-            }
+            }]
           }] : [{
             "@type": ["MathSolver", "LearningResource"],
             "@id": `https://quickconvertunits.com/${urlPath}#mathsolver`,
@@ -920,12 +938,12 @@ export default {
             "learningResourceType": "Formula",
             "inLanguage": "en",
             "usageInfo": "https://quickconvertunits.com/terms",
-            "potentialAction": {
+            "potentialAction": [{
               "@type": "SolveMathAction",
-              "target": `https://quickconvertunits.com/${canonicalPathBase}?val={math_expression}`,
-              "mathExpression-input": "required name=math_expression",
+              "target": `https://quickconvertunits.com/${canonicalPathBase}?val={math_expression_string}`,
+              "mathExpression-input": "required name=math_expression_string",
               "eduQuestionType": "Arithmetic"
-            }
+            }]
           }])
         ].filter(Boolean)
       };
