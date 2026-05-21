@@ -1045,9 +1045,9 @@ export default function App() {
         "potentialAction": {
           "@type": "SolveMathAction",
           "target": `${mathSolverTargetUrl}?val={math_expression}`,
-          "mathExpression-input": "required name=math_expression"
-        },
-        "eduQuestionType": "Arithmetic"
+          "mathExpression-input": "required name=math_expression",
+          "eduQuestionType": "Arithmetic"
+        }
       });
     }
 
